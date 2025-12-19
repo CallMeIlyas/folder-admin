@@ -1,0 +1,19 @@
+{
+  "nav": {
+    "home": "Home",
+    "products": "Our Products",
+    "sizeGuide": "Size Guide",
+    "backgroundCatalog": "Background Catalog",
+    "location": "Location",
+    "faq": "FAQ",
+    "language": "Language"
+  },
+  "search": "Search products...",
+  "cart": "Cart",
+  "recentlyAdded": "Recently Added Products",
+  "emptyCart": "Your cart is empty",
+  "languageOptions": {
+    "id": "Indonesian",
+    "en": "English"
+  }
+}

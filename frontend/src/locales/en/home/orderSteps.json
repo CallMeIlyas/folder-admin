@@ -1,0 +1,19 @@
+{
+  "title": "Order Format",
+  "steps": {
+    "faces": "How many faces on the frame?",
+    "frames": "How many frames do you need?",
+    "size": "Pick the frame size",
+    "city": "Fill subdistrict and city for estimated shipping fee",
+    "deadline": "Fill the deadline date and month",
+    "admin": "Send the order format to our admin"
+  },
+  "modal": {
+    "selectDate": "Select date",
+    "placeholder": "Type your answer here...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "back": "Back",
+    "clear": "Clear"
+  }
+}

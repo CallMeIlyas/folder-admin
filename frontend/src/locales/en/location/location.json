@@ -1,0 +1,17 @@
+{
+  "title": "Location",
+  "fromBogor": "Shipped from ",
+  "fromJakarta": "Shipped from ",
+  "bogor": {
+    "desc1": "Our original production process based in Bogor.",
+    "desc2": "Currently offline store not available, only online store.",
+    "desc3": "Our team or customer can order courier to pickup from this address below."
+  },
+  "jakarta": {
+    "desc1": "Our team or customer can order courier to pickup from this address below.",
+    "desc2": "Please note, this address only for small or medium frame size,",
+    "desc3": "Maximum 1 pcs 10R or 1 pcs 12R."
+  },
+  "shippingFrom": "Shipped From",
+  "courierMethods": "Shipping Methods"
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Lokasi",
+  "fromBogor": "Dikirim dari ",
+  "fromJakarta": "Dikirim dari ",
+  "bogor": {
+    "desc1": "Asal proses pembuatan di Bogor.",
+    "desc2": "Untuk saat ini toko fisik belum ada, hanya toko online.",
+    "desc3": "Tim kami atau customer bisa order kurir untuk pickup dari alamat ini."
+  },
+  "jakarta": {
+    "desc1": "Tim kami atau customer bisa order kurir untuk pickup dari alamat ini.",
+    "desc2": "Mohon diingat, alamat ini hanya untuk frame kecil dan medium, tidak bisa kirim size besar dari Jakarta.",
+    "desc3": "Maksimal kirim 1 pcs 10R atau 1 pcs 12R."
+  },
+  "shippingFrom": "Dikirim dari",
+  "courierMethods": "Metode Pengiriman"
+}

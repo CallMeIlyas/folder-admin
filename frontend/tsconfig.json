@@ -1,0 +1,26 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
+
+    // ✅ tambahkan ini
+    "baseUrl": "./src",
+    "paths": {
+      "@data/*": ["data/*"],
+      "/data/data/com.termux/files/home/folder/src/*": ["*"]
+    },
+    "types": ["node"]
+  }
+}

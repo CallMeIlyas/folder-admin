@@ -1,0 +1,27 @@
+{
+  "title": "Format Order",
+  "steps": {
+    "faces": "Berapa jumlah wajah karikatur yang ingin dibuat?",
+    "frames": "Berapa pcs bingkai yang ingin diorder?",
+    "size": "Pilih ukuran bingkai yang ingin diorder",
+    "city": "Kecamatan dan kota tujuan pengiriman",
+    "deadline": "Tanggal dan bulan harus sampai",
+    "admin": "Kirim format order ke admin"
+  },
+  "placeholders": {
+    "general": "Ketik jawabanmu di sini",
+    "size": "Pilih ukuran bingkai"
+  },
+  "locationLabels": {
+    "district": "Kecamatan",
+    "city": "Kota"
+  },
+  "modal": {
+    "selectDate": "Pilih tanggal",
+    "placeholder": "Ketik jawabanmu di sini",
+    "cancel": "Batal",
+    "save": "Simpan",
+    "back": "Kembali",
+    "clear": "Hapus"
+  }
+}

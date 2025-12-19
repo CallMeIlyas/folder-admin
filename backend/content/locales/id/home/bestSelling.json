@@ -1,0 +1,33 @@
+{
+  "title": "Produk Terpopuler",
+  "items": [
+    {
+      "key": "10R",
+      "displayName": "10R / A4 25x30cm",
+      "match": "10R",
+      "target3D": "10R",
+      "imageUrl": "/api/uploads/images/karya/10R.jpg"
+    },
+    {
+      "key": "12R",
+      "displayName": "12R / A3 30x40cm",
+      "match": "12R",
+      "target3D": "12R",
+      "imageUrl": "/api/uploads/images/karya/12R-6.jpg"
+    },
+    {
+      "key": "A2",
+      "displayName": "A2 40x55cm",
+      "match": "A2-40X55CM",
+      "target3D": "A1-55X80CM",
+      "imageUrl": "/api/uploads/images/karya/55x80cm.jpg"
+    },
+    {
+      "key": "A1",
+      "displayName": "A1 55x80cm",
+      "match": "A1-55X80CM",
+      "target3D": "A0-80X110CM",
+      "imageUrl": "/api/uploads/images/karya/80x110cm.jpeg"
+    }
+  ]
+}

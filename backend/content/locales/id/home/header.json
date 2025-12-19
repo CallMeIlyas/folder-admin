@@ -1,0 +1,19 @@
+{
+  "nav": {
+    "home": "Home",
+    "products": "Produk Kami",
+    "sizeGuide": "Panduan Ukuran",
+    "backgroundCatalog": "Katalog Background",
+    "location": "Lokasi",
+    "faq": "Pertanyaan Umum",
+    "language": "Bahasa"
+  },
+  "search": "Cari Produk...",
+  "cart": "Keranjang",
+  "recentlyAdded": "Produk Terbaru Ditambahkan",
+  "emptyCart": "Keranjang kamu kosong",
+  "languageOptions": {
+    "id": "Indonesia",
+    "en": "English"
+  }
+}
