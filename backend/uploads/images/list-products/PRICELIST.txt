@@ -1,0 +1,91 @@
+3D frame
+
+4R 		203.800
+15cm 		215.800
+6R 		245.800
+20cm 		313.800
+8R duskraft	365.800
+8R hardbox 	418.800
+10R 		495.800
+12R 		598.800
+40x55cm 	1.428.800
+55x80cm 	2.288.800
+80x110cm 	3.259.800
+
+12R by AI	573.800
+
+
+
+2D frame
+
+4R simple shading	123.800
+4R background catalog	140.800
+4R bold shading		185.800
+4R ai			100.800
+
+15cm ss 132.800
+15cm bc	150.800
+15cm bs 190.800
+15cm ai 105.800
+
+6R ss 142.800
+6R bc 170.800
+6R bs 211.800
+6R ai 110.800
+
+8R ss 185.800
+8R bc 252.800
+8R bs 225.800
+8R ai 130.800
+
+12R ss 348.800
+12R bc 398.800
+12R bs 365.800
+12R ai 296.800
+
+
+
+Acrylic Stand
+
+Acrylic Stand 2cm size 15x15cm		455.800
+Acrylic Stand 3mm size 15x15cm 1 sisi	324.800
+Acrylic Stand 3mm size A4 2 sisi	455.800
+Acrylic Stand 3mm size A3 2 sisi	595.800
+
+
+Additional
+
+Background Custom				62.800
+Tambahan Wajah Karikatur 1-9 wajah		52.800
+Tambahan Wajah Karikatur diatas 10 wajah	62.800
+Tambahan Wajah Bold Shading			120.800
+Tambahan Wajah by AI				15.000
+Tambahan Wajah dari Foto Asli			10.000
+
+Biaya Tambahan Wajah Banyak 1-9 wajah		150.000
+Biaya Tambahan Wajah Banyak diatas 10 wajah	250.000
+Biaya Tambahan Packing untuk Order....		100.000
+Biaya Tambahan Ganti Frame Kaca ke Acrylic A2	175.800
+Biaya Tambahan Ganti Frame Kaca ke Acrylic A1	319.800
+Biaya Tambahan Ganti Frame Kaca ke Acrylic A0	695.000
+Biaya Ekspress 12R				200.000
+Biaya Ekspress A2				250.000
+Biaya Ekspress A1				450.000
+Biaya Ekspress A0				550.000
+Biaya Ekspress General				60.000, 85.000, 100.000
+Biaya Tambahan Lainnya				60.000
+Pose Custom dengan Gradasi			62.800
+
+
+
+Softcopy Design
+
+Softcopy Design without background		100.800
+Softcopy Design with background catalog		175.800
+Softcopy Design with background custom		225.800
+
+
+
+
+
+
