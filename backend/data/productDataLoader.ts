@@ -144,20 +144,38 @@ export const allProducts: Product[] = Object.entries(groupedImages).map(
     const mappedCategory =
       categoryMapping[rawCategory.toUpperCase()] || rawCategory;
 
-    const decodedImages = images.map(img => decodeURIComponent(img));
+const decodedImages = images.map(img => decodeURIComponent(img));
 
-    const mainImage =
-      decodedImages.find(img => {
-        const f = img.split("/").pop()?.toLowerCase() || "";
-        return f.includes("mainimage") || f.includes("main image");
-      }) || decodedImages[0];
+// 🔴 PRIORITAS MAIN IMAGE
+const mainImage =
+  decodedImages.find(img => {
+    const f = img.split("/").pop()?.toLowerCase() || "";
+    return f === "main image.jpg";
+  }) ||
+  decodedImages.find(img => {
+    const f = img.split("/").pop()?.toLowerCase() || "";
+    return f.includes("main image") || f.includes("mainimage");
+  }) ||
+  decodedImages.find(img => {
+    const f = img.split("/").pop()?.toLowerCase() || "";
+    return f === "1.jpg";
+  }) ||
+  decodedImages[0];
+
+// 🔴 PAKSA MAIN IMAGE DI INDEX 0
+const orderedImages = [
+  mainImage,
+  ...decodedImages.filter(img => img !== mainImage),
+];
 
     const cleanSub = subcategory?.trim() || null;
     const fileName = cleanSub || `Product ${index + 1}`;
 
     return {
-      id: `prod-${rawCategory.toLowerCase()}-${(subcategory || "default").toLowerCase().replace(/[^a-z0-9]/g, "-")}`,
-      imageUrl: mainImage,
+      id: `prod-${rawCategory.toLowerCase()}-${(subcategory || "default")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "-")}`,
+      imageUrl: mainImage,          // ✔ untuk product card
       name: fileName,
       displayName: subcategory
         ? `${mappedCategory} ${subcategory.replace(/-\s*\d+\s*x\s*\d+\s*cm/i, "").trim()}`
@@ -169,9 +187,11 @@ export const allProducts: Product[] = Object.entries(groupedImages).map(
       price: getPrice(mappedCategory, fileName),
       shippedFrom: ["Bogor", "Jakarta"],
       shippedTo: ["Worldwide"],
-      allImages: decodedImages,
-      shadingOptions: mappedCategory === "2D Frame" ? get2DShadingOptions() : undefined,
-      sizeFrameOptions: mappedCategory === "2D Frame" ? get2DSizeFrameOptions() : undefined,
+      allImages: orderedImages,     // ✔ gallery stabil
+      shadingOptions:
+        mappedCategory === "2D Frame" ? get2DShadingOptions() : undefined,
+      sizeFrameOptions:
+        mappedCategory === "2D Frame" ? get2DSizeFrameOptions() : undefined,
     };
   }
 );
