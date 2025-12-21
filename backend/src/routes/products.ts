@@ -5,8 +5,14 @@ import { getAdditionalProducts } from "../controllers/ProductAdditionalControlle
 
 const router = Router();
 
-router.get("/:id", getProductDetail);
-router.post("/calculate-price", calculatePrice);
+// === ADDITIONAL HARUS DI ATAS ===
 router.get("/additional", getAdditionalProducts);
+
+// === PRICE (POST + GET) ===
+router.post("/calculate-price", calculatePrice);
+router.get("/calculate-price", calculatePrice);
+
+// === DETAIL PRODUCT PALING BAWAH ===
+router.get("/:id", getProductDetail);
 
 export default router;

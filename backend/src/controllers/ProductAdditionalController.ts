@@ -2,19 +2,31 @@ import { Request, Response } from "express";
 import { allProducts } from "../../data/productDataLoader";
 import { getPrice } from "../../utils/getPrice";
 
+// Urutan DI SINI menentukan urutan tampil
+const ALLOWED_ADDITIONAL_IDS = [
+  "prod-additional-biaya-tambahan-wajah-karikatur", // Wajah
+  "prod-additional-background-custom",              // Background
+  "prod-additional-biaya-tambahan-packing"          // Packing
+];
+
 export const getAdditionalProducts = (req: Request, res: Response) => {
   const { category } = req.query;
 
-  const items = allProducts
-    .filter(p => p.category === "Additional")
+  if (!category || typeof category !== "string") {
+    return res.status(400).json({ message: "Category is required" });
+  }
+
+  const items = ALLOWED_ADDITIONAL_IDS
+    .map(id => allProducts.find(p => p.id === id))
+    .filter(Boolean)
     .map(p => ({
-      id: p.id,
-      name: p.name,
-      displayName: p.displayName || p.name,
-      category: p.category,
-      imageUrl: p.imageUrl,
-      price: getPrice(p.category, p.name),
-      targetProduct: category || ""
+      id: p!.id,
+      name: p!.name,
+      displayName: p!.displayName || p!.name,
+      category: p!.category,
+      imageUrl: p!.imageUrl,
+      price: getPrice(p!.category, p!.name),
+      targetProduct: category
     }));
 
   res.json(items);

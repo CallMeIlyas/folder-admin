@@ -30,7 +30,10 @@ export const getProductDetail = (req: Request, res: Response) => {
       main: product.imageUrl,
       gallery: product.allImages || [],
     },
-    options: product.options || {},
+
+    // ⛔ JANGAN KIRIM options DARI SINI
+    // Mapper yang tentukan options
+
     uiText: {
       ...uiText,
       details: description,

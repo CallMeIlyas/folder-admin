@@ -1,68 +1,106 @@
 import { priceList } from "../data/priceList";
 
-export function getPrice(category: string, name: string, size?: string): number {
+export function getPrice(
+  category: string,
+  name: string,
+  size?: string
+): number {
   if (!category || !name) return 0;
 
   const normalize = (str: string) =>
-    str.trim().toLowerCase().replace(/\s+/g, " ");
+    str
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
 
   const normalizedCategory = normalize(category);
   const normalizedName = normalize(name);
   const normalizedSize = size ? normalize(size) : "";
 
   const matchedCategory = Object.keys(priceList).find(
-    (key) => normalize(key) === normalizedCategory
+    key => normalize(key) === normalizedCategory
   );
 
   if (!matchedCategory) {
-    console.warn(`Category not found in priceList: ${category}`);
+    console.warn("Category not found:", category);
     return 0;
   }
 
   const categoryData = priceList[matchedCategory as keyof typeof priceList];
-
-  if (!categoryData || typeof categoryData !== 'object') {
-    console.warn(`Invalid category data for: ${matchedCategory}`);
-    return 0;
-  }
-
   let matchedKey: string | undefined;
 
+  // =========================
+  // ADDITIONAL (SMART RESOLVE)
+  // =========================
   if (normalizedCategory === "additional") {
-    if (normalizedName.includes("ekspress")) {
-      matchedKey = Object.keys(categoryData).find(
-        (key) => normalize(key) === normalizedName
-      );
+  matchedKey = Object.keys(categoryData).find(key => {
+    const k = normalize(key);
+
+    // ===== KARIKATUR =====
+    if (normalizedName.includes("karikatur")) {
+      if (normalizedName.includes("1 9")) {
+        return k.includes("karikatur") && k.includes("1 9");
+      }
+      if (normalizedName.includes("diatas") || normalizedName.includes("10")) {
+        return k.includes("karikatur") && k.includes("diatas");
+      }
+      return k.includes("karikatur");
     }
-    else if (normalizedName.includes("wajah")) {
-      const shadingTypes = ["ai", "bold shading", "dari foto asli", "karikatur", "banyak"];
-      const foundType = shadingTypes.find((type) =>
-        normalizedName.includes(type)
-      );
-      matchedKey = Object.keys(categoryData).find(
-        (key) => normalize(key).includes(foundType || "wajah")
-      );
+
+    // ===== WAJAH BANYAK =====
+    if (normalizedName.includes("wajah banyak")) {
+      if (normalizedName.includes("1 9")) {
+        return k.includes("wajah banyak") && k.includes("1 9");
+      }
+      if (normalizedName.includes("diatas") || normalizedName.includes("10")) {
+        return k.includes("wajah banyak") && k.includes("diatas");
+      }
+      return k.includes("wajah banyak");
     }
-    else {
-      matchedKey = Object.keys(categoryData).find(
-        (key) => normalize(key) === normalizedName
-      );
+
+    // ===== BOLD SHADING =====
+    if (normalizedName.includes("bold")) {
+      return k.includes("bold shading");
     }
-  } else {
-    matchedKey = Object.keys(categoryData).find((key) => {
-      const normalizedKey = normalize(key);
+
+    // ===== FOTO ASLI =====
+    if (normalizedName.includes("foto")) {
+      return k.includes("foto");
+    }
+
+    // ===== AI =====
+    if (normalizedName.includes("ai")) {
+      return k.includes("ai");
+    }
+
+    // ===== EXPRESS =====
+    if (normalizedName.includes("ekspress") || normalizedName.includes("express")) {
+      return k.includes("ekspress");
+    }
+
+    return k === normalizedName;
+  });
+}
+
+  // =========================
+  // OTHER PRODUCTS
+  // =========================
+  else {
+    matchedKey = Object.keys(categoryData).find(key => {
+      const k = normalize(key);
       return (
-        normalizedKey.includes(normalizedSize) &&
-        normalizedKey.includes(normalizedName.split(" ")[1] ?? normalizedName)
+        k.includes(normalizedName) &&
+        (!normalizedSize || k.includes(normalizedSize))
       );
     });
   }
 
   if (!matchedKey) {
-    console.warn(`Size not found in priceList[${matchedCategory}]: ${name} (normalized: ${normalizedName})`);
+    console.warn("Price key not found:", name);
     return 0;
   }
 
   const price = categoryData[matchedKey as keyof typeof categoryData];
-  return typeof price === 'number' ? price : 0;
+  return typeof price === "number" ? price : 0;
 }
