@@ -188,15 +188,33 @@ const getAdditionalOptions = (productName: string = "", productCategory: string 
 };
 
 // ===== 2D FRAME SIZE OPTIONS =====
-const get2DFrameSizes = () => {
-  return [
-    { value: "4r", label: "4R", image: "/api/uploads/images/placeholder/frame-4r.jpg" },
-    { value: "15cm", label: "15x15cm", image: "/api/uploads/images/placeholder/frame-15cm.jpg" },
-    { value: "6r", label: "6R", image: "/api/uploads/images/placeholder/frame-6r.jpg" },
-    { value: "8r", label: "8R", image: "/api/uploads/images/placeholder/frame-8r.jpg" },
-    { value: "12r", label: "12R", image: "/api/uploads/images/placeholder/frame-12r.jpg" },
-  ];
-};
+const get2DFrameSizes = () => [
+  {
+    value: "4r",
+    label: "4R",
+    image: "/api/uploads/images/list-products/2D/variation/frame/4R/4R.jpg"
+  },
+  {
+    value: "15cm",
+    label: "15x15cm",
+    image: "/api/uploads/images/list-products/2D/variation/frame/15cm/15cm.jpg"
+  },
+  {
+    value: "6r",
+    label: "6R",
+    image: "/api/uploads/images/list-products/2D/variation/frame/6R/6R.jpg"
+  },
+  {
+    value: "8r",
+    label: "8R",
+    image: "/api/uploads/images/list-products/2D/variation/frame/8R/8R.jpg"
+  },
+  {
+    value: "12r",
+    label: "12R",
+    image: "/api/uploads/images/list-products/2D/variation/frame/12R/12R.jpg"
+  }
+];
 
 // ===== CUSTOM HOOKS =====
 const useDebounce = <T,>(value: T, delay: number): T => {
@@ -289,18 +307,30 @@ const ProductDetail = () => {
             : [],
 
       // Shading Styles - Include Background Catalog (hanya untuk 2D)
-      shadingStyles: product.options?.shadingStyles?.length 
-        ? product.options.shadingStyles 
-        : product.shadingOptions?.length
-          ? product.shadingOptions
-          : is2D
-            ? [
-                { value: "simple", label: "Simple Shading", image: "/api/uploads/images/placeholder/shading-simple.jpg" },
-                { value: "background-catalog", label: "Background Catalog", image: "/api/uploads/images/placeholder/shading-catalog.jpg" },
-                { value: "bold", label: "Bold Shading", image: "/api/uploads/images/placeholder/shading-bold.jpg" },
-                { value: "ai", label: "AI Generated", image: "/api/uploads/images/placeholder/shading-ai.jpg" },
-              ]
-            : [],
+shadingStyles: is2D
+  ? [
+      {
+        value: "simple",
+        label: "Simple Shading",
+        image: apiAsset("images/list-products/2D/variation/shading/2D SIMPLE SHADING/2D SIMPLE SHADING.jpg")
+      },
+      {
+        value: "background-catalog",
+        label: "Background Catalog",
+        image: apiAsset("images/list-products/2D/variation/shading/2D BACKGROUND CATALOG/1.jpg")
+      },
+      {
+        value: "bold",
+        label: "Bold Shading",
+        image: apiAsset("images/list-products/2D/variation/shading/2D BOLD SHADING/2D BOLD SHADING.jpg")
+      },
+      {
+        value: "ai",
+        label: "AI Generated",
+        image: apiAsset("images/list-products/2D/variation/shading/2D BY AI/1.jpg")
+      }
+    ]
+  : product.options?.shadingStyles || [],
 
       // Packaging Options untuk 8R (3D)
       packagingOptions: product.options?.packagingOptions?.length 
@@ -538,23 +568,25 @@ const ProductDetail = () => {
   }, []);
 
   const handleFrameSizeSelect = useCallback((size: string, images?: string[]) => {
-    setSelectedOptions(prev => ({
-      ...prev,
-      frameSize: size
-    }));
+  setSelectedOptions(prev => ({
+    ...prev,
+    frameSize: size
+  }));
 
-    if (images?.length) {
-      const apiImages = images.map(img => apiAsset(img));
-      setVariationImages(apiImages);
-      setSelectedPreviewImage(apiImages[0]);
-      setShowPreview(false);
-      setTimeout(() => setShowPreview(true), 50);
-    } else {
-      setVariationImages([]);
-      setSelectedPreviewImage(null);
-      setShowPreview(false);
-    }
-  }, []);
+  if (images && images.length > 0) {
+    const apiImages = images.map(img => apiAsset(img));
+
+    setVariationImages(apiImages);
+    setSelectedPreviewImage(apiImages[0]); // WAJIB
+    setShowPreview(true);
+    setIsZoomOpen(false); // reset modal
+  } else {
+    setVariationImages([]);
+    setSelectedPreviewImage(null);
+    setShowPreview(false);
+    setIsZoomOpen(false);
+  }
+}, []);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -891,14 +923,14 @@ const ProductDetail = () => {
                   : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
               }`}
             >
-              <img
-                src={apiAsset(opt.image || opt.preview || "/api/uploads/images/placeholder/shading-default.jpg")}
-                alt={opt.label}
-                className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl"
-                onError={(e) => {
-                  e.currentTarget.src = "/api/uploads/images/placeholder/shading-default.jpg";
-                }}
-              />
+<img
+  src={opt.image || opt.preview || "/api/uploads/images/placeholder/shading-default.jpg"}
+  alt={opt.label}
+  className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl"
+  onError={(e) => {
+    e.currentTarget.src = "/api/uploads/images/placeholder/shading-default.jpg";
+  }}
+/>
               <span className="text-[13px] md:text-base font-medium text-gray-800 text-center">
                 {opt.label}
               </span>

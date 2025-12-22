@@ -5,5 +5,11 @@ export const apiFetch = (path: string, options?: RequestInit) => {
 };
 
 export const apiAsset = (path: string) => {
-  return `${API_BASE_URL}${path}`;
+  if (!path) return "";
+
+  const cleanPath = path
+    .replace(/^\/+/, "")        // hapus slash depan
+    .replace(/^api\/uploads\//, ""); // hapus api/uploads kalau sudah ada
+
+  return `${API_BASE_URL}/api/uploads/${encodeURI(cleanPath)}`;
 };

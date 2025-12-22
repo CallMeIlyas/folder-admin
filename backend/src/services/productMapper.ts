@@ -10,21 +10,7 @@ export const productMapper = {
 // 2D FRAME (FINAL FIX)
 // =========================
 if (categoryLower.includes("2d")) {
-  options = {
-    frameSizes: [
-      { value: "4r", label: "4R" },
-      { value: "15cm", label: "15x15cm" },
-      { value: "6r", label: "6R" },
-      { value: "8r", label: "8R" },
-      { value: "12r", label: "12R" },
-    ],
-    shadingStyles: [
-      { value: "simple", label: "Simple Shading" },
-      { value: "background-catalog", label: "Background Catalog" },
-      { value: "bold", label: "Bold Shading" },
-      { value: "ai", label: "AI Generated" },
-    ],
-  };
+  options = {};
 }
 
     // =========================
