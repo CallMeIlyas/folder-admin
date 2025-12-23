@@ -10,8 +10,13 @@ app.use(cors());
 app.use(express.json());
 
 app.use(
-  "/api/uploads",
-  express.static(path.join(process.cwd(), "uploads"))
+  "/api/uploads/images",
+  express.static(path.join(process.cwd(), "uploads/images"))
+);
+
+app.use(
+  "/api/uploads/bg-catalog",
+  express.static(path.join(process.cwd(), "uploads/bg-catalog"))
 );
 
 app.use("/api/content", contentRoutes);

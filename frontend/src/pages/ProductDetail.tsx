@@ -235,7 +235,7 @@ const useDebounce = <T,>(value: T, delay: number): T => {
 
 // ===== MAIN COMPONENT =====
 const ProductDetail = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart } = useOutletContext<LayoutContext>();
@@ -291,11 +291,7 @@ const ProductDetail = () => {
     // Untuk produk reguler (non-additional)
     return {
       // Variations
-      variations: product.options?.variations?.length 
-        ? product.options.variations 
-        : (is3D || is2D) && !isAcrylicStand && !isAdditional && !isSoftcopy
-          ? ["Frame Kaca", "Frame Acrylic"]
-          : [],
+variations: product.options?.variations || [],
 
       // Frame Sizes - Hanya untuk 2D, 3D tidak perlu frame sizes
       frameSizes: product.options?.frameSizes?.length 
@@ -398,7 +394,9 @@ shadingStyles: is2D
         setIsLoading(true);
         
         // Fetch product
-        const productResponse = await apiFetch(`/api/products/${id}`);
+        const productResponse = await apiFetch(
+  `/api/products/${id}?lang=${i18n.language}`
+);
         if (!productResponse.ok) {
           throw new Error(`Failed to fetch product: ${productResponse.status}`);
         }
@@ -450,7 +448,7 @@ shadingStyles: is2D
     };
 
     fetchProductData();
-  }, [id]);
+  }, [id, i18n.language]);
 
   // ===== SET DEFAULT OPTIONS =====
   useEffect(() => {
@@ -960,7 +958,7 @@ shadingStyles: is2D
                   : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
               }`}
             >
-              {variation}
+              {t(`product.${variation}`)}
             </button>
           ))}
         </div>

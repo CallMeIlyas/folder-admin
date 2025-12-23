@@ -1,6 +1,32 @@
 import { Request, Response } from "express";
 import { orderedProducts } from "../../data/productDataLoader";
 
+// =====================
+// SEMANTIC KEYWORDS
+// =====================
+const SEMANTIC_KEYWORDS: Record<string, string[]> = {
+  karikatur: ["2D Frame", "3D Frame"],
+  caricature: ["2D Frame", "3D Frame"],
+  foto: ["2D Frame", "3D Frame"],
+  frame: ["2D Frame", "3D Frame"],
+  bingkai: ["2D Frame", "3D Frame"],
+
+  acrylic: ["Acrylic Stand", "3D Frame"],
+  standee: ["Acrylic Stand"],
+  plakat: ["Acrylic Stand"],
+
+  softcopy: ["Softcopy Design"],
+  desain: ["Softcopy Design"],
+  "desain aja": ["Softcopy Design"],
+
+  tambahan: ["Additional"],
+  additional: ["Additional"],
+
+  kado: ["2D Frame", "3D Frame", "Acrylic Stand"],
+  hadiah: ["2D Frame", "3D Frame", "Acrylic Stand"],
+  hampers: ["2D Frame", "3D Frame", "Acrylic Stand"],
+};
+
 export const getProducts = (req: Request, res: Response) => {
   const {
     search = "",
@@ -16,10 +42,70 @@ export const getProducts = (req: Request, res: Response) => {
   // SEARCH
   // =====================
   if (search) {
-    const q = String(search).toLowerCase();
-    results = results.filter(p =>
-      p.displayName.toLowerCase().includes(q)
-    );
+    const q = String(search).toLowerCase().trim();
+
+    // =====================
+    // HARD RULE: A3
+    // =====================
+    if (q.includes("a3")) {
+      results = results.filter(p => {
+        const name = p.displayName.toLowerCase();
+        const cat = p.category.toLowerCase();
+
+        // 3D Frame 12R (BUKAN AI)
+        if (
+          cat.includes("3d") &&
+          name.includes("12r") &&
+          !name.includes("by ai")
+        ) {
+          return true;
+        }
+
+        // Additional Biaya Ekspress 12R
+        if (
+          cat === "additional" &&
+          name.includes("ekspress") &&
+          name.includes("12r")
+        ) {
+          return true;
+        }
+
+        return false;
+      });
+    }
+
+    // =====================
+    // SEMANTIC SEARCH
+    // =====================
+    else {
+      let matchedCategories: string[] | null = null;
+
+      for (const key of Object.keys(SEMANTIC_KEYWORDS)) {
+        if (q.includes(key)) {
+          matchedCategories = SEMANTIC_KEYWORDS[key];
+          break;
+        }
+      }
+
+      if (matchedCategories) {
+        results = results.filter(p =>
+          matchedCategories!.some(cat =>
+            p.category.toLowerCase() === cat.toLowerCase() ||
+            p.category.toLowerCase().includes(cat.toLowerCase())
+          )
+        );
+      }
+
+      // =====================
+      // FALLBACK SEARCH
+      // =====================
+      if (!matchedCategories) {
+        results = results.filter(p =>
+          p.displayName.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q)
+        );
+      }
+    }
   }
 
   // =====================
@@ -50,17 +136,17 @@ export const getProducts = (req: Request, res: Response) => {
     case "best-selling":
       results = results.filter(p => {
         const name = p.displayName.toLowerCase();
-        const category = p.category.toLowerCase();
+        const cat = p.category.toLowerCase();
 
-        if (category.includes("3d") && (name.includes("12r") || name.includes("10r")) && !name.includes("by ai")) {
-          return true;
-        }
-        if (category.includes("2d") && name.includes("8r")) {
-          return true;
-        }
-        if (name.includes("acrylic stand") && name.includes("2cm")) {
-          return true;
-        }
+        if (
+          cat.includes("3d") &&
+          (name.includes("12r") || name.includes("10r")) &&
+          !name.includes("by ai")
+        ) return true;
+
+        if (cat.includes("2d") && name.includes("8r")) return true;
+        if (cat.includes("acrylic") && name.includes("2cm")) return true;
+
         return false;
       });
       break;
@@ -81,7 +167,7 @@ export const getProducts = (req: Request, res: Response) => {
   const paginated = results.slice(start, end);
 
   // =====================
-  // RESPONSE SHAPE
+  // RESPONSE
   // =====================
   res.json({
     items: paginated.map(p => ({

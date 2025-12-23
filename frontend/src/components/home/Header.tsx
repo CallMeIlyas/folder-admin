@@ -193,8 +193,8 @@ const Header = ({ cartCount, cartItems, onSearch }: HeaderProps) => {
       'voli': 'Sport',
       
       // Pop Up Photos
-      'pop up': 'Pop Up Photos',
-      'popup': 'Pop Up Photos',
+'pop up': 'Pop Up Photos',
+'popup': 'Pop Up Photos',
       
       // Acrylic Stand (redirect ke background catalog karena ada kategori ini)
       'plakat background': 'Acrylic Stand',
@@ -206,6 +206,14 @@ const Header = ({ cartCount, cartItems, onSearch }: HeaderProps) => {
       'katalog': null,
       'catalog': null,
     };
+    
+if (
+  normalizedQuery.includes("pop up frame") ||
+  normalizedQuery.includes("popup frame")
+) {
+  navigate(`/products?search=${encodeURIComponent(value)}`);
+  return;
+}
 
     // Check if query matches background catalog keywords
     let matchedBgKeyword = '';

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { allProducts } from "../../data/productDataLoader";
 import { getPrice } from "../../utils/getPrice";
+import { getBackgroundCatalogImages } from "../../utils/backgroundCatalog";
 
 // Urutan DI SINI menentukan urutan tampil
 const ALLOWED_ADDITIONAL_IDS = [
@@ -15,19 +16,33 @@ export const getAdditionalProducts = (req: Request, res: Response) => {
   if (!category || typeof category !== "string") {
     return res.status(400).json({ message: "Category is required" });
   }
-
+  
   const items = ALLOWED_ADDITIONAL_IDS
     .map(id => allProducts.find(p => p.id === id))
     .filter(Boolean)
-    .map(p => ({
-      id: p!.id,
-      name: p!.name,
-      displayName: p!.displayName || p!.name,
-      category: p!.category,
-      imageUrl: p!.imageUrl,
-      price: getPrice(p!.category, p!.name),
-      targetProduct: category
-    }));
+    .map(p => {
+      let imageUrl = p!.imageUrl;
+
+      // ===== BACKGROUND CUSTOM =====
+if (p!.id === "prod-additional-background-custom") {
+  const images = getBackgroundCatalogImages("goverment-police");
+  const selected = images.find(img =>
+    img.toLowerCase().includes("ka-may23-01")
+  );
+
+  imageUrl = selected || images[0] || imageUrl;
+}
+
+      return {
+        id: p!.id,
+        name: p!.name,
+        displayName: p!.displayName || p!.name,
+        category: p!.category,
+        imageUrl,
+        price: getPrice(p!.category, p!.name),
+        targetProduct: category
+      };
+    });
 
   res.json(items);
 };

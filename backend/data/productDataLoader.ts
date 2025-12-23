@@ -17,6 +17,9 @@ export interface Product {
   allImages?: string[];
   specialVariations?: { label: string; value: string }[];
   shadingOptions?: { label: string; value: string; preview?: string }[];
+    options?: {
+    variations?: string[];
+  };
   sizeFrameOptions?: { label: string; value: string; image: string }[];
   details?: Record<string, any>;
 }
@@ -146,6 +149,31 @@ export const allProducts: Product[] = Object.entries(groupedImages).map(
 
 const decodedImages = images.map(img => decodeURIComponent(img));
 
+
+// frame variation
+const getFrameVariations = (category: string, name: string): string[] => {
+  const c = category.toLowerCase();
+  const n = name.toLowerCase();
+
+  const glassSizes = ["4r", "6r", "8r", "10r", "12r", "15cm"];
+  const acrylicSizes = ["a2", "a1", "a0"];
+
+  if (c.includes("2d")) {
+    return ["frameGlass"];
+  }
+
+  if (c.includes("3d")) {
+    if (acrylicSizes.some(s => n.includes(s))) {
+      return ["frameAcrylic"];
+    }
+    if (glassSizes.some(s => n.includes(s))) {
+      return ["frameGlass"];
+    }
+  }
+
+  return [];
+};
+
 // 🔴 PRIORITAS MAIN IMAGE
 const mainImage =
   decodedImages.find(img => {
@@ -171,28 +199,33 @@ const orderedImages = [
     const cleanSub = subcategory?.trim() || null;
     const fileName = cleanSub || `Product ${index + 1}`;
 
-    return {
-      id: `prod-${rawCategory.toLowerCase()}-${(subcategory || "default")
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, "-")}`,
-      imageUrl: mainImage,          // ✔ untuk product card
-      name: fileName,
-      displayName: subcategory
-        ? `${mappedCategory} ${subcategory.replace(/-\s*\d+\s*x\s*\d+\s*cm/i, "").trim()}`
-        : mappedCategory,
-      size: "Custom",
-      category: mappedCategory,
-      subcategory: subcategory || null,
-      fullPath: `${mappedCategory}${subcategory ? " / " + subcategory : ""}`,
-      price: getPrice(mappedCategory, fileName),
-      shippedFrom: ["Bogor", "Jakarta"],
-      shippedTo: ["Worldwide"],
-      allImages: orderedImages,     // ✔ gallery stabil
-      shadingOptions:
-        mappedCategory === "2D Frame" ? get2DShadingOptions() : undefined,
-      sizeFrameOptions:
-        mappedCategory === "2D Frame" ? get2DSizeFrameOptions() : undefined,
-    };
+return {
+  id: `prod-${rawCategory.toLowerCase()}-${(subcategory || "default")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "-")}`,
+  imageUrl: mainImage,
+  name: fileName,
+  displayName: subcategory
+    ? `${mappedCategory} ${subcategory.replace(/-\s*\d+\s*x\s*\d+\s*cm/i, "").trim()}`
+    : mappedCategory,
+  size: "Custom",
+  category: mappedCategory,
+  subcategory: subcategory || null,
+  fullPath: `${mappedCategory}${subcategory ? " / " + subcategory : ""}`,
+  price: getPrice(mappedCategory, fileName),
+  shippedFrom: ["Bogor", "Jakarta"],
+  shippedTo: ["Worldwide"],
+  allImages: orderedImages,
+
+  options: {
+    variations: getFrameVariations(mappedCategory, fileName),
+  },
+
+  shadingOptions:
+    mappedCategory === "2D Frame" ? get2DShadingOptions() : undefined,
+  sizeFrameOptions:
+    mappedCategory === "2D Frame" ? get2DSizeFrameOptions() : undefined,
+};
   }
 );
 
