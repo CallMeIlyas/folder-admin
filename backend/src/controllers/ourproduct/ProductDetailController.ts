@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { allProducts } from "../../data/productDataLoader";
-import { productService } from "../services/productService";
-import { productMapper } from "../services/productMapper";
-import { productLocaleService } from "../services/productLocaleService";
+import { allProducts } from "../../../data/productDataLoader";
+import { productService } from "../../services/productService";
+import { productMapper } from "../../services/productMapper";
+import { productLocaleService } from "../../services/productLocaleService";
 
 export const getProductDetail = (req: Request, res: Response) => {
   const { id } = req.params;

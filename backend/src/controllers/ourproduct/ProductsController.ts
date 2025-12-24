@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { orderedProducts } from "../../data/productDataLoader";
+import { orderedProducts } from "../../../data/productDataLoader";
 
 // =====================
 // SEMANTIC KEYWORDS

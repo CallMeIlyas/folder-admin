@@ -6,6 +6,8 @@ export const apiFetch = (path: string, options?: RequestInit) => {
 
 export const apiAsset = (path: string) => {
   if (!path) return "";
+  return `${API_BASE_URL}${encodeURI(path)}`;
+
 
   const cleanPath = path
     .replace(/^\/+/, "")        // hapus slash depan

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { allProducts } from "../../data/productDataLoader";
-import { getPrice } from "../../utils/getPrice";
-import { getBackgroundCatalogImages } from "../../utils/backgroundCatalog";
+import { allProducts } from "../../../data/productDataLoader";
+import { getPrice } from "../../../utils/getPrice";
+import { getBackgroundCatalogImages } from "../../../utils/backgroundCatalog";
 
 // Urutan DI SINI menentukan urutan tampil
 const ALLOWED_ADDITIONAL_IDS = [

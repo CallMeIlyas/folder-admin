@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { getProductDetail } from "../controllers/ProductDetailController";
-import { calculatePrice } from "../controllers/ProductPriceController";
-import { getAdditionalProducts } from "../controllers/ProductAdditionalController";
+import { getProductDetail } from "../controllers/ourproduct/ProductDetailController";
+import { calculatePrice } from "../controllers/ourproduct/ProductPriceController";
+import { getAdditionalProducts } from "../controllers/ourproduct/ProductAdditionalController";
 
 const router = Router();
 

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { priceService } from "../services/priceService";
+import { priceService } from "../../services/priceService";
 
 export const calculatePrice = (req: Request, res: Response) => {
   // ⛔ Guard paling awal

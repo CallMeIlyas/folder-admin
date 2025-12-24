@@ -9,14 +9,22 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// images
 app.use(
   "/api/uploads/images",
   express.static(path.join(process.cwd(), "uploads/images"))
 );
 
+// bg catalog
 app.use(
   "/api/uploads/bg-catalog",
   express.static(path.join(process.cwd(), "uploads/bg-catalog"))
+);
+
+// size guide (INI YANG KURANG)
+app.use(
+  "/api/uploads/size-guide",
+  express.static(path.join(process.cwd(), "uploads/size-guide"))
 );
 
 app.use("/api/content", contentRoutes);

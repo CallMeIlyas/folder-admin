@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { readJson } from "../../utils/readJson";
+import { readJson } from "../../../utils/readJson";
 
 const SUPPORTED_LANGS = ["en", "id"] as const;
 type Lang = typeof SUPPORTED_LANGS[number];

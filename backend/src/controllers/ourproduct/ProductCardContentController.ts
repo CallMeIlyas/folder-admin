@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { allProducts } from "../../data/productDataLoader";
+import { allProducts } from "../../../data/productDataLoader";
 
 export const getProductCardContent = (_req: Request, res: Response) => {
   const items = allProducts.map(product => ({
