@@ -6,6 +6,7 @@ import { getGalleryContent } from "../controllers/home/GalleryContentController"
 import { getProductCardContent } from "../controllers/ourproduct/ProductCardContentController";
 import { getProducts } from "../controllers/ourproduct/ProductsController";
 import { getSizeGuideContent } from "../controllers/sizeguide/SizeGuideContentController";
+import { getBackgroundCatalog } from "../controllers/background/BackgroundCatalogController";
 
 const router = Router();
 
@@ -21,5 +22,8 @@ router.get("/products", getProducts);
 
 // size guide
 router.get("/size-guide", getSizeGuideContent);
+
+// background catalog
+router.get("/background-catalog", getBackgroundCatalog);
 
 export default router;
