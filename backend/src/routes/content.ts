@@ -9,6 +9,7 @@ import { getSizeGuideContent } from "../controllers/sizeguide/SizeGuideContentCo
 import { getBackgroundCatalog } from "../controllers/background/BackgroundCatalogController";
 import { getLocationContent } from "../controllers/locations/LocationContentController";
 import { getFAQContent } from "../controllers/faq/FAQContentController";
+import { getTermsContent } from "../controllers/terms/TermsContentController";
 
 const router = Router();
 
@@ -33,5 +34,8 @@ router.get("/location", getLocationContent);
 
 // faq
 router.get("/faq", getFAQContent);
+
+// terms
+router.get("/tos", getTermsContent);
 
 export default router;

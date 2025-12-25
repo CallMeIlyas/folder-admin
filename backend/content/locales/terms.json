@@ -1,0 +1,114 @@
+{
+  "id": {
+    "metadata": {
+      "title": "Mengenai Pembayaran",
+      "description": []
+    },
+    "sections": [
+      {
+        "id": 1,
+        "title": "Pembayaran",
+        "subtitle": "Ketentuan",
+        "items": [
+          "Seluruh customer harus mengisi format order",
+          "Full payment dibawah order Rp 5.000.000,-",
+          {
+            "type": "html",
+            "content": "Ketentuan DP:<br />DP 1 = saat customer order<br />DP 2 = setelah customer acc preview desain yang diberikan tim kami, bukan setelah paket sampai."
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Revisi Desain",
+        "subtitle": "Ketentuan",
+        "items": [
+          "Kami menerima revisi minor 2x, customer tidak bisa ganti background setelah preview desain dikasih oleh tim kami. Silahkan berikan sketsa kasar di awal, seperti peletakkan tulisan, pose, seragam yang dipakai, nama, ucapan, logo, dan berikan referensi foto background.",
+          "Untuk order deadline, mohon perhatikan revisi yang diberikan kepada tim kami. Kami tidak bertanggung jawab untuk memenuhi waktu deadline, jika revisinya lebih dari 3x, karena kami memproses frame sesuai urutan customer yang duluan order beserta tanggal deadlinenya. Meskipun kami menyanggupi deadline di awal, namun tidak berarti customer bisa memberikan revisi terus menerus."
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Karikatur",
+        "subtitle": "Ketentuan",
+        "items": [
+          "Karikatur dibuat sesuai garis wajah foto asli yang diberikan, style ilustrasi kami berupa vector ilustrasi, kami tidak menggunakan AI untuk membuat karikatur, kecuali etalase 3D. Jika customer ingin ganti foto, silahkan checkout tambahan wajah di etalase, proses tambahan per 1 wajah adalah 1 hari kerja.",
+          "Tim kami tidak bertanggung jawab melaporkan progres desain ke customer, karena kami sudah memberikan tanggal estimasi preview desainnya. Customer harus menunggu sampai preview desainnya jadi. Mohon pengertiannya bahwa kami tidak mengerjakan order 1 customer saja, sistem ini dibuat agar kami bisa lebih teliti dan supaya ga banyak salah, kami bisa fokus ngerjain tanpa dikejar kejar customer."
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Pengiriman Barang",
+        "subtitle": "Ketentuan",
+        "items": [
+          "Silahkan menginfokan alamat lengkap seperti blok,nomor,kavling, dan lainnya. Tidak menerima screenshot alamat, mohon isi alamat sesuai format yang sudah kami berikan, untuk mempermudah kami dan pihak kurir mengerti. Customer harus mengingat, bahwa alamat bisa beda sesuai aplikasi yang dipakai, contoh: Grab, Gojek, Maxim, Google Maps, Grab Map tidak terhubung ke Google Maps, mereka punya server sendiri. Gojek kehubung ke Google Maps, namun kadang banyak alamat gak ada pin pointnya. Makadari itu, customer harus menginformasikan di awal seluruh detailnya.",
+          "Kami tidak bertanggung jawab jika driver/kurir salah kirim barang karena kurang lengkap, atau customer ga bisa dihubungi oleh driver. Customer harus tau bahwa aplikasi Grab atau Gojek menelfon melalui aplikasinya dan telfon nomor asli, driver ga tau nomor WhatsApp penerima paket, karena di ban oleh pihak Grab/Gojek. Jika driver teliti, nomor WhatsApp tertera di paket frame yang kami bungkus. Kurir JNE sekarang hanya menerima telfon nomor asli atau WhatsApp, tidak menerima nomor telfon kantor/rumah lagi."
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Barang Rusak",
+        "subtitle": "Ketentuan",
+        "items": [
+          "Kami selalu memperhatikan untuk packaging setiap frame yang dikirim, jika ke luar kota atau pulau, kami bakal nambahin extra bubblewrap, air column bag atau dus. Stiker fragile, stiker arah paket harus ditaruh di posisi yang bener, juga udah selalu kami tempelin. Selama pengalaman kami, pengiriman frame via kurir sangat jarang banget rusak, namun jika kurir tidak berhati-hati kendala bisa terjadi. Jika sudah terjadi kendala, customer bisa melakukan video unboxing dan kami bisa bantu ngurusin komplainnya ke pihak kurir. Jika framenya sudah tidak bisa dipakai lagi, kami bisa bikin ulang framenya, namun customer harus bayar 70% dari harga frame per 1pcs-nya, tambahan biaya custom background dan tambahan wajah dan tambahan lainnya tidak perlu dihitung. Berikut adalah solusi terbaik yang bisa kami berikan kepada customer."
+        ]
+      }
+    ]
+  },
+  "en": {
+    "metadata": {
+      "title": "Terms Of Service",
+      "description": []
+    },
+    "sections": [
+      {
+        "id": 1,
+        "title": "Payment",
+        "subtitle": "Regarding",
+        "items": [
+          "All customer must fill the order format",
+          "Full payment for order below Rp. 5.000.000,-",
+          {
+            "type": "html",
+            "content": "Terms of Down Payment:<br />First Down Payment = when customer make an order<br />Final Down Payment = after the customer accept the preview design, then customer can make the final payment. The second payment is not made after the goods arrive as we are making a handmade products."
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Design Revision",
+        "subtitle": "Regarding",
+        "items": [
+          "We accept minor revision for 2 times, customer can't change the background if our team already give a design preview. Please tell the brief design at the beginning, customer can send us background photos references or rough sketch to show the people order position, logo, greetings, and other objects placement.",
+          "If customer has a deadline time, please consider in giving the number of the design revision, as our team already make the design based on the first brief that customer give. We can not guarantee to fulfil the deadline time if the customer give us revision more than 3 times. Please understand that we already handling and arrange all order based on the process time which customer and our team have agreed from the beginning."
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Caricature",
+        "subtitle": "Regarding",
+        "items": [
+          "The caricature face made from the same face line from the original photos, our team make it as vector illustration, we do not use Al to make the caricature face. If customer want to change to other photos, customers are subject to additional charges per 1 face caricature, and 1 day additional process time added.",
+          "Our team is not obliged to report any of the progress to the customer, we already give the date of the design preview, customer must wait until we give the design preview. Please understand that we are handling more than one order, this system was made so our team can achieve more focus in making the products and making less error in the process."
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Shipping & Delivery",
+        "subtitle": "Regarding",
+        "items": [
+          "Please share the precise address for the receiver locations and details for example office hour, drop zone, etc. We won't take any responsibility if the product sent to a mistaken locations due to lack of informations and detail given by customer, or customer missed a call from the driver during the delivery process.",
+          "For shipping process, our team can order the Grab Express or Gosend, please note that we already give the customer data, such as address, note, and phone number on the application. Sometimes there is an issue about the application notification do not show up or do not pop up on the customer's phone. Therefore we give the customer's WhatsApp number to the driver. If there is issues about the delivery process, we can help to report the driver via Gojek or Grab application. This is the farthest assistance we could provide for the customer, so customer must pay attention with their phone when our team order the delivery from the application."
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Defect Product",
+        "subtitle": "Regarding",
+        "items": [
+          "Our team already make the best effort to cover packaging of the products with bubblewrap inside and outside the box, using airbag to wrap big sized frame, put the fragile sticker, and position sticker on top of the front wrap. From our experience, there is a very small chance the products will break or defect, but if it happen, we can report it to the courier services. Please make a video unboxing before customer open the packaging, if the products defect or break, we can help to recreate and reship the new frame, with an additional fee of 60% of the original price. This is the best our team can do to provide the customer's need."
+        ]
+      }
+    ]
+  }
+}
