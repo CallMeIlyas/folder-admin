@@ -1,0 +1,276 @@
+{
+  "id": {
+    "metadata": {
+      "title": "Pertanyaan yang sering diajukan customer",
+      "mobileDescription": [
+        "Proses pembuatan dan total harga tergantung format order yang diisi customer.",
+        "Berikut informasi untuk proses normal atau tidak ekspres dan detail lainnya dari produk dan jasa kami.",
+        "Untuk proses ekspres silahkan kontak admin kami."
+      ],
+      "desktopDescription": [
+        "Proses pembuatan dan total harga tergantung format order yang diisi customer.",
+        "Berikut informasi untuk proses normal atau tidak ekspres dan detail lainnya dari produk dan jasa kami.",
+        "Untuk proses ekspres silahkan kontak admin kami."
+      ]
+    },
+    "questions": [
+      {
+        "id": 1,
+        "question": "Berapa lama proses pembuatan untuk 1 wajah karikatur di 1 pcs frame?",
+        "answer": "Proses normal<br />4R, 15cm, 6R, 20cm, 8R, 10R, 12R = 3-4 hari<br />A2, A1, A0 = 4-5 hari<br /><br />Proses ekspres<br />4R, 15cm, 6R, 20cm, 8R, 10R, 12R = 1-2 hari<br />A2, A1, A0 = 2-3 hari<br /><br />Waktu pengerjaan <span class='text-red-500 font-bold italic'>tidak termasuk</span> waktu revisi dari customer dan waktu pengiriman kurir.<br />Kami bisa memproses order ekspres selama kuota masih tersedia."
+      },
+      {
+        "id": 2,
+        "question": "Dari mana produk ini dikirimkan?",
+        "linkText": "Klik disini untuk lihat lokasi",
+        "linkTo": "/location"
+      },
+      {
+        "id": 3,
+        "question": "Pop up frame itu apa sih? kenapa 3D itu unik dan special?",
+        "answer": "Pop up frame adalah kerajinan yang menggunakan kertas berlapis sehingga tampak memiliki kedalaman 3D. Kami membuat karikatur digital, mendesain background, mencetak, memotong, dan merakitnya satu per satu sejak 2018."
+      },
+      {
+        "id": 4,
+        "question": "Apakah customer boleh minta desainnya sebelum payment?",
+        "text": "Tidak bisa, karena kami menggunakan jasa ilustrator dan desainer. Setelah pembayaran, kirim referensi foto atau sketsa agar sesuai keinginan.",
+        "links": [
+          {
+            "text": "Galeri Foto",
+            "url": "https://www.instagram.com/alittleamora?igsh=MXZ4emVlcnk5dm1mdw=="
+          },
+          {
+            "text": "Galeri Video",
+            "url": "https://www.tiktok.com/@alittleamora?_t=ZS-8yeIkqZXx8G&_r=1"
+          },
+          {
+            "text": "Katalog Background",
+            "to": "/background-catalog"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "question": "Apakah customer boleh pilih frame kaca atau acrylic?",
+        "answer": "Ya, customer bisa memilih antara kaca atau acrylic. Silahkan beli biaya tambahan untuk mengganti kaca ke acrylic.<br /><br />Biasanya, untuk kebutuhan keamanan, frame acrylic digunakan untuk mengirim frame ukuran besar seperti A2, A1, dan A0 menggunakan kurir kargo JNE atau pengiriman ke luar negeri menggunakan Rayspeed.<br /><br />Di bawah ukuran A2 seperti A3, 10R, 8R, 6R, 20cm, 15cm, 4R tidak perlu menggunakan acrylic."
+      },
+      {
+        "id": 6,
+        "question": "Apa yang membuat Little Amora beda dari toko lainnya?",
+        "answer": "Karikatur vector kami, cara kami memunculkan elemen pada frame, dan keseluruhan desain yang membuat Little Amora memiliki karakteristik tersendiri di bidang kerajinan tangan ini."
+      },
+      {
+        "id": 7,
+        "question": "Apakah customer bisa ambil framenya sendiri ke lokasi?",
+        "answer": "Ya, customer bisa mengambil pesanan dari lokasi di Bogor atau Jakarta, tergantung ukuran frame."
+      },
+      {
+        "id": 8,
+        "question": "Apakah ada diskon untuk beli lebih dari 1?",
+        "answer": "Diskon untuk frame tersedia untuk pesanan lebih dari 25 pcs, karena ini adalah produk kerajinan tangan, setiap desain dan karikatur membutuhkan waktu, usaha dan perhatian untuk memberikan hasil terbaik untuk customer."
+      },
+      {
+        "id": 9,
+        "question": "Apakah customer bisa ganti logo, tambahin gambar produk/brand dan elemen lain di background katalog?",
+        "answer": "Ya, customer bisa mengubah apapun dari katalog background gratis.<br /><br />Harap diingat, background tidak bisa diubah setelah preview desain diberikan."
+      },
+      {
+        "id": 10,
+        "question": "Berapa lama proses pembuatan untuk 2-10 wajah karikatur di 1 pcs frame?",
+        "answer": "Proses normal<br />10R, 12R = 5-7 hari<br />A2, A1, A0 = 7-10 hari<br /><br />Proses ekspres<br />10R, 12R = 4-5 hari<br />A2, A1, A0 = 5-7 hari<br /><br />Waktu pengerjaan <span class='text-red-500 font-bold italic'>tidak termasuk</span> waktu revisi dari customer dan waktu pengiriman kurir.<br />Kami bisa memproses pesanan ekspres selama kuota masih tersedia."
+      },
+      {
+        "id": 11,
+        "question": "Gimana cara order frame disini?",
+        "listItems": [
+          "Berapa jumlah wajah karikatur yang ingin dibuat?",
+          "Berapa pcs bingkai yang ingin diorder?",
+          "Ukuran bingkai yang ingin diorder",
+          "Kecamatan dan kota tujuan pengiriman",
+          "Tanggal dan bulan harus sampai"
+        ],
+        "linkText": "Kirim format order ke admin.",
+        "linkUrl": "https://wa.me/6281380340307?text=fo1%20(kode%20jangan%20dihapus)%0A%0A%E2%80%A2%20Berapa%20wajah%20dalam%201%20frame%20=%0A%E2%80%A2%20Jumlah%20frame%20yang%20akan%20diorder%20=%0A%E2%80%A2%20Ukuran%20frame%20=%0A%E2%80%A2%20Background%20=%20free%20/%20custom%3F%0A%E2%80%A2%20Kecamatan%20%26%20kota%20pengiriman%20=%0A%E2%80%A2%20Tanggal-bulan%20barang%20harus%20sampai%20="
+      },
+      {
+        "id": 12,
+        "question": "Bedanya frame 2D dan 3D apa?",
+        "answer": "Frame 2D adalah frame foto biasa yang terbuat dari kayu dan kaca, tidak memiliki kedalaman.<br /><br />Sedangkan frame 3D memiliki kedalaman, kami bisa meletakkan apapun di dalamnya berdasarkan kreativitas kami. Biasanya crafter di seluruh dunia membuat pop up frame menggunakan frame 3D, menambahkan lampu atau jam, atau bahkan menambahkan beberapa miniatur di dalamnya. Beberapa dari mereka bisa menambahkan bunga artifisial atau bahkan pasir, dan banyak elemen lainnya untuk membuat frame 3D terlihat hidup."
+      },
+      {
+        "id": 13,
+        "question": "Apakah pengirimannya aman?",
+        "answer": "Semua frame kami dikemas dengan bubblewrap di dalam dan luar box. Untuk frame ukuran besar, kami menggunakan airbag dan packaging box kardus.<br /><br />Jika Anda khawatir tentang packaging, silahkan pesan Instant Delivery menggunakan motor atau mobil.<br /><br />Jika packaging rusak karena kurir, tim kami bisa membantu customer untuk mengkomplain masalah tersebut ke kurir, dan jika customer meminta kami untuk membuat ulang frame, customer bisa membayar biaya hanya 70% dari harga frame asli, tidak perlu membayar tambahan wajah dan background custom."
+      },
+      {
+        "id": 14,
+        "question": "Apa bisa tambah lampu atau emas keping ke framenya?",
+        "answer": "Saat ini, penambahan lampu atau plat emas masih belum tersedia di Little Amora Caricature Frame.<br /><br />Jika customer ingin menambahkan, customer bisa membuka MDF di bagian belakang frame, dan menempelkannya menggunakan lem tembak."
+      },
+      {
+        "id": 15,
+        "question": "Bisa berapa kali revisi untuk desainnya?",
+        "answer": "Maksimal revisi minor 2x, customer tidak bisa mengubah background setelah preview desain.<br /><br />Silahkan berikan informasi detail ketika customer melakukan pemesanan."
+      },
+      {
+        "id": 16,
+        "question": "Gimana kalau karikaturnya ga mirip dengan foto yang diberikan?",
+        "answer": "Karakter wajah setiap orang berbeda pada variasi sudut. Tim kami membuat karikatur berdasarkan garis wajah pada foto asli.<br /><br />Customer harus memperhatikan foto asli yang mereka kirim ke tim kami. Untuk membuat ulang karikatur, customer bisa mengirim ulang foto dengan sudut yang berbeda dari yang pertama, biaya tambahan termasuk karena illustrator kami membuat karikatur secara manual digital, kami tidak menggunakan AI untuk membuat karikatur."
+      },
+      {
+        "id": 17,
+        "question": "Bedanya ilustrasi manual sama digital apa?",
+        "answer": "Umumnya, illustrator membuat ilustrasi menggunakan pen tablet untuk menggambar manual. Pen tablet mengacu pada gambar digital. Banyak illustrator juga masih menggunakan mouse dan laptop atau PC untuk menggambar, itu disebut vectoring. Vectoring sebuah gambar adalah apa yang kami lakukan di sini, dengan mengikuti garis wajah atau garis foto untuk membuat ilustrasi.<br /><br />Gambar manual menggunakan pensil, pena atau alat untuk menggambar gambar atau lukisan."
+      },
+      {
+        "id": 18,
+        "question": "Apakah customer bisa ganti style ilustrasi ke 3D atau semi realis?",
+        "answer": "Saat ini, tim kami membuat ilustrasi vector untuk semua karikatur dan desain.<br /><br />Untuk semi realisme, illustrator kami tersedia untuk melakukan permintaan. Membutuhkan biaya tambahan.<br /><br />Untuk saat ini, tim kami belum tersedia untuk membuat menjadi 3D, tapi kami bisa menggunakan AI untuk membuatnya 3D, membutuhkan biaya tambahan juga."
+      },
+      {
+        "id": 19,
+        "question": "Jika ada pertanyaan lain, silahkan hubungi admin kami disini",
+        "linkText": "Chat via WhatsApp",
+        "linkUrl": "https://wa.me/6281380340307?text=fo1%20(kode%20jangan%20dihapus)%0A%0A%E2%80%A2%20Berapa%20wajah%20dalam%201%20frame%20=%0A%E2%80%A2%20Jumlah%20frame%20yang%20akan%20diorder%20=%0A%E2%80%A2%20Ukuran%20frame%20=%0A%E2%80%A2%20Background%20=%20free%20/%20custom%3F%0A%E2%80%A2%20Kecamatan%20%26%20kota%20pengiriman%20=%0A%E2%80%A2%20Tanggal-bulan%20barang%20harus%20sampai%20=",
+        "isCustom": true
+      }
+    ]
+  },
+  "en": {
+    "metadata": {
+      "title": "Frequently Ask Question",
+      "mobileDescription": [
+        "The format order from customer determine the process time and total price.",
+        "Here is the information for non-express process and other detail regarding",
+        "our services and products. For express process please contact our team."
+      ],
+      "desktopDescription": [
+        "The format order from customer determine the process time and total price.",
+        "Here is the information for non-express process and other detail regarding",
+        "our services and products. For express process please contact our team."
+      ]
+    },
+    "questions": [
+      {
+        "id": 1,
+        "question": "How long the process time for 1 frame 1 face caricature?",
+        "answer": "Normal process for frame<br />4R, 15cm, 6R, 20cm, 8R, 108, 12R = 3 - 4 days<br />A2, A1, A0 = 4 - 5 days<br /><br />Express process for frame<br />4R, 15cm, 6R, 20cm, 8R, 10R, 12R = 1-2 days<br />A2, A1, A0 = 2 - 3 days<br /><br />The process time <span class='text-red-500 font-bold italic'>not include</span> revision time from customer and courier shipping time.<br />We can proceed the express process as long as the quota is available."
+      },
+      {
+        "id": 2,
+        "question": "Which city are the products shipped from?",
+        "linkText": "Click here to see the location",
+        "linkTo": "/location"
+      },
+      {
+        "id": 3,
+        "question": "What is pop up frame? Why 3D frame is special?",
+        "answer": "Pop up frames are a type of handicraft that uses stacked paper so it has depth or it looks 3D. Starting from making digital caricature from photos, designing it with background based on the customer preferences. After that we print, cut, and assembling the paper layer by layer. Little Amora Caricature established since 2018. Our design characteristic we use is vector illustration, the body shown smaller and shorter so the faces can be more stand out."
+      },
+      {
+        "id": 4,
+        "question": "Can customer get the design before payment?",
+        "text": "No, the customer can't get the design before payment. For our design and frame portfolio, customer can check the gallery and video, and also the background catalog here.",
+        "links": [
+          {
+            "text": "Photo Gallery",
+            "url": "https://www.instagram.com/alittleamora?igsh=MXZ4emVlcnk5dm1mdw=="
+          },
+          {
+            "text": "Video Gallery",
+            "url": "https://www.tiktok.com/@alittleamora?_t=ZS-8yeIkqZXx8G&_r=1"
+          },
+          {
+            "text": "Background Catalog",
+            "to": "/background-catalog"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "question": "Can customer choose the frame using glass or acrylic?",
+        "answer": "Yes, customer can choose whether to use glass or acrylic. Please purchase the additional fees for changing glass to acrylic.<br /><br />Mostly, for safety needs, acrylic frame are used to send big frame size like A2, A1, and A0 using JNE cargo courier or sending to worldwide using Rayspeed.<br /><br />Below A2 size like A3, 10R, 8R, 6R, 20cm, 15cm, 4R don't need to use acrylic."
+      },
+      {
+        "id": 6,
+        "question": "What makes Little Amora special than the other shop?",
+        "answer": "Our vector caricature, the way we pop up the element on the frame, and the whole design that makes Little Amora has it's own characteristic in this handcraft field."
+      },
+      {
+        "id": 7,
+        "question": "Can customer pick up the frame on the site?",
+        "answer": "Yes, customer can pick the order from the location in Bogor or Jakarta, depend on the size frame."
+      },
+      {
+        "id": 8,
+        "question": "Any discount if customer order more than 1 frame?",
+        "answer": "Discount for frames are for order more than 25 pcs, as this is a handcraft products, each design and caricature needs time, effort and attention to give the best result for customers."
+      },
+      {
+        "id": 9,
+        "question": "Can customer change logo, product or element in free background catalog?",
+        "answer": "Yes, customer can change anything from the free background catalog.<br /><br />Please remind, the background can't be change after the design preview is given."
+      },
+      {
+        "id": 10,
+        "question": "How long the process time for 1 frame 2-10 faces caricature?",
+        "answer": "Normal process for frame<br />10R, 12R = 5–7 days<br />A2, A1, A0 = 7–10 days<br /><br />Express process for frame<br />10R, 12R = 4–5 days<br />A2, A1, A0 = 5–7 days<br /><br />The process time <span class='text-red-500 font-bold italic'>not include</span> revision time from customer and courier shipping time.<br />We can proceed the express process as long as the quota is available."
+      },
+      {
+        "id": 11,
+        "question": "What is the procedure for order the frame?",
+        "listItems": [
+          "How many faces on the frame?",
+          "How many frame that you need?",
+          "Pick the frame size",
+          "Fill subdistrict and city for estimated shipping fee",
+          "Fill the deadline date and month"
+        ],
+        "linkText": "Give the format order to our team",
+        "linkUrl": "https://wa.me/6281380340307?text=fo1%20(kode%20jangan%20dihapus)%0A%0A%E2%80%A2%20Berapa%20wajah%20dalam%201%20frame%20=%0A%E2%80%A2%20Jumlah%20frame%20yang%20akan%20diorder%20=%0A%E2%80%A2%20Ukuran%20frame%20=%0A%E2%80%A2%20Background%20=%20free%20/%20custom%3F%0A%E2%80%A2%20Kecamatan%20%26%20kota%20pengiriman%20=%0A%E2%80%A2%20Tanggal-bulan%20barang%20harus%20sampai%20="
+      },
+      {
+        "id": 12,
+        "question": "What is the difference between 2D and 3D frame?",
+        "answer": "2D frame is an ordinary photo frame made from wood and glass, it has no depth.<br /><br />While 3D frame has it's depth, we can put anything inside based on our creativity. Usually the crafter around the world make a pop up frame using 3D frame, add a lamp or clock, or even add some miniature inside. Some of them can add artificial flower or even sand, and many more elements to create the 3D frame looks alive."
+      },
+      {
+        "id": 13,
+        "question": "Is the packaging safe for delivery?",
+        "answer": "All our frame packed with bubblewrap inside and outside the box. For big size frame, we use airbag and card box packaging.<br /><br />If you are concern about the packaging, please order an Instant Delivery using bike or car.<br /><br />If the packaging was broken by the courier, our team can help customer to complain about the issues to the courier, and if customer ask us to recreate the frame, customer can pay the fee by only 70% of the original frame price, don't need to pay the additional faces and background custom."
+      },
+      {
+        "id": 14,
+        "question": "Can customer add lamp or gold plate on the frame?",
+        "answer": "Currently, adding lamp or gold plate still not available in Little Amora Caricature Frame.<br /><br />If customer want to add, customers can open the MDF on the back of the frame, and paste it using glue gun."
+      },
+      {
+        "id": 15,
+        "question": "How many revision for the design?",
+        "answer": "Maximum design is 2x minor revision, customer can't change background after the preview design.<br /><br />Please give us the detail information when customer make an order."
+      },
+      {
+        "id": 16,
+        "question": "What if the caricature not similar than the photo?",
+        "answer": "The face character on every person is different on angle variant. Our team make the caricature based from their face line on the original photos.<br /><br />Customer must pay attention to the original photos that they send to our team. To remake the caricature, customer can re-submit the photo with different angle than the first one, additional fee included as our illustrator make the caricature manually digital, we don't use Al to make the caricature."
+      },
+      {
+        "id": 17,
+        "question": "What is the difference between manual and digital illustration?",
+        "answer": "Generally, illustrator make an illustration using pen tablet to draw manual drawing. Pen tablet referred to digital drawing. Many illustrators too, still using mouse and laptop or PC to draw, it called vectoring. Vectoring an image is what we are doing here, by following the face line or photo line to create an illustration.<br /><br />Manual drawing is using pencil, pen or tools to draw a picture or painting."
+      },
+      {
+        "id": 18,
+        "question": "Can customer request to change the illustration style into 3D or semi realism?",
+        "answer": "Currently, our team make a vector illustration for all the caricature and the design.<br /><br />For semi realism, our illustrator is available to do the request. Requires additional costs.<br /><br />For now, our team is not available for making into a 3D yet, but we can use Al to make it 3D, requires additional fee too."
+      },
+      {
+        "id": 19,
+        "question": "Place your question here, our team will answer you soon",
+        "linkText": "Chat via WhatsApp",
+        "linkUrl": "https://wa.me/6281380340307?text=fo1%20(kode%20jangan%20dihapus)%0A%0A%E2%80%A2%20Berapa%20wajah%20dalam%201%20frame%20=%0A%E2%80%A2%20Jumlah%20frame%20yang%20akan%20diorder%20=%0A%E2%80%A2%20Ukuran%20frame%20=%0A%E2%80%A2%20Background%20=%20free%20/%20custom%3F%0A%E2%80%A2%20Kecamatan%20%26%20kota%20pengiriman%20=%0A%E2%80%A2%20Tanggal-bulan%20barang%20harus%20sampai%20=",
+        "isCustom": true
+      }
+    ]
+  }
+}

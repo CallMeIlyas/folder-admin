@@ -7,6 +7,8 @@ import { getProductCardContent } from "../controllers/ourproduct/ProductCardCont
 import { getProducts } from "../controllers/ourproduct/ProductsController";
 import { getSizeGuideContent } from "../controllers/sizeguide/SizeGuideContentController";
 import { getBackgroundCatalog } from "../controllers/background/BackgroundCatalogController";
+import { getLocationContent } from "../controllers/locations/LocationContentController";
+import { getFAQContent } from "../controllers/faq/FAQContentController";
 
 const router = Router();
 
@@ -25,5 +27,11 @@ router.get("/size-guide", getSizeGuideContent);
 
 // background catalog
 router.get("/background-catalog", getBackgroundCatalog);
+
+// location
+router.get("/location", getLocationContent);
+
+// faq
+router.get("/faq", getFAQContent);
 
 export default router;

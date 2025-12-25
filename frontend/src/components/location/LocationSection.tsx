@@ -1,15 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-
-import locationIcon from "../../assets/Icons/location.png";
-import whatsappIcon from "../../assets/Icons/whatsapp.png";
-import gmapsIcon from "../../assets/Icons/GMAPS.png";
-
-import JNELogo from "../../assets/Icons/address/JNE.png";
-import GOJEKLogo from "../../assets/Icons/address/GOJEK.png";
-import GRABLogo from "../../assets/Icons/address/GRAB.png";
-import PAXELLogo from "../../assets/Icons/address/PAXEL.png";
-import RAYSPEEDLogo from "../../assets/Icons/address/RAYSPEED.png";
+import { apiAsset } from "@/utils/api";
 
 interface LocationSectionProps {
   location: {
@@ -26,16 +17,14 @@ interface LocationSectionProps {
     };
     shippingMethods: (string | { courier: string; name: string })[];
   };
+  icons: {
+    location: string;
+    whatsapp: string;
+    gmaps: string;
+  };
+  couriers: Record<string, string>;
   isLast: boolean;
 }
-
-const logoMap: Record<string, string> = {
-  JNE: JNELogo,
-  GOJEK: GOJEKLogo,
-  GRAB: GRABLogo,
-  PAXEL: PAXELLogo,
-  RAYSPEED: RAYSPEEDLogo,
-};
 
 const logoSizeMap: Record<
   string,
@@ -69,7 +58,12 @@ const logoSizeMap: Record<
 };
 
 // Mobile Layout Component
-const MobileLayout: React.FC<{ location: LocationSectionProps['location']; isLast: boolean }> = ({ location, isLast }) => {
+const MobileLayout: React.FC<{
+  location: LocationSectionProps['location'];
+  icons: LocationSectionProps['icons'];
+  couriers: LocationSectionProps['couriers'];
+  isLast: boolean;
+}> = ({ location, icons, couriers, isLast }) => {
   const { t } = useTranslation();
 
   return (
@@ -77,7 +71,7 @@ const MobileLayout: React.FC<{ location: LocationSectionProps['location']; isLas
       {/*  Location Info - Mobile */}
       <div className="flex items-start gap-2">
         <img
-          src={locationIcon}
+          src={apiAsset(icons.location)}
           alt="Location"
           className="w-[50px] h-auto -mt-2 translate-x-1"
         />
@@ -105,7 +99,7 @@ const MobileLayout: React.FC<{ location: LocationSectionProps['location']; isLas
           {/* WhatsApp Contact */}
           <div className="font-poppinsRegular flex items-center gap-2 translate-x-1.5 mb-3">
             <img
-              src={whatsappIcon}
+              src={apiAsset(icons.whatsapp)}
               alt="WhatsApp"
               className="w-[43px] h-auto"
             />
@@ -123,7 +117,7 @@ const MobileLayout: React.FC<{ location: LocationSectionProps['location']; isLas
               className="self-start"
             >
               <img
-                src={gmapsIcon}
+                src={apiAsset(icons.gmaps)}
                 alt="Google Maps"
                 className="w-28 h-auto cursor-pointer transition-transform duration-200 hover:scale-105"
               />
@@ -149,7 +143,7 @@ const MobileLayout: React.FC<{ location: LocationSectionProps['location']; isLas
               ? method.split(" ")[0].toUpperCase()
               : method.courier.toUpperCase();
 
-          const logoSrc = logoMap[courierName];
+          const logoSrc = couriers[courierName];
           const logoSize = {
             JNE: { width: "w-[70px]", translate: "translate-x-[30px]" },
             GOJEK: { width: "w-[70px]", translate: "translate-x-[21px]" },
@@ -166,7 +160,7 @@ const MobileLayout: React.FC<{ location: LocationSectionProps['location']; isLas
               <div className="flex items-center justify-center min-w-[80px] h-[30px]">
                 {logoSrc && (
                   <img
-                    src={logoSrc}
+                    src={apiAsset(logoSrc)}
                     alt={courierName}
                     className={`${logoSize.width} h-auto ${logoSize.translate}`}
                   />
@@ -189,8 +183,13 @@ const MobileLayout: React.FC<{ location: LocationSectionProps['location']; isLas
   );
 };
 
-// Desktop Layout Component (tetap seperti sebelumnya)
-const DesktopLayout: React.FC<{ location: LocationSectionProps['location']; isLast: boolean }> = ({ location, isLast }) => {
+// Desktop Layout Component
+const DesktopLayout: React.FC<{
+  location: LocationSectionProps['location'];
+  icons: LocationSectionProps['icons'];
+  couriers: LocationSectionProps['couriers'];
+  isLast: boolean;
+}> = ({ location, icons, couriers, isLast }) => {
   const { t } = useTranslation();
 
   return (
@@ -198,7 +197,7 @@ const DesktopLayout: React.FC<{ location: LocationSectionProps['location']; isLa
       {/*  Location Info */}
       <div className="flex items-start gap-3">
         <img
-          src={locationIcon}
+          src={apiAsset(icons.location)}
           alt="Location"
           className="w-[80px] h-auto -mt-5 translate-x-4"
         />
@@ -226,7 +225,7 @@ const DesktopLayout: React.FC<{ location: LocationSectionProps['location']; isLa
           {/* WhatsApp Contact */}
           <div className="font-poppinsRegular flex items-center gap-2 translate-y-6 translate-x-4 mb-5 ml-32">
             <img
-              src={whatsappIcon}
+              src={apiAsset(icons.whatsapp)}
               alt="WhatsApp"
               className="w-[50px] h-auto translate-x-3"
             />
@@ -244,7 +243,7 @@ const DesktopLayout: React.FC<{ location: LocationSectionProps['location']; isLa
               className="self-auto"
             >
               <img
-                src={gmapsIcon}
+                src={apiAsset(icons.gmaps)}
                 alt="Google Maps"
                 className="w-40 h-auto cursor-pointer transition-transform duration-200 hover:scale-105"
               />
@@ -263,18 +262,18 @@ const DesktopLayout: React.FC<{ location: LocationSectionProps['location']; isLa
       </div>
 
       {/*  Shipping Methods */}
-<div
-  className={`border border-gray-600 rounded-[30px] p-4 max-w-xl mt-8 mx-auto 
-    ${isLast ? "mb-32" : ""}
-  `}
->
+      <div
+        className={`border border-gray-600 rounded-[30px] p-4 max-w-xl mt-8 mx-auto 
+          ${isLast ? "mb-32" : ""}
+        `}
+      >
         {location.shippingMethods.map((method, index) => {
           const courierName =
             typeof method === "string"
               ? method.split(" ")[0].toUpperCase()
               : method.courier.toUpperCase();
 
-          const logoSrc = logoMap[courierName];
+          const logoSrc = couriers[courierName];
           const logoSize = logoSizeMap[courierName] || {
             width: "w-20 md:w-24",
             height: "h-auto",
@@ -289,7 +288,7 @@ const DesktopLayout: React.FC<{ location: LocationSectionProps['location']; isLa
               <div className="flex items-center justify-center min-w-[130px] h-[45px]">
                 {logoSrc && (
                   <img
-                    src={logoSrc}
+                    src={apiAsset(logoSrc)}
                     alt={courierName}
                     className={`${logoSize.width} ${logoSize.height} ${logoSize.translate || ""}`}
                   />
@@ -313,7 +312,12 @@ const DesktopLayout: React.FC<{ location: LocationSectionProps['location']; isLa
 };
 
 // Main Component
-const LocationSection: React.FC<LocationSectionProps> = ({ location, isLast }) => {
+const LocationSection: React.FC<LocationSectionProps> = ({ 
+  location, 
+  icons, 
+  couriers, 
+  isLast 
+}) => {
   const [isMobile, setIsMobile] = React.useState(false);
 
   React.useEffect(() => {
@@ -330,8 +334,18 @@ const LocationSection: React.FC<LocationSectionProps> = ({ location, isLast }) =
   }, []);
 
   return isMobile ? 
-    <MobileLayout location={location} isLast={isLast} /> : 
-    <DesktopLayout location={location} isLast={isLast} />;
+    <MobileLayout 
+      location={location} 
+      icons={icons} 
+      couriers={couriers} 
+      isLast={isLast} 
+    /> : 
+    <DesktopLayout 
+      location={location} 
+      icons={icons} 
+      couriers={couriers} 
+      isLast={isLast} 
+    />;
 };
 
 export default LocationSection;

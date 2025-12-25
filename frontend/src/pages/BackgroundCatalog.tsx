@@ -6,18 +6,19 @@ import ProductGrid from '../components/background-catalog/ProductGrid';
 import MobileFilterSheet from '../components/background-catalog/MobileFilterSheet';
 import SortControls from '../components/background-catalog/SortControls';
 import type { FilterOptions } from '../types/types';
-import NoteIcon from "../assets/Icons/NOTES.png";
+import { apiFetch, apiAsset } from "@/utils/api";
+import { useTranslation } from "react-i18next";
 
 interface BackgroundCatalogProps {
   searchQuery?: string; 
 }
 
 const BackgroundCatalog: React.FC<BackgroundCatalogProps> = ({ searchQuery = "" }) => {
+  const { i18n } = useTranslation();
+  const currentLang = i18n.language;
   const location = useLocation();
   const [filters, setFilters] = useState<FilterOptions>({
-    categories: [],
-    shippedFrom: [],
-    shippedTo: []
+    categories: [] // hanya categories, shippedFrom dan shippedTo dihapus
   });
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sortOption, setSortOption] = useState("all");
@@ -30,8 +31,8 @@ const BackgroundCatalog: React.FC<BackgroundCatalogProps> = ({ searchQuery = "" 
     setUrlSearchQuery(urlSearch);
   }, [location.search]);
 
-  // Gabungkan search query dari props dan URL
-  const combinedSearchQuery = searchQuery || urlSearchQuery;
+  // Gabungkan search query dari props dan URL (URL prioritas utama)
+  const combinedSearchQuery = urlSearchQuery || searchQuery;
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -55,7 +56,7 @@ const BackgroundCatalog: React.FC<BackgroundCatalogProps> = ({ searchQuery = "" 
           
           <ProductGrid 
             filters={filters} 
-            searchQuery={combinedSearchQuery} // Gunakan combined search query
+            searchQuery={combinedSearchQuery}
             sortOption={sortOption}
           />
         </div>
@@ -64,19 +65,21 @@ const BackgroundCatalog: React.FC<BackgroundCatalogProps> = ({ searchQuery = "" 
       {/* Note Section */}
       <div className="flex text-justify items-start gap-4 my-6 md:my-8 px-4 md:px-24 max-w-full md:max-w-[969px] md:ml-[150px]">
         <img 
-          src={NoteIcon} 
+          src={apiAsset("/api/uploads/images/Icons/NOTES.png")}
           alt="Note Icon" 
           className="hidden md:block w-[110px] -translate-y-3 translate-x-7" 
         />
         <img 
-          src={NoteIcon} 
+          src="/api/uploads/images/icons/notes.png" 
           alt="Note Icon" 
           className="block md:hidden w-16 -translate-y-1" 
         />
         <p className="text-sm md:text-md font-poppinsRegular">
-          Customers are free to use the background from this catalog, the logo, products, plant or any
-          elements can be replaced as requested. Please note, customers must purchase additional fee for
-          background custom. From image to illustration count as background custom.
+          {i18n.language === 'id' ? (
+            "Pelanggan bebas menggunakan latar belakang dari katalog ini, logo, produk, tanaman atau elemen apa pun dapat diganti sesuai permintaan. Harap diperhatikan, pelanggan harus membayar biaya tambahan untuk kustomisasi latar belakang. Dari gambar ke ilustrasi dihitung sebagai kustomisasi latar belakang."
+          ) : (
+            "Customers are free to use the background from this catalog, the logo, products, plant or any elements can be replaced as requested. Please note, customers must purchase additional fee for background custom. From image to illustration count as background custom."
+          )}
         </p>
       </div>
 
