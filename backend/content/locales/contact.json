@@ -1,0 +1,132 @@
+{
+  "id": {
+    "metadata": {
+      "title": "Kontak Kami",
+      "description": [
+        {
+          "type": "text",
+          "content": "<span class='font-poppinsSemiBold'>Seluruh diskusi order dan tanya jawab</span> hanya melalui WhatsApp saja. Social Media hanya bertujuan untuk menjadi galeri foto atau video. Email dan Google Drive bisa untuk kirim data yang lebih besar dan lengkap. Tim kami tidak berkewajiban membalas dan berdiskusi di platform social media."
+        },
+        {
+          "type": "text",
+          "content": "Mohon mengingat bahwa payment hanya atas nama <span class='font-poppinsSemiBold'>Claresta</span> atau <span class='font-poppinsSemiBold'>Little Amora Karikatur</span> dengan nomor WhatsApp tertera diatas, silahkan berikan bukti pembayaran ke chat WhatsApp kami. Untuk pengiriman luar negeri, pembayaran bisa menggunakan Paypal, silahkan kontak admin lebih lanjut."
+        }
+      ]
+    },
+    "contacts": [
+      {
+        "id": 1,
+        "type": "shopee",
+        "name": "Shopee",
+        "value": "littleamorakarikatur",
+        "url": "https://id.shp.ee/FGfGHup",
+        "icon": "/api/uploads/images/icon-contact/icon-contact/shopee.png"
+      },
+      {
+        "id": 2,
+        "type": "gmail",
+        "name": "Gmail",
+        "value": "littleamoradesign@gmail.com",
+        "url": "mailto:littleamoradesign@gmail.com",
+        "icon": "/api/uploads/images/icon-contact/gmail.png"
+      },
+      {
+        "id": 3,
+        "type": "gmaps",
+        "name": "Google Maps",
+        "value": "Little Amora Karikatur",
+        "url": "https://share.google/3NK3xtA32ThyT5hxH",
+        "icon": "/api/uploads/images/icon-contact/gmaps.png"
+      },
+      {
+        "id": 4,
+        "type": "instagram",
+        "name": "Instagram",
+        "value": "@alittleamora",
+        "url": "https://www.instagram.com/alittleamora",
+        "icon": "/api/uploads/images/icon-contact/IG.png"
+      },
+      {
+        "id": 5,
+        "type": "tiktok",
+        "name": "TikTok",
+        "value": "@alittleamora",
+        "url": "https://www.tiktok.com/@alittleamora",
+        "icon": "/api/uploads/images/icon-contact/TIKTOK.png"
+      },
+      {
+        "id": 6,
+        "type": "whatsapp",
+        "name": "WhatsApp",
+        "value": "+6281380340307",
+        "url": "https://wa.me/6281380340307",
+        "icon": "/api/uploads/images/icon-contact/whatsapp.png"
+      }
+    ]
+  },
+  "en": {
+    "metadata": {
+      "title": "Contact Us",
+      "description": [
+        {
+          "type": "text",
+          "content": "<span class='font-poppinsSemiBold'>All discussion and order</span> available on WhatsApp only. Our social media used for gallery purpose. Email or Google Drive used for transferring big size data. Our team do not reply and open discussion on any platform besides WhatsApp."
+        },
+        {
+          "type": "text",
+          "content": "Please note for all payment only on behalf of <span class='font-poppinsSemiBold'>Claresta</span> or <span class='font-poppinsSemiBold'>Little Amora Karikatur</span>, please ensure to copy the payment info directly on the chat that our team gave to the customer. For worldwide shipping our team used Paypal, please contact us for further information."
+        }
+      ]
+    },
+    "contacts": [
+      {
+        "id": 1,
+        "type": "shopee",
+        "name": "Shopee",
+        "value": "littleamorakarikatur",
+        "url": "https://id.shp.ee/FGfGHup",
+        "icon": "/api/uploads/images/icon-contact/shopee.png"
+      },
+      {
+        "id": 2,
+        "type": "gmail",
+        "name": "Gmail",
+        "value": "littleamoradesign@gmail.com",
+        "url": "mailto:littleamoradesign@gmail.com",
+        "icon": "/api/uploads/images/icon-contact/gmail.png"
+      },
+      {
+        "id": 3,
+        "type": "gmaps",
+        "name": "Google Maps",
+        "value": "Little Amora Karikatur",
+        "url": "https://share.google/3NK3xtA32ThyT5hxH",
+        "icon": "/api/uploads/images/icon-contact/gmaps.png"
+      },
+      {
+        "id": 4,
+        "type": "instagram",
+        "name": "Instagram",
+        "value": "@alittleamora",
+        "url": "https://www.instagram.com/alittleamora",
+        "icon": "/api/uploads/images/icon-contact/IG.png"
+      },
+      {
+        "id": 5,
+        "type": "tiktok",
+        "name": "TikTok",
+        "value": "@alittleamora",
+        "url": "https://www.tiktok.com/@alittleamora",
+        "icon": "/api/uploads/images/icon-contact/TIKTOK.png"
+      },
+      {
+        "id": 6,
+        "type": "whatsapp",
+        "name": "WhatsApp",
+        "value": "+6281380340307",
+        "url": "https://wa.me/6281380340307",
+        "icon": "/api/uploads/images/icon-contact/whatsapp.png"
+      }
+    ]
+  }
+}

@@ -10,6 +10,7 @@ import { getBackgroundCatalog } from "../controllers/background/BackgroundCatalo
 import { getLocationContent } from "../controllers/locations/LocationContentController";
 import { getFAQContent } from "../controllers/faq/FAQContentController";
 import { getTermsContent } from "../controllers/terms/TermsContentController";
+import { getContactContent } from "../controllers/contact/ContactContentController";
 
 const router = Router();
 
@@ -38,4 +39,6 @@ router.get("/faq", getFAQContent);
 // terms
 router.get("/tos", getTermsContent);
 
+// contact
+router.get("/contact", getContactContent);
 export default router;
