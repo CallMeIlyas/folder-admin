@@ -24,7 +24,6 @@ import TextEditorPage from "./pages/admin/TextEditorPage"
 import VideoManagerPage from "./pages/admin/VideoManagerPage"
 import ContactManagerPage from "./pages/admin/ContactManagerPage"
 import InvoiceManagerPage from "./pages/admin/InvoiceManagerPage"
-import OrderManagerPage from "./pages/admin/OrderManagerPage"
 import MediaLibraryPage from "./pages/admin/MediaLibraryPage"
 
 // Import AuthGuard dan AdminLayout
@@ -114,7 +113,6 @@ const App = () => {
             <Route path="videos" element={<VideoManagerPage />} />
             <Route path="contact" element={<ContactManagerPage />} />
             <Route path="invoices" element={<InvoiceManagerPage />} />
-            <Route path="orders" element={<OrderManagerPage />} />
             <Route path="media" element={<MediaLibraryPage />} />
           </Route>
 

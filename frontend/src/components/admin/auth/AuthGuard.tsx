@@ -1,14 +1,17 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate } from "react-router-dom";
 
 interface AuthGuardProps {
-  children: React.ReactNode;
+  children: JSX.Element;
 }
 
-const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('admin_auth') === 'true';
-  if (!isAuthenticated) return <Navigate to="/admin/login" replace />;
-  return <>{children}</>;
+const AuthGuard = ({ children }: AuthGuardProps) => {
+  const token = localStorage.getItem("admin_token");
+
+  if (!token) {
+    return <Navigate to="/admin/login" replace />;
+  }
+
+  return children;
 };
 
 export default AuthGuard;

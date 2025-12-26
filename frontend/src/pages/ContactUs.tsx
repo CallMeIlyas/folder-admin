@@ -83,7 +83,7 @@ export default function ContactUs() {
       </main>
 
       {/* DESCRIPTION */}
-      <div className="font-poppinsRegular text-sm md:text-[15px] text-center leading-relaxed px-6 max-w-[700px] mx-auto mb-20">
+      <div className="font-poppinsRegular text-sm md:text-[15px] text-justify text-center leading-relaxed px-6 max-w-[700px] mx-auto mb-20">
         {Array.isArray(metadata.description) &&
           metadata.description.map((item, i) => (
             <p
