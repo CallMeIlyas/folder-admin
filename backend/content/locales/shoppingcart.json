@@ -1,0 +1,268 @@
+{
+  "id": {
+    "shoppingCart": {
+      "title": "Keranjang Belanja",
+      "emptyCart": "Keranjang kosong",
+      "selectAll": "Pilih semua",
+      "addShipping": "Tambah Ongkir",
+      "noVariations": "Tidak ada variasi",
+      "variations": "Variasi",
+      "glassFrame": "Frame Kaca",
+      "acrylicFrame": "Frame Acrylic",
+      "shippingCostDescription": "Biaya pengiriman untuk pesanan Anda",
+      "save": "Simpan",
+      "cancel": "Batal",
+      "edit": "Edit",
+      "delete": "Hapus",
+      "total": "Total",
+      "items": "item",
+      "includesShipping": "Termasuk biaya pengiriman",
+      "checkout": "Checkout",
+      "payment": {
+        "title": "Pembayaran",
+        "description": "Mohon melakukan pembayaran ke:",
+        "notes": {
+          "note1": "*Silahkan screenshoot bukti bayar dan kirim ke WhatsApp admin kami",
+          "note2": "*Kwitansi ini valid dan dibuat oleh Claresta, pemilik dari Little Amora Karikatur",
+          "note3": "*Dilarang menyalin dan merubah kwitansi ini dalam bentuk apapun"
+        }
+      },
+      "continueOrder": {
+        "title": "Lanjutkan Pemesanan",
+        "description": "Jika <strong>MAU BAYAR</strong> atau <strong>SUDAH BAYAR</strong>, bisa konfirmasi dahulu ke tim Little Amora.",
+        "points": {
+          "point1": "1. Untuk cek detail pesanan (ongkir, sesuai deadline, kaca/acrylic, dll)",
+          "point2": "2. Agar invoice yang didapatkan benar dan sah"
+        }
+      },
+      "contactLittleAmora": "Hubungi Little Amora",
+      "sendToWhatsApp": "Kirim ke WhatsApp Little Amora",
+      "alerts": {
+        "shippingExists": {
+          "title": "Ongkir Sudah Ada",
+          "message": "Biaya pengiriman sudah ada di keranjang belanja.",
+          "gotIt": "Mengerti"
+        },
+        "selectProduct": {
+          "title": "Perhatian",
+          "message": "Pilih minimal 1 produk untuk checkout.",
+          "gotIt": "Mengerti"
+        },
+        "enterName": {
+          "title": "Masukkan Nama Anda",
+          "message": "Masukkan nama Anda untuk membuat invoice.",
+          "example": "Contoh: Budi Santoso",
+          "sendToWhatsApp": "Kirim ke WhatsApp",
+          "cancel": "Batal"
+        },
+        "emptyName": {
+          "title": "Nama Kosong",
+          "message": "Harap masukkan nama Anda terlebih dahulu.",
+          "gotIt": "Mengerti"
+        }
+      },
+      "whatsappMessage": "Halo, Little Amora\nboleh bikinin invoice untuk order atas nama {{customerName}}"
+    },
+    "shipping": {
+      "shippingCost": "Biaya Pengiriman (Ongkir)"
+    },
+    "paymentMethods": {
+      "banks": [
+        {
+          "key": "bca",
+          "label": "BCA",
+          "account": "7370-2351-33",
+          "owner": "Claresta"
+        },
+        {
+          "key": "tmrw",
+          "label": "TMRW",
+          "account": "7293-8666-12",
+          "owner": "Claresta"
+        },
+        {
+          "key": "aladin",
+          "label": "Aladin",
+          "account": "2022-7324-139",
+          "owner": "Claresta"
+        }
+      ],
+      "ewallets": [
+        {
+          "key": "dana",
+          "label": "DANA",
+          "account": "0813-7313-1988",
+          "owner": "Claresta/LittleAmoraKarikatur"
+        },
+        {
+          "key": "gopay",
+          "label": "Gopay",
+          "account": "0813-7313-1988",
+          "owner": "Claresta/LittleAmoraKarikatur"
+        },
+        {
+          "key": "ovo",
+          "label": "OVO",
+          "account": "0813-7313-1988",
+          "owner": "Claresta/LittleAmoraKarikatur"
+        },
+        {
+          "key": "shopeepay",
+          "label": "ShopeePay",
+          "account": "0821-6266-2302",
+          "owner": "LittleAmoraKarikatur"
+        }
+      ]
+    },
+    "assets": {
+      "shippingIcon": "icons/shipping-icon.svg",
+      "placeholders": {
+        "productDefault": "images/placeholder/product-default.jpg",
+        "productThumb": "images/placeholder/product-thumb.jpg",
+        "bankDefault": "images/placeholder/bank-default.jpg",
+        "ewalletDefault": "images/placeholder/ewallet-default.jpg",
+        "frameDefault": "images/placeholder/frame-default.jpg",
+        "shadingDefault": "images/placeholder/shading-default.jpg",
+        "packagingDefault": "images/placeholder/packaging-default.jpg",
+        "variationDefault": "images/placeholder/variation-default.jpg",
+        "previewDefault": "images/placeholder/preview-default.jpg",
+        "variationThumb": "images/placeholder/variation-thumb.jpg",
+        "zoomDefault": "images/placeholder/zoom-default.jpg",
+        "additionalDefault": "images/placeholder/additional-default.jpg"
+      }
+    }
+  },
+  "en": {
+    "shoppingCart": {
+      "title": "Shopping Cart",
+      "emptyCart": "Cart is empty",
+      "selectAll": "Select All",
+      "addShipping": "Add Shipping",
+      "noVariations": "No variations",
+      "variations": "Variations",
+      "glassFrame": "Glass Frame",
+      "acrylicFrame": "Acrylic Frame",
+      "shippingCostDescription": "Shipping cost for your order",
+      "save": "Save",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete",
+      "total": "Total",
+      "items": "items",
+      "includesShipping": "Includes shipping cost",
+      "checkout": "Checkout",
+      "payment": {
+        "title": "Payment",
+        "description": "Please make a payment to:",
+        "notes": {
+          "note1": "*Please give the bank payment receipt to our team via WhatsApp",
+          "note2": "*This invoice is valid and published by Claresta, owner of Little Amora Karikatur",
+          "note3": "*Copying or changing in any form is prohibited"
+        }
+      },
+      "continueOrder": {
+        "title": "Continue Order",
+        "description": "If you <strong>WANT TO PAY</strong> or <strong>ALREADY PAID</strong>, you can confirm first with Little Amora team.",
+        "points": {
+          "point1": "1. To check order details (shipping fee, meeting deadline, glass/acrylic, etc)",
+          "point2": "2. So the invoice you get is correct and valid"
+        }
+      },
+      "contactLittleAmora": "Contact Little Amora",
+      "sendToWhatsApp": "Send to Little Amora WhatsApp",
+      "alerts": {
+        "shippingExists": {
+          "title": "Shipping Already Exists",
+          "message": "Shipping cost already exists in the shopping cart.",
+          "gotIt": "Got it"
+        },
+        "selectProduct": {
+          "title": "Attention",
+          "message": "Please select at least 1 product to checkout.",
+          "gotIt": "Got it"
+        },
+        "enterName": {
+          "title": "Enter Your Name",
+          "message": "Enter your name to create invoice.",
+          "example": "Example: John Doe",
+          "sendToWhatsApp": "Send to WhatsApp",
+          "cancel": "Cancel"
+        },
+        "emptyName": {
+          "title": "Empty Name",
+          "message": "Please enter your name first.",
+          "gotIt": "Got it"
+        }
+      },
+      "whatsappMessage": "Hello, Little Amora\nplease make an invoice for order under the name {{customerName}}"
+    },
+    "shipping": {
+      "shippingCost": "Shipping Cost"
+    },
+    "paymentMethods": {
+      "banks": [
+        {
+          "key": "bca",
+          "label": "BCA",
+          "account": "7370-2351-33",
+          "owner": "Claresta"
+        },
+        {
+          "key": "tmrw",
+          "label": "TMRW",
+          "account": "7293-8666-12",
+          "owner": "Claresta"
+        },
+        {
+          "key": "aladin",
+          "label": "Aladin",
+          "account": "2022-7324-139",
+          "owner": "Claresta"
+        }
+      ],
+      "ewallets": [
+        {
+          "key": "dana",
+          "label": "DANA",
+          "account": "0813-7313-1988",
+          "owner": "Claresta/LittleAmoraKarikatur"
+        },
+        {
+          "key": "gopay",
+          "label": "Gopay",
+          "account": "0813-7313-1988",
+          "owner": "Claresta/LittleAmoraKarikatur"
+        },
+        {
+          "key": "ovo",
+          "label": "OVO",
+          "account": "0813-7313-1988",
+          "owner": "Claresta/LittleAmoraKarikatur"
+        },
+        {
+          "key": "shopeepay",
+          "label": "ShopeePay",
+          "account": "0821-6266-2302",
+          "owner": "LittleAmoraKarikatur"
+        }
+      ]
+    },
+    "assets": {
+      "shippingIcon": "icons/shipping-icon.svg",
+      "placeholders": {
+        "productDefault": "images/placeholder/product-default.jpg",
+        "productThumb": "images/placeholder/product-thumb.jpg",
+        "bankDefault": "images/placeholder/bank-default.jpg",
+        "ewalletDefault": "images/placeholder/ewallet-default.jpg",
+        "frameDefault": "images/placeholder/frame-default.jpg",
+        "shadingDefault": "images/placeholder/shading-default.jpg",
+        "packagingDefault": "images/placeholder/packaging-default.jpg",
+        "variationDefault": "images/placeholder/variation-default.jpg",
+        "previewDefault": "images/placeholder/preview-default.jpg",
+        "variationThumb": "images/placeholder/variation-thumb.jpg",
+        "zoomDefault": "images/placeholder/zoom-default.jpg",
+        "additionalDefault": "images/placeholder/additional-default.jpg"
+      }
+    }
+  }
+}

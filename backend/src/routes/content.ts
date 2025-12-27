@@ -11,6 +11,7 @@ import { getLocationContent } from "../controllers/locations/LocationContentCont
 import { getFAQContent } from "../controllers/faq/FAQContentController";
 import { getTermsContent } from "../controllers/terms/TermsContentController";
 import { getContactContent } from "../controllers/contact/ContactContentController";
+import { getShoppingCartContent } from "../controllers/shoppingcart/ShoppingCartController";
 
 const router = Router();
 
@@ -41,4 +42,7 @@ router.get("/tos", getTermsContent);
 
 // contact
 router.get("/contact", getContactContent);
+
+// shoppingcart
+router.get("/shoppingcart", getShoppingCartContent);
 export default router;
