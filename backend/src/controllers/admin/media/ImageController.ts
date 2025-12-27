@@ -93,3 +93,34 @@ export const deleteImageOrFolder = (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to delete" });
   }
 };
+
+// rename
+export const renameImage = (req: Request, res: Response) => {
+  const { oldPath, newName } = req.body;
+
+  if (!oldPath || !newName) {
+    return res.status(400).json({ message: "Invalid data" });
+  }
+
+  const safeName = newName.replace(/[^a-zA-Z0-9-_\.]/g, "");
+  const oldFullPath = path.join(process.cwd(), "uploads/images", oldPath);
+
+  if (!fs.existsSync(oldFullPath)) {
+    return res.status(404).json({ message: "File not found" });
+  }
+
+  const ext = path.extname(oldFullPath);
+  const dir = path.dirname(oldFullPath);
+  const newFullPath = path.join(dir, safeName + ext);
+
+  if (fs.existsSync(newFullPath)) {
+    return res.status(409).json({ message: "Filename already exists" });
+  }
+
+  fs.renameSync(oldFullPath, newFullPath);
+
+  res.json({
+    success: true,
+    name: safeName + ext
+  });
+};

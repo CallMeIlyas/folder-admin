@@ -15,7 +15,10 @@ const ImageManagerPage = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showRename, setShowRename] = useState(false);
+  const [renameValue, setRenameValue] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -59,9 +62,7 @@ const ImageManagerPage = () => {
   const toggleSelect = (item: ImageItem) => {
     setSelectedItems(prev => {
       const exists = prev.find(i => i.id === item.id);
-      if (exists) {
-        return prev.filter(i => i.id !== item.id);
-      }
+      if (exists) return prev.filter(i => i.id !== item.id);
       return [...prev, item];
     });
   };
@@ -81,11 +82,9 @@ const ImageManagerPage = () => {
 
     try {
       const formData = new FormData();
-
-      Array.from(files).forEach(file => {
-        formData.append("images", file);
-      });
-
+      Array.from(files).forEach(file =>
+        formData.append("images", file)
+      );
       formData.append("folder", currentFolder);
 
       const res = await apiFetch(
@@ -114,8 +113,6 @@ const ImageManagerPage = () => {
   };
 
   const confirmDelete = async () => {
-    if (selectedItems.length === 0) return;
-
     try {
       for (const item of selectedItems) {
         const path = currentFolder
@@ -146,8 +143,47 @@ const ImageManagerPage = () => {
     }
   };
 
+  const confirmRename = async () => {
+    if (selectedItems.length !== 1) return;
+
+    const item = selectedItems[0];
+    const oldPath = currentFolder
+      ? `${currentFolder}/${item.name}`
+      : item.name;
+
+    try {
+      const res = await apiFetch(
+        "/api/admin/media/images/rename",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("admin_token")}`
+          },
+          body: JSON.stringify({
+            oldPath,
+            newName: renameValue
+          })
+        }
+      );
+
+      if (!res.ok) throw new Error("Rename gagal");
+
+      setShowRename(false);
+      setSelectedItems([]);
+      fetchImages(currentFolder);
+    } catch (err: any) {
+      setError(err.message || "Rename gagal");
+    }
+  };
+
+  const canRename =
+    selectedItems.length === 1 &&
+    selectedItems[0].type === "image";
+
   return (
     <div className="p-6 font-poppinsRegular">
+      {/* HEADER */}
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-poppinsBold">Image Manager</h1>
@@ -162,7 +198,19 @@ const ImageManagerPage = () => {
             disabled={uploading}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black text-white text-sm hover:bg-gray-800 disabled:opacity-50"
           >
-            ＋ Upload Image
+            ＋ Upload
+          </button>
+
+          <button
+            onClick={() => {
+              const base = selectedItems[0].name.replace(/\.[^/.]+$/, "");
+              setRenameValue(base);
+              setShowRename(true);
+            }}
+            disabled={!canRename}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black text-white text-sm hover:bg-gray-800 disabled:opacity-50"
+          >
+            ✎ Rename
           </button>
 
           <button
@@ -170,7 +218,7 @@ const ImageManagerPage = () => {
             disabled={selectedItems.length === 0}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black text-white text-sm hover:bg-gray-800 disabled:opacity-50"
           >
-            Hapus ({selectedItems.length})
+            🗑 Hapus ({selectedItems.length})
           </button>
         </div>
 
@@ -197,6 +245,7 @@ const ImageManagerPage = () => {
       {uploading && <p className="text-sm text-gray-500">Uploading...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
+      {/* GRID */}
       {!loading && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {items.map(item => {
@@ -227,9 +276,7 @@ const ImageManagerPage = () => {
                 {item.type === "folder" ? (
                   <div className="flex flex-col items-center justify-center h-40">
                     <div className="text-5xl">📁</div>
-                    <p className="text-sm mt-2 truncate">
-                      {item.name}
-                    </p>
+                    <p className="text-sm mt-2 truncate">{item.name}</p>
                   </div>
                 ) : (
                   <>
@@ -238,53 +285,72 @@ const ImageManagerPage = () => {
                       alt={item.name}
                       className="w-full h-40 object-cover rounded"
                     />
-                    <p className="text-xs mt-2 truncate">
-                      {item.name}
-                    </p>
+                    <p className="text-xs mt-2 truncate">{item.name}</p>
                   </>
                 )}
               </div>
             );
           })}
-
-          {items.length === 0 && (
-            <p className="text-gray-500 col-span-full">
-              Folder kosong
-            </p>
-          )}
         </div>
       )}
 
-      {showDeleteConfirm && selectedItems.length > 0 && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl">
-            <div className="text-center">
-              <div className="mx-auto flex items-center justify-center w-16 h-16 rounded-full bg-[#dcbec1] mb-4">
-                !
-              </div>
+      {/* DELETE MODAL */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl text-center">
+            <div className="mx-auto w-16 h-16 rounded-full bg-[#dcbec1] flex items-center justify-center mb-4">
+              !
+            </div>
+            <h3 className="font-poppinsBold mb-2">
+              Hapus {selectedItems.length} file?
+            </h3>
+            <p className="text-gray-600 mb-6">
+              File akan dihapus permanen
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="w-full py-3 rounded-full bg-gray-100 hover:bg-gray-200"
+              >
+                Batal
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="w-full py-3 rounded-full bg-[#dcbec1] hover:bg-[#c7a9ac]"
+              >
+                Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-              <h3 className="font-poppinsBold text-lg mb-2">
-                Hapus {selectedItems.length} file?
-              </h3>
-
-              <p className="text-gray-600 mb-6">
-                File akan dihapus permanen
-              </p>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="w-full py-3 rounded-full bg-gray-100 hover:bg-gray-200"
-                >
-                  Batal
-                </button>
-                <button
-                  onClick={confirmDelete}
-                  className="w-full py-3 rounded-full bg-[#dcbec1] hover:bg-[#c7a9ac]"
-                >
-                  Hapus
-                </button>
-              </div>
+      {/* RENAME MODAL */}
+      {showRename && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl text-center">
+            <div className="mx-auto w-16 h-16 rounded-full bg-[#dcbec1] flex items-center justify-center mb-4">
+              ✎
+            </div>
+            <h3 className="font-poppinsBold mb-2">Ubah Nama File</h3>
+            <input
+              value={renameValue}
+              onChange={e => setRenameValue(e.target.value)}
+              className="w-full border rounded-lg px-4 py-2 mb-6"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowRename(false)}
+                className="w-full py-3 rounded-full bg-gray-100 hover:bg-gray-200"
+              >
+                Batal
+              </button>
+              <button
+                onClick={confirmRename}
+                className="w-full py-3 rounded-full bg-[#dcbec1] hover:bg-[#c7a9ac]"
+              >
+                Simpan
+              </button>
             </div>
           </div>
         </div>

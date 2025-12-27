@@ -4,9 +4,9 @@ import { uploadImage } from "../../middleware/uploadImage";
 import {
   listImages,
   uploadImageFile,
-  deleteImageOrFolder
+  deleteImageOrFolder,
+  renameImage
 } from "../../controllers/admin/media/ImageController";
-
 const router = Router();
 
 router.get("/images", adminAuth, listImages);
@@ -22,6 +22,12 @@ router.delete(
   "/images",
   adminAuth,
   deleteImageOrFolder
+);
+
+router.put(
+  "/images/rename",
+  adminAuth,
+  renameImage
 );
 
 export default router;

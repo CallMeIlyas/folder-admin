@@ -22,9 +22,8 @@ import AdminDashboard from "./pages/admin/AdminDashboard"
 import ImageManagerPage from "./pages/admin/ImageManagerPage"
 import TextEditorPage from "./pages/admin/TextEditorPage"
 import VideoManagerPage from "./pages/admin/VideoManagerPage"
-import ContactManagerPage from "./pages/admin/ContactManagerPage"
 import InvoiceManagerPage from "./pages/admin/InvoiceManagerPage"
-import MediaLibraryPage from "./pages/admin/MediaLibraryPage"
+import ProductManagerPage from "./pages/admin/ProductManagerPage";
 
 // Import AuthGuard dan AdminLayout
 import AuthGuard from "./components/admin/auth/AuthGuard"
@@ -111,9 +110,8 @@ const App = () => {
             <Route path="images" element={<ImageManagerPage />} />
             <Route path="text" element={<TextEditorPage />} />
             <Route path="videos" element={<VideoManagerPage />} />
-            <Route path="contact" element={<ContactManagerPage />} />
-            <Route path="invoices" element={<InvoiceManagerPage />} />
-            <Route path="media" element={<MediaLibraryPage />} />
+            <Route path="invoice" element={<InvoiceManagerPage />} />
+            <Route path="product" element ={<ProductManagerPage />} />
           </Route>
 
           {/* Redirect untuk admin yang tidak login */}
