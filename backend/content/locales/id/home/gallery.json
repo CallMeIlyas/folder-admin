@@ -1,38 +1,59 @@
 {
   "title": "Galeri Kami",
-  
+
   "sections": {
     "photo": "Galeri Foto",
     "video": "Galeri Video"
   },
-  
+
   "icons": {
-    "instagram": "/api/uploads/images/icons/ig.png",
-    "tiktok": "/api/uploads/images/icons/tiktok.png"
+    "instagram": "/api/uploads/images/Icons/IG.png",
+    "tiktok": "/api/uploads/images/Icons/TIKTOD2.png"
   },
-  
-  "videos": {
-    "video1": "/api/uploads/videos/vid-1.mp4",
-    "video2": "/api/uploads/videos/vid-2.mp4",
-    "video3": "/api/uploads/videos/vid-3.mp4"
-  },
-  
-  "photos": {
-    "foto1": "/api/uploads/images/karya/foto/foto1.jpeg",
-    "foto2": "/api/uploads/images/karya/foto/foto2.jpeg",
-    "foto3": "/api/uploads/images/karya/foto/foto3.jpeg",
-    "foto4": "/api/uploads/images/karya/foto/foto4.jpeg",
-    "foto5": "/api/uploads/images/karya/foto/foto5.jpeg"
-  },
-  
-  "photoLabels": {
-    "foto1": "A2 (40×55cm)",
-    "foto2": "10R / 25×30cm",
-    "foto3": "12R / 30×40cm",
-    "foto4": "12R / 30×40cm",
-    "foto5": "A0 (80×110cm)"
-  },
-  
+
+  "videos": [
+    {
+      "id": "video1",
+      "src": "/api/uploads/videos/vid-1.mp4"
+    },
+    {
+      "id": "video2",
+      "src": "/api/uploads/videos/vid-2.mp4"
+    },
+    {
+      "id": "video3",
+      "src": "/api/uploads/videos/vid-3.mp4"
+    }
+  ],
+
+  "photos": [
+    {
+      "id": "foto1",
+      "image": "/api/uploads/images/karya/foto/foto1.jpeg",
+      "label": "A2 (40×55cm)"
+    },
+    {
+      "id": "foto2",
+      "image": "/api/uploads/images/karya/foto/foto2.jpeg",
+      "label": "10R / 25×30cm"
+    },
+    {
+      "id": "foto3",
+      "image": "/api/uploads/images/karya/foto/foto3.jpeg",
+      "label": "12R / 30×40cm"
+    },
+    {
+      "id": "foto4",
+      "image": "/api/uploads/images/karya/foto/foto4.jpeg",
+      "label": "12R / 30×40cm"
+    },
+    {
+      "id": "foto5",
+      "image": "/api/uploads/images/karya/foto/foto5.jpeg",
+      "label": "A0 (80×110cm)"
+    }
+  ],
+
   "modal": {
     "chatAdmin": "Chat Admin",
     "goToProduct": "Pergi ke Produk",

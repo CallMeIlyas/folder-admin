@@ -1,48 +1,52 @@
 import { Request, Response } from "express";
 import { readJson } from "../../../utils/readJson";
+import { getAllProducts } from "../../services/productService";
 
-const SUPPORTED_LANGS = ["en", "id"] as const;
-type Lang = typeof SUPPORTED_LANGS[number];
-
-export const getGalleryContent = (req: Request, res: Response) => {
-  const queryLang = req.query.lang as string;
-  
-  const lang: Lang = SUPPORTED_LANGS.includes(queryLang as Lang) 
-    ? (queryLang as Lang) 
-    : "en";
-
-  let data;
-  
+export const getGalleryContent = async (req: Request, res: Response) => {
   try {
-    data = readJson(`content/locales/${lang}/home/gallery.json`);
-  } catch {
-    data = readJson("content/locales/en/home/gallery.json");
-  }
+    const lang = (req.query.lang as string) || "en";
+    const data = readJson(`content/locales/${lang}/home/gallery.json`);
 
-  const response = {
-    title: data.title,
-    social: {
-      instagram: {
-        label: data.social.instagram.label,
-        icon: "/api/uploads/images/icons/ig.png",
-        url: data.social.instagram.url
+    const products = await getAllProducts(lang);
+
+    const frameProducts = products.filter(
+      (p: any) => p.category?.toLowerCase() === "3d frame"
+    );
+
+    const normalizeSize = (label: string) =>
+      label.split(/[\/\s(]/)[0].trim().toUpperCase();
+
+    const photos = (data.photos || []).map((p: any) => {
+      const sizeKey = normalizeSize(p.label);
+
+      const matchedProduct = frameProducts.find((prod: any) =>
+        prod.name.toUpperCase().includes(sizeKey)
+      );
+
+      return {
+        id: p.id,
+        imageUrl: p.image,
+        label: p.label,
+        productId: matchedProduct?.id ?? null,
+        productName: matchedProduct?.name ?? p.label,
+        price: matchedProduct?.price ?? null
+      };
+    });
+
+    res.json({
+      title: data.title,
+      socialIcons: {
+        instagram: "/api/uploads/images/Icons/IG.png",
+        tiktok: "/api/uploads/images/Icons/TIKTOD2.png"
       },
-      tiktok: {
-        label: data.social.tiktok.label,
-        icon: "/api/uploads/images/icons/tiktok.png",
-        url: data.social.tiktok.url
-      }
-    },
-    videos: data.videos.map((v: any) => ({
-      id: v.id,
-      src: v.src
-    })),
-    photos: data.photos.map((p: any) => ({
-      id: p.id,
-      image: p.image,
-      label: p.label
-    }))
-  };
-
-  res.json(response);
+      videos: (data.videos || []).map((v: any) => ({
+        id: v.id,
+        videoUrl: v.src
+      })),
+      photos
+    });
+  } catch (err) {
+    console.error("GalleryContent error:", err);
+    res.status(500).json({ message: "Failed to load gallery content" });
+  }
 };

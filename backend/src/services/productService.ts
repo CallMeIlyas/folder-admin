@@ -268,7 +268,7 @@ export const productService = {
     // =========================
     // ===== OTHER ============
     // =========================
-    else {
+else {
       price = getPrice(product.category, product.name);
     }
 
@@ -277,4 +277,17 @@ export const productService = {
 
     return price;
   },
+};
+
+// =========================
+// ===== GET ALL PRODUCTS ==
+// =========================
+
+export const getAllProducts = async (language: 'id' | 'en' = 'id') => {
+  return allProducts.map((p) => ({
+    id: p.id,
+    name: p.name,
+    category: p.category,
+    price: getPrice(p.category, p.name),
+  }));
 };
