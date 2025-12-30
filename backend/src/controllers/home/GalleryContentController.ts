@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { readJson } from "../../../utils/readJson"
-import { getAllProducts } from "../../services/productService"
+import { getAllProducts } from "../../../data/productDataLoader"
 
 const normalizeLang = (lang?: string) => {
   if (!lang) return "en"
@@ -12,7 +12,7 @@ const normalizeLang = (lang?: string) => {
 const normalizeSize = (label: string) =>
   label.split(/[\/\s(]/)[0].trim().toUpperCase()
 
-export const getGalleryContent = async (req: Request, res: Response) => {
+export const getGalleryContent = (req: Request, res: Response) => {
   try {
     const lang = normalizeLang(req.query.lang as string)
 
@@ -23,21 +23,22 @@ export const getGalleryContent = async (req: Request, res: Response) => {
       data = readJson(`content/locales/en/home/gallery.json`)
     }
 
-    const products = await getAllProducts(lang)
+    // ✅ LIVE PRODUCTS
+    const products = getAllProducts()
 
+    // ✅ HANYA 3D FRAME + AKTIF
     const frameProducts = products.filter(
-      (p: any) => p.category?.toLowerCase() === "3d frame"
+      p =>
+        p.category === "3D Frame" &&
+        p.admin?.active !== false
     )
 
     const photos = (data.photos || []).map((p: any) => {
       const sizeKey = normalizeSize(p.label)
 
-      const matchedProduct = frameProducts.find((prod: any) => {
-        const name =
-          prod.name ||
-          prod.displayName ||
-          ""
-        return name.toUpperCase().includes(sizeKey)
+      const matchedProduct = frameProducts.find(prod => {
+        const name = `${prod.name} ${prod.displayName}`.toUpperCase()
+        return name.includes(sizeKey)
       })
 
       return {
@@ -46,8 +47,8 @@ export const getGalleryContent = async (req: Request, res: Response) => {
         label: p.label,
         productId: matchedProduct?.id ?? null,
         productName:
-          matchedProduct?.name ||
           matchedProduct?.displayName ||
+          matchedProduct?.name ||
           p.label,
         price: matchedProduct?.price ?? null
       }

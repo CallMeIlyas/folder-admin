@@ -3,8 +3,6 @@ import path from "path";
 import { getPrice } from "../utils/getPrice";
 import { loadProductAdminConfig } from "../src/config/productConfig";
 
-const adminConfig = loadProductAdminConfig();
-
 export interface Product {
   id: string;
   imageUrl: string;
@@ -26,6 +24,14 @@ export interface Product {
   sizeFrameOptions?: { label: string; value: string; image: string }[];
   details?: Record<string, any>;
   showInGallery?: boolean;
+  admin?: {
+    active: boolean;
+    frames?: {
+      glass: boolean;
+      acrylic: boolean;
+    };
+    mainImageIndex?: number;
+  };
 }
 
 // === Mapping Folder → Nama Kategori Custom ===
@@ -146,121 +152,125 @@ const get2DSizeFrameOptions = () => {
 
 // === Helper untuk mendapatkan default frame variations ===
 const getFrameVariations = (category: string, name: string): string[] => {
-  const c = category.toLowerCase();
-  const n = name.toLowerCase();
+  const c = category.toLowerCase()
+  const n = name.toLowerCase()
 
-  const glassSizes = ["4r", "6r", "8r", "10r", "12r", "15cm"];
-  const acrylicSizes = ["a2", "a1", "a0"];
+  const glassSizes = ["4r", "6r", "8r", "10r", "12r", "15cm"]
+  const acrylicOnlySizes = ["a2", "a1", "a0"]
 
   if (c.includes("2d")) {
-    return ["frameGlass"];
+    return ["frameGlass"]
   }
 
   if (c.includes("3d")) {
-    if (acrylicSizes.some(s => n.includes(s))) {
-      return ["frameAcrylic"];
+    // 🔥 PAKSA ACRYLIC ONLY
+    if (acrylicOnlySizes.some(s => n.includes(s))) {
+      return ["frameAcrylic"]
     }
+
+    // 🔥 GLASS DEFAULT UNTUK UKURAN KECIL
     if (glassSizes.some(s => n.includes(s))) {
-      return ["frameGlass"];
+      return ["frameGlass"]
     }
   }
 
-  return [];
-};
+  return []
+}
 
-// === Generate Semua Produk (IDENTIK) ===
-export const allProducts: Product[] = Object.entries(groupedImages)
-  .map(([groupKey, images], index) => {
-    const [rawCategory, subcategory] = groupKey.split("/");
-    const mappedCategory =
-      categoryMapping[rawCategory.toUpperCase()] || rawCategory;
+// === Function untuk mendapatkan semua produk ===
+export const getAllProducts = (): Product[] => {
+  const adminConfig = loadProductAdminConfig();
 
-    // ✅ FIX: Deklarasi cleanSub dan fileName DI AWAL
-    const cleanSub = subcategory?.trim() || null;
-    const fileName = cleanSub || `Product ${index + 1}`;
+  return Object.entries(groupedImages)
+    .map(([groupKey, images], index) => {
+      const [rawCategory, subcategory] = groupKey.split("/");
+      const mappedCategory =
+        categoryMapping[rawCategory.toUpperCase()] || rawCategory;
 
-    // Generate product ID
-    const productId = `prod-${rawCategory.toLowerCase()}-${(cleanSub || "default")
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, "-")}`;
+      const cleanSub = subcategory?.trim() || null;
+      const fileName = cleanSub || `Product ${index + 1}`;
 
-    // Get admin config untuk product ini
-    const admin = adminConfig[productId];
+      const productId = `prod-${rawCategory.toLowerCase()}-${(cleanSub || "default")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "-")}`;
 
-    // Skip produk jika tidak aktif di admin config
-    if (admin?.active === false) {
-      return null;
-    }
+      const admin = adminConfig[productId];
 
-    const decodedImages = images.map(img => decodeURIComponent(img));
+      const decodedImages = images.map(img => decodeURIComponent(img));
 
-    // ✅ FIX: SEKARANG fileName SUDAH ADA untuk digunakan di sini
-    // FRAME OVERRIDE LOGIC: Ganti dengan admin config jika ada
-    const defaultFrames = getFrameVariations(mappedCategory, fileName);
-    let frameVariations = defaultFrames;
-    
-    if (admin?.frames) {
-      frameVariations = [];
-      if (admin.frames.glass) frameVariations.push("frameGlass");
-      if (admin.frames.acrylic) frameVariations.push("frameAcrylic");
-    }
-
-    // 🔴 PRIORITAS MAIN IMAGE
-const mainImage =
-  admin?.mainImage ||
-  decodedImages.find(img => {
-    const f = img.split("/").pop()?.toLowerCase() || "";
-    return f === "main image.jpg";
-  }) ||
-  decodedImages.find(img => {
-    const f = img.split("/").pop()?.toLowerCase() || "";
-    return f.includes("main image") || f.includes("mainimage");
-  }) ||
-  decodedImages.find(img => {
-    const f = img.split("/").pop()?.toLowerCase() || "";
-    return f === "1.jpg";
-  }) ||
-  decodedImages[0];
-
-    // 🔴 PAKSA MAIN IMAGE DI INDEX 0
-    const orderedImages = [
-      mainImage,
-      ...decodedImages.filter(img => img !== mainImage),
-    ];
-
-    // Show in gallery default to true jika tidak ada config
-    const showInGallery = admin?.showInGallery !== false;
-
-    return {
-      id: productId,
-      imageUrl: mainImage,
-      name: fileName,
-      displayName: subcategory
-        ? `${mappedCategory} ${subcategory.replace(/-\s*\d+\s*x\s*\d+\s*cm/i, "").trim()}`
-        : mappedCategory,
-      size: "Custom",
-      category: mappedCategory,
-      subcategory: subcategory || null,
-      fullPath: `${mappedCategory}${subcategory ? " / " + subcategory : ""}`,
-      price: getPrice(mappedCategory, fileName),
-      shippedFrom: ["Bogor", "Jakarta"],
-      shippedTo: ["Worldwide"],
-      allImages: orderedImages,
-
-      options: {
-        variations: frameVariations,
-      },
-
-      shadingOptions:
-        mappedCategory === "2D Frame" ? get2DShadingOptions() : undefined,
-      sizeFrameOptions:
-        mappedCategory === "2D Frame" ? get2DSizeFrameOptions() : undefined,
+      const defaultFrames = getFrameVariations(mappedCategory, fileName);
       
-      // Tambahkan showInGallery dari admin config
-      showInGallery: showInGallery
-    };
-  })
-  .filter(Boolean) as Product[]; // Filter out null products
+      
+let frameVariations: string[] = []
+
+if (admin?.frames) {
+  if (admin.frames.glass === true) {
+    frameVariations.push("frameGlass")
+  }
+
+  if (admin.frames.acrylic === true) {
+    frameVariations.push("frameAcrylic")
+  }
+} else {
+  frameVariations = getFrameVariations(mappedCategory, fileName)
+}
+
+      const mainImage =
+        decodedImages.find(img => {
+          const f = img.split("/").pop()?.toLowerCase() || "";
+          return f === "main image.jpg";
+        }) ||
+        decodedImages.find(img => {
+          const f = img.split("/").pop()?.toLowerCase() || "";
+          return f.includes("main image") || f.includes("mainimage");
+        }) ||
+        decodedImages.find(img => {
+          const f = img.split("/").pop()?.toLowerCase() || "";
+          return f === "1.jpg";
+        }) ||
+        decodedImages[0];
+
+      const orderedImages = [
+        mainImage,
+        ...decodedImages.filter(img => img !== mainImage),
+      ];
+
+      return {
+        id: productId,
+        imageUrl: mainImage,
+        name: fileName,
+        displayName: subcategory
+          ? `${mappedCategory} ${subcategory.replace(/-\s*\d+\s*x\s*\d+\s*cm/i, "").trim()}`
+          : mappedCategory,
+        size: "Custom",
+        category: mappedCategory,
+        subcategory: subcategory || null,
+        fullPath: `${mappedCategory}${subcategory ? " / " + subcategory : ""}`,
+        price: getPrice(mappedCategory, fileName),
+        shippedFrom: ["Bogor", "Jakarta"],
+        shippedTo: ["Worldwide"],
+        allImages: orderedImages,
+
+        admin: {
+          active: admin?.active !== false,
+          frames: admin?.frames || { glass: false, acrylic: false },
+          mainImageIndex: admin?.mainImageIndex ?? 0,
+        },
+
+        options: {
+          variations: frameVariations,
+        },
+
+        shadingOptions:
+          mappedCategory === "2D Frame" ? get2DShadingOptions() : undefined,
+        sizeFrameOptions:
+          mappedCategory === "2D Frame" ? get2DSizeFrameOptions() : undefined,
+
+        showInGallery: admin?.showInGallery !== false,
+      };
+    })
+    .filter(Boolean) as Product[];
+};
 
 // === Custom Ordering (TIDAK DIUBAH SATU KARAKTER) ===
 const baris1 = [
@@ -291,20 +301,38 @@ const baris4 = [
   { category: "Additional", name: "BIAYA TAMBAHAN GANTI FRAME KACA KE ACRYLIC" },
 ];
 
-const findProduct = (item: { category: string; name: string }) =>
-  allProducts.find(p => p.category === item.category && p.name === item.name) || null;
+// === Helper function untuk menemukan produk berdasarkan kategori dan nama ===
+const findProduct = (item: { category: string; name: string }, products: Product[]) =>
+  products.find(p => p.category === item.category && p.name === item.name) || null;
 
-const part1 = baris1.map(findProduct).filter(Boolean) as Product[];
-const part2 = baris2.map(findProduct).filter(Boolean) as Product[];
-const part3 = baris3.map(findProduct).filter(Boolean) as Product[];
-const part4 = baris4.map(findProduct).filter(Boolean) as Product[];
+// === Function untuk mendapatkan produk dengan custom ordering ===
+export const getOrderedProducts = (): Product[] => {
+  const allProducts = getAllProducts();
+  
+  const part1 = baris1.map(item => findProduct(item, allProducts)).filter(Boolean) as Product[];
+  const part2 = baris2.map(item => findProduct(item, allProducts)).filter(Boolean) as Product[];
+  const part3 = baris3.map(item => findProduct(item, allProducts)).filter(Boolean) as Product[];
+  const part4 = baris4.map(item => findProduct(item, allProducts)).filter(Boolean) as Product[];
 
-let orderedProducts = [...part1, ...part2, ...part3, ...part4];
-const usedIds = new Set(orderedProducts.map(p => p.id));
-const remainingProducts = allProducts.filter(p => !usedIds.has(p.id));
-orderedProducts = [...orderedProducts, ...remainingProducts];
+  let orderedProducts = [...part1, ...part2, ...part3, ...part4];
+  const usedIds = new Set(orderedProducts.map(p => p.id));
+  const remainingProducts = allProducts.filter(p => !usedIds.has(p.id));
+  orderedProducts = [...orderedProducts, ...remainingProducts];
 
-// Export produk untuk gallery (hanya yang showInGallery true)
-export const galleryProducts = allProducts.filter(p => p.showInGallery !== false);
+  return orderedProducts;
+};
 
-export { orderedProducts };
+// === Function untuk mendapatkan produk gallery ===
+export const getGalleryProducts = (): Product[] => {
+  const allProducts = getAllProducts();
+  return allProducts.filter(p => p.showInGallery !== false);
+};
+
+// === Export untuk kompatibilitas backward ===
+export {
+  getAllProducts,
+  getOrderedProducts,
+  getGalleryProducts
+};
+
+export { getAllProducts, getOrderedProducts, getGalleryProducts };

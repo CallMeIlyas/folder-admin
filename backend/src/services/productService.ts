@@ -1,6 +1,18 @@
-import { allProducts } from "../../data/productDataLoader";
+import { getAllProducts } from "../../data/productDataLoader";
 import { getProductDescription } from "../../data/productDescriptions";
 import { getPrice } from "../../utils/getPrice";
+
+// =========================
+// ===== HELPER FUNCTION ===
+// =========================
+
+/**
+ * Helper untuk mendapatkan produk terbaru (live data)
+ * Setiap pemanggilan akan mendapatkan data fresh dari filesystem
+ */
+const getLiveProducts = () => {
+  return getAllProducts();
+};
 
 // =========================
 // ===== NORMALIZERS =======
@@ -138,10 +150,25 @@ const resolveAdditionalKey = (productName: string, options: any, language: 'id' 
 // =========================
 
 export const productService = {
-  getProductDetail(category: string, name: string, language: 'id' | 'en' = 'id') {
-    // Update getProductDescription untuk menerima parameter bahasa
-    // Jika getProductDescription tidak mendukung bahasa, kita perlu buat wrapper
-    const description = getProductDescription(category, name);
+  /**
+   * ✅ DIPERBAIKI: Sekarang menggunakan productId, bukan category+name
+   * Signature lama: getProductDetail(category: string, name: string, language: 'id' | 'en' = 'id')
+   * Signature baru: getProductDetail(productId: string, language: 'id' | 'en' = 'id')
+   */
+  getProductDetail(productId: string, language: 'id' | 'en' = 'id') {
+    const products = getLiveProducts();
+    const product = products.find(p => p.id === productId);
+    
+    // Cek apakah produk aktif
+    if (!product || product.admin?.active === false) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[ProductService] Product not found or inactive: ${productId}`);
+      }
+      return null;
+    }
+    
+    // Dapatkan deskripsi berdasarkan product yang ditemukan
+    const description = getProductDescription(product.category, product.name);
     
     // Jika description sudah berupa object dengan properti bahasa
     if (description && typeof description === 'object' && (description.id || description.en)) {
@@ -153,48 +180,94 @@ export const productService = {
   },
 
   getBasePrice(productId: string, language: 'id' | 'en' = 'id') {
-    const product = allProducts.find(p => p.id === productId);
-    if (!product) return 0;
+    const products = getLiveProducts();
+    const product = products.find(p => p.id === productId);
     
-    // Jika getPrice mendukung bahasa, update parameter
-    // Jika tidak, return harga dasar saja
+    // Cek apakah produk aktif
+    if (!product || product.admin?.active === false) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[ProductService] Product not found or inactive: ${productId}`);
+      }
+      return 0;
+    }
+    
     return getPrice(product.category, product.name);
   },
 
   isBestSelling(productId: string, language: 'id' | 'en' = 'id') {
-    const product = allProducts.find(p => p.id === productId);
-    if (!product) return { isBestSelling: false };
+  const products = getLiveProducts()
+  const product = products.find(p => p.id === productId)
 
-    const name = product.name.toLowerCase();
-    const category = product.category.toLowerCase();
+  if (!product || product.admin?.active === false) {
+    return { isBestSelling: false }
+  }
 
-    if (
-      (category.includes("3d") && (name.includes("12r") || name.includes("10r"))) ||
-      (category.includes("2d") && name.includes("8r"))
-    ) {
-      const labels = {
-        id: "Paling populer untuk ukuran",
-        en: "Most popular for size"
-      };
-      return { isBestSelling: true, label: labels[language] };
-    }
+  const name = product.name.toLowerCase()
+  const category = product.category.toLowerCase()
 
-    return { isBestSelling: false };
-  },
+  // ⛔ HARD BLOCK AI
+  const isAI =
+    name.includes("by ai") ||
+    name.endsWith(" ai") ||
+    name.includes("(ai)") ||
+    name.includes(" ai ") ||
+    name.includes("-ai") ||
+    name.includes(" ai-")
+
+  if (isAI) {
+    return { isBestSelling: false }
+  }
+
+  // ⛔ ADDITIONAL TIDAK PERNAH BEST SELLING
+  if (category.includes("additional")) {
+    return { isBestSelling: false }
+  }
+
+  // ✅ RULE BEST SELLING
+const isBest =
+  (category.includes("3d") && (name.includes("12r") || name.includes("10r"))) ||
+  (category.includes("2d") && name.includes("8r")) ||
+  (category.includes("acrylic") && name.includes("2cm"))
+
+  if (!isBest) {
+    return { isBestSelling: false }
+  }
+
+  const labels = {
+    id: "Paling populer untuk ukuran",
+    en: "Most popular for size"
+  }
+
+  return {
+    isBestSelling: true,
+    label: labels[language]
+  }
+},
 
   calculatePrice(productId: string, options: any, language: 'id' | 'en' = 'id') {
-    const product = allProducts.find(p => p.id === productId);
-    if (!product) return 0;
+    const products = getLiveProducts();
+    const product = products.find(p => p.id === productId);
+    
+    // Cek apakah produk aktif
+    if (!product || product.admin?.active === false) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[ProductService] Product not found or inactive: ${productId}`);
+      }
+      return 0;
+    }
 
     const category = product.category.toLowerCase();
     let price = 0;
 
-    console.log("========== CALCULATE PRICE ==========");
-    console.log("productId:", productId);
-    console.log("category:", product.category);
-    console.log("name:", product.name);
-    console.log("language:", language);
-    console.log("options:", options);
+    // ✅ DIPERBAIKI: Hanya log di development dengan flag khusus
+    if (process.env.DEBUG_PRICE === "true" || process.env.NODE_ENV === 'development') {
+      console.log("========== CALCULATE PRICE ==========");
+      console.log("productId:", productId);
+      console.log("category:", product.category);
+      console.log("name:", product.name);
+      console.log("language:", language);
+      console.log("product active status:", product.admin?.active);
+    }
 
     // =========================
     // ===== ADDITIONAL (HARD RULE)
@@ -203,10 +276,14 @@ export const productService = {
       const key = resolveAdditionalKey(product.name, options, language);
       if (key) {
         price = getPrice("Additional", key);
-        console.log("[ADDITIONAL] lookup:", key, price);
+        if (process.env.DEBUG_PRICE === "true") {
+          console.log("[ADDITIONAL] lookup:", key, price);
+        }
         return price;
       }
-      console.log("[ADDITIONAL] no matching key");
+      if (process.env.DEBUG_PRICE === "true") {
+        console.log("[ADDITIONAL] no matching key");
+      }
       return 0;
     }
 
@@ -219,12 +296,16 @@ export const productService = {
 
       if (frameSize && shadingKey) {
         price = getPrice("2D frame", shadingKey, frameSize);
-        console.log("[2D] lookup:", frameSize, shadingKey, price);
+        if (process.env.DEBUG_PRICE === "true") {
+          console.log("[2D] lookup:", frameSize, shadingKey, price);
+        }
       }
 
       if (price === 0) {
         price = getPrice(product.category, product.name);
-        console.log("[2D] fallback:", price);
+        if (process.env.DEBUG_PRICE === "true") {
+          console.log("[2D] fallback:", price);
+        }
       }
     }
 
@@ -238,12 +319,16 @@ export const productService = {
       if (frameSize === "8R" && packaging) {
         const key = `${frameSize} ${packaging}`;
         price = getPrice("3D frame", key);
-        console.log("[3D] lookup:", key, price);
+        if (process.env.DEBUG_PRICE === "true") {
+          console.log("[3D] lookup:", key, price);
+        }
       }
 
       if (price === 0) {
         price = getPrice(product.category, product.name);
-        console.log("[3D] fallback:", price);
+        if (process.env.DEBUG_PRICE === "true") {
+          console.log("[3D] fallback:", price);
+        }
       }
     }
 
@@ -256,38 +341,147 @@ export const productService = {
       if (opt) {
         const key = `Acrylic Stand 3mm size ${opt}`;
         price = getPrice("Acrylic Stand", key);
-        console.log("[ACRYLIC] lookup:", key, price);
+        if (process.env.DEBUG_PRICE === "true") {
+          console.log("[ACRYLIC] lookup:", key, price);
+        }
       }
 
       if (price === 0) {
         price = getPrice(product.category, product.name);
-        console.log("[ACRYLIC] fallback:", price);
+        if (process.env.DEBUG_PRICE === "true") {
+          console.log("[ACRYLIC] fallback:", price);
+        }
       }
     }
 
     // =========================
     // ===== OTHER ============
     // =========================
-else {
+    else {
       price = getPrice(product.category, product.name);
     }
 
-    console.log("FINAL PRICE:", price);
-    console.log("====================================");
+    if (process.env.DEBUG_PRICE === "true") {
+      console.log("FINAL PRICE:", price);
+      console.log("====================================");
+    }
 
     return price;
   },
 };
 
 // =========================
-// ===== GET ALL PRODUCTS ==
+// ===== GET PRODUCTS FOR USER ===
 // =========================
 
-export const getAllProducts = async (language: 'id' | 'en' = 'id') => {
-  return allProducts.map((p) => ({
+/**
+ * ✅ DIPERBAIKI: Hanya untuk user-facing endpoints
+ * Digunakan oleh: ProductGrid, Search, Gallery
+ */
+export const getAllProductsForUser = async (language: 'id' | 'en' = 'id') => {
+  const products = getLiveProducts();
+  
+  // Filter hanya produk yang aktif untuk user
+  const activeProducts = products.filter(p => p.admin?.active !== false);
+  
+  return activeProducts.map((p) => ({
     id: p.id,
     name: p.name,
+    displayName: p.displayName,
     category: p.category,
     price: getPrice(p.category, p.name),
+    imageUrl: p.imageUrl,
+    allImages: p.allImages,
+    options: p.options,
+    shadingOptions: p.shadingOptions,
+    sizeFrameOptions: p.sizeFrameOptions,
+    subcategory: p.subcategory,
+    fullPath: p.fullPath,
+    shippedFrom: p.shippedFrom,
+    shippedTo: p.shippedTo,
+    showInGallery: p.showInGallery,
+    // Tidak termasuk admin properties untuk user
   }));
+};
+
+// =========================
+// ===== GET PRODUCTS FOR ADMIN ===
+// =========================
+
+/**
+ * Untuk admin panel - melihat semua produk termasuk yang tidak aktif
+ */
+export const getAllProductsForAdmin = async () => {
+  const products = getLiveProducts();
+  
+  return products.map((p) => ({
+    id: p.id,
+    name: p.name,
+    displayName: p.displayName,
+    category: p.category,
+    price: getPrice(p.category, p.name),
+    imageUrl: p.imageUrl,
+    admin: p.admin, // Admin bisa melihat status admin
+    showInGallery: p.showInGallery,
+    // Semua properti untuk admin
+  }));
+};
+
+// =========================
+// ===== HELPER FUNCTIONS ===
+// =========================
+
+/**
+ * Helper untuk memeriksa apakah produk aktif
+ * Digunakan oleh controller/API
+ */
+export const isProductActive = (productId: string): boolean => {
+  const products = getLiveProducts();
+  const product = products.find(p => p.id === productId);
+  return product?.admin?.active !== false;
+};
+
+/**
+ * ✅ DIPERBAIKI: Helper untuk mendapatkan produk berdasarkan ID
+ * Dengan pengecekan status aktif untuk user
+ * Digunakan oleh: ProductDetailController
+ */
+export const getProductById = (productId: string, forUser: boolean = true) => {
+  const products = getLiveProducts();
+  const product = products.find(p => p.id === productId);
+  
+  // Jika untuk user, cek status aktif
+  if (forUser && product?.admin?.active === false) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[ProductService] Product inactive for user: ${productId}`);
+    }
+    return null;
+  }
+  
+  return product;
+};
+
+/**
+ * ✅ BARU: Helper untuk mendapatkan ordered products untuk user
+ * Dengan filter hanya produk aktif
+ */
+export const getOrderedProductsForUser = async () => {
+  const products = getLiveProducts();
+  const activeProducts = products.filter(p => p.admin?.active !== false);
+  
+  // Custom ordering logic di sini (jika ada)
+  // Untuk sekarang, return semua produk aktif
+  return activeProducts;
+};
+
+/**
+ * ✅ BARU: Helper untuk mendapatkan gallery products untuk user
+ * Dengan filter hanya produk aktif dan showInGallery = true
+ */
+export const getGalleryProductsForUser = async () => {
+  const products = getLiveProducts();
+  return products.filter(p => 
+    p.admin?.active !== false && 
+    p.showInGallery !== false
+  );
 };

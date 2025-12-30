@@ -1,14 +1,18 @@
-import { Request, Response } from "express";
-import { allProducts } from "../../../data/productDataLoader";
+import { Request, Response } from "express"
+import { getAllProducts } from "../../../data/productDataLoader"
 
 export const getProductCardContent = (_req: Request, res: Response) => {
-  const items = allProducts.map(product => ({
-    id: product.id,
-    displayName: product.displayName || product.name,
-    category: product.category,
-    price: product.price,
-    imageUrl: product.imageUrl,
-  }));
+  const products = getAllProducts()
 
-  res.json({ items });
-};
+  const items = products
+    .filter(p => p.admin?.active !== false)
+    .map(p => ({
+      id: p.id,
+      displayName: p.displayName || p.name,
+      category: p.category,
+      price: p.price,
+      imageUrl: p.imageUrl,
+    }))
+
+  res.json({ items })
+}

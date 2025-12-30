@@ -11,20 +11,39 @@
   "prod-3d-12r": {
     "active": true,
     "showInGallery": true,
-    "frames": {},
-    "mainImage": "/api/uploads/images/list-products/3D/12R/1.jpg"
+    "frames": {
+      "glass": true
+    },
+    "mainImage": "/api/uploads/images/list-products/3D/12R/1.jpg",
+    "mainImageIndex": 0,
+    "displayName": "3D Frame 12R",
+    "description": "Frame material: Wood, Glass, back side MDF 2-3mm\nOverall frame size: ±35x45x4cm\nDepth: ± 3cm\nFrame Color: White, Wood Motif\nPacking: Black Hardbox + Paperbag\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 20 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping. For Cargo to different island or country, please choose acrylic frame.\nNote: 12R available for up to 20 people, more than 20 people please choose A2, A1, or A0",
+    "price": 598800
   },
   "prod-3d-10r": {
     "showInGallery": true,
-    "active": true
+    "active": true,
+    "displayName": "3D Frame 10R",
+    "description": "Frame material: Wood, Glass, back side MDF 2-3mm\nOverall frame size: ±30x35x4cm\nDepth: ± 3cm\nFrame Color: White, Wood Motif\nPacking: Black Hardbox + Paperbag\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 10 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping. For Cargo to different island or country, please choose acrylic frame.\nNote: 10R available for up to 10 people, more than 10 people please choose 12R, A2, A1, A0",
+    "price": 495800,
+    "frames": {
+      "acrylic": true
+    },
+    "mainImageIndex": 0
   },
   "prod-2d-12r": {
     "showInGallery": true,
     "active": true,
-    "frames": {},
+    "frames": {
+      "acrylic": false,
+      "glass": true
+    },
     "displayName": "2D Frame 12R",
-    "description": "",
+    "description": "Frame material: Wood, Glass, back side MDF 2-3mm\nOverall frame size: ±35x45x4cm\nFrame Color: White, Wood Motif\nPacking: Black Hardbox + Paperbag\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 20 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping. For Cargo to different island or country, please choose acrylic frame.\nNote: 12R available for up to 20 people, more than 20 people please choose A2, A1, or A0",
     "price": 348800,
-    "mainImageIndex": 5
+    "mainImageIndex": 1
+  },
+  "prod-3d-8r": {
+    "mainImageIndex": 0
   }
 }

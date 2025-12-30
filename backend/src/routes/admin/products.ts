@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   getAllProductsAdmin,
-  getProductAdminById,   // ⬅️ TAMBAH INI
+  getProductAdminById,
   updateProductActive,
   updateProductGallery,
   updateProductFrames,
@@ -12,7 +12,7 @@ import {
 const router = Router();
 
 router.get("/", getAllProductsAdmin);
-router.get("/:id", getProductAdminById); // ⬅️ WAJIB ADA
+router.get("/:id", getProductAdminById);
 router.put("/:id", updateProductAdminConfig);
 router.put("/:id/active", updateProductActive);
 router.put("/:id/gallery", updateProductGallery);

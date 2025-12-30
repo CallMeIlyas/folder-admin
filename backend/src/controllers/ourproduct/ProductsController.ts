@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { orderedProducts } from "../../../data/productDataLoader";
+import { getOrderedProducts } from "../../../data/productDataLoader";
+import { productService } from "../../services/productService"
 
 // =====================
 // SEMANTIC KEYWORDS
@@ -36,7 +37,15 @@ export const getProducts = (req: Request, res: Response) => {
     limit = "16",
   } = req.query;
 
-  let results = [...orderedProducts];
+  // =====================
+  // LOAD DATA REALTIME
+  // =====================
+  let results = [...getOrderedProducts()];
+
+  // =====================
+  // ADMIN ACTIVE FILTER
+  // =====================
+  results = results.filter(p => p.admin?.active !== false);
 
   // =====================
   // SEARCH
@@ -44,43 +53,30 @@ export const getProducts = (req: Request, res: Response) => {
   if (search) {
     const q = String(search).toLowerCase().trim();
 
-    // =====================
-    // HARD RULE: A3
-    // =====================
+    // HARD RULE A3
     if (q.includes("a3")) {
       results = results.filter(p => {
         const name = p.displayName.toLowerCase();
         const cat = p.category.toLowerCase();
 
-        // 3D Frame 12R (BUKAN AI)
         if (
           cat.includes("3d") &&
           name.includes("12r") &&
           !name.includes("by ai")
-        ) {
-          return true;
-        }
+        ) return true;
 
-        // Additional Biaya Ekspress 12R
         if (
           cat === "additional" &&
           name.includes("ekspress") &&
           name.includes("12r")
-        ) {
-          return true;
-        }
+        ) return true;
 
         return false;
       });
-    }
-
-    // =====================
-    // SEMANTIC SEARCH
-    // =====================
-    else {
+    } else {
       let matchedCategories: string[] | null = null;
 
-      for (const key of Object.keys(SEMANTIC_KEYWORDS)) {
+      for (const key in SEMANTIC_KEYWORDS) {
         if (q.includes(key)) {
           matchedCategories = SEMANTIC_KEYWORDS[key];
           break;
@@ -90,16 +86,10 @@ export const getProducts = (req: Request, res: Response) => {
       if (matchedCategories) {
         results = results.filter(p =>
           matchedCategories!.some(cat =>
-            p.category.toLowerCase() === cat.toLowerCase() ||
             p.category.toLowerCase().includes(cat.toLowerCase())
           )
         );
-      }
-
-      // =====================
-      // FALLBACK SEARCH
-      // =====================
-      if (!matchedCategories) {
+      } else {
         results = results.filter(p =>
           p.displayName.toLowerCase().includes(q) ||
           p.category.toLowerCase().includes(q)
@@ -124,47 +114,31 @@ export const getProducts = (req: Request, res: Response) => {
   // =====================
   // SORT
   // =====================
-  switch (sort) {
-    case "price-asc":
-      results.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
-      break;
-
-    case "price-desc":
-      results.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
-      break;
-
-    case "best-selling":
-      results = results.filter(p => {
-        const name = p.displayName.toLowerCase();
-        const cat = p.category.toLowerCase();
-
-        if (
-          cat.includes("3d") &&
-          (name.includes("12r") || name.includes("10r")) &&
-          !name.includes("by ai")
-        ) return true;
-
-        if (cat.includes("2d") && name.includes("8r")) return true;
-        if (cat.includes("acrylic") && name.includes("2cm")) return true;
-
-        return false;
-      });
-      break;
+  if (sort === "price-asc") {
+    results.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
   }
+
+  if (sort === "price-desc") {
+    results.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+  }
+
+if (sort === "best-selling") {
+  results = results.filter(p =>
+    productService.isBestSelling(p.id, "id").isBestSelling === true
+  );
+}
 
   // =====================
   // PAGINATION
   // =====================
-  const pageNum = Math.max(parseInt(page as string, 10), 1);
-  const limitNum = Math.max(parseInt(limit as string, 10), 1);
+  const pageNum = Math.max(parseInt(page as string), 1);
+  const limitNum = Math.max(parseInt(limit as string), 1);
 
   const totalItems = results.length;
   const totalPages = Math.max(Math.ceil(totalItems / limitNum), 1);
 
   const start = (pageNum - 1) * limitNum;
-  const end = start + limitNum;
-
-  const paginated = results.slice(start, end);
+  const paginated = results.slice(start, start + limitNum);
 
   // =====================
   // RESPONSE

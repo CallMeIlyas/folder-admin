@@ -1,59 +1,62 @@
 import { Request, Response } from "express";
-import { allProducts } from "../../../data/productDataLoader";
+import { getAllProducts } from "../../../data/productDataLoader";
 import { productService } from "../../services/productService";
 import { productMapper } from "../../services/productMapper";
 import { productLocaleService } from "../../services/productLocaleService";
 
 export const getProductDetail = (req: Request, res: Response) => {
   const { id } = req.params;
-  const lang = (req.query.lang as string) || "id";
+  const lang = req.query.lang === "en" ? "en" : "id";
+  const language: "id" | "en" = lang;
 
-  // Validate language parameter
-  const validLanguages = ['id', 'en'];
-  const language = validLanguages.includes(lang.toLowerCase()) ? lang.toLowerCase() as 'id' | 'en' : 'id';
+  const products = getAllProducts();
+  const product = products.find(p => p.id === id);
 
-  const product = allProducts.find(p => p.id === id);
-  if (!product) {
-    const errorMessages = {
-      id: "Produk tidak ditemukan",
-      en: "Product not found"
-    };
-    return res.status(404).json({ 
-      message: errorMessages[language]
+  if (!product || product.admin?.active === false) {
+    return res.status(404).json({
+      message: language === "id"
+        ? "Produk tidak tersedia"
+        : "Product unavailable"
     });
   }
 
-  // Get description based on language
   const description = productService.getProductDetail(
-    product.category,
-    product.name,
-    language // Pass language parameter
+    product.id,
+    language
   );
 
-  const basePrice = productService.getBasePrice(product.id, language);
-  const bestSelling = productService.isBestSelling(product.id, language);
-  
-  // Get UI text for the specific language
   const uiText = productLocaleService.getProductLocale(language);
 
-  // Pass language parameter to mapper
-  const response = productMapper.toProductDetail({
-    id: product.id,
-    category: product.category,
-    name: product.name,
-    images: {
-      main: product.imageUrl,
-      gallery: product.allImages || [],
+  const response = productMapper.toProductDetail(
+    {
+      id: product.id,
+      category: product.category,
+      name: product.name,
+
+      images: {
+        main: product.imageUrl,
+        gallery: product.allImages || [],
+      },
+
+      options: {
+        variations: product.options?.variations || [],
+        shadingOptions: product.shadingOptions,
+        sizeFrameOptions: product.sizeFrameOptions,
+      },
+
+      uiText: {
+        ...uiText,
+        details: description,
+      },
+
+      price: productService.getBasePrice(product.id, language),
+
+      isBestSelling: productService.isBestSelling(product.id, language).isBestSelling,
+      bestSellingLabel:
+        productService.isBestSelling(product.id, language).label || "",
     },
-    options: product.options || {},
-    uiText: {
-      ...uiText,
-      details: description,
-    },
-    price: basePrice,
-    isBestSelling: bestSelling.isBestSelling,
-    bestSellingLabel: bestSelling.label,
-  }, language); // ← Pass language here
+    language
+  );
 
   res.json(response);
 };

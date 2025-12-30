@@ -1,12 +1,13 @@
-import { allProducts } from "../../data/productDataLoader";
+import { getAllProducts } from "../../data/productDataLoader";
 
 export const resolveSizeTargetProduct = (target3D: string) => {
   const normalized = target3D.trim().toLowerCase();
 
-  const product = allProducts.find(
-    p =>
-      p.category === "3D Frame" &&
-      p.name.trim().toLowerCase() === normalized
+  const products = getAllProducts();
+
+  const product = products.find(p =>
+    p.category === "3D Frame" &&
+    p.name.trim().toLowerCase() === normalized
   );
 
   if (!product) {
