@@ -290,8 +290,7 @@ const ProductDetail = () => {
 
     // Untuk produk reguler (non-additional)
     return {
-      // Variations
-variations: product.options?.variations || [],
+variations: product.options?.variations ?? [],
 
       // Frame Sizes - Hanya untuk 2D, 3D tidak perlu frame sizes
       frameSizes: product.options?.frameSizes?.length 

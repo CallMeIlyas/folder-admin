@@ -114,12 +114,12 @@ const BestSelling = () => {
             <div
               key={item.id}
               onClick={() => handleClick(item.id)}
-              className="cursor-pointer text-center bg-white p-5 rounded-xl shadow-md hover:-translate-y-1 transition-all duration-500 scroll-float"
+              className="cursor-pointer text-center bg-white p-5 rounded-xl shadow-md hover:shadow-hover hover:-translate-y-1 transform transition-all duration-500 scroll-float group"
             >
               <img
                 src={apiAsset(item.imageUrl)}
                 alt={item.displayName}
-                className="w-full h-48 object-cover rounded-lg mb-4"
+                className="w-full h-48 object-cover rounded-lg mb-4 group-hover:scale-110 transition-transform duration-500"
               />
               <p className="font-poppinsBold text-gray-600">
                 {item.displayName}
