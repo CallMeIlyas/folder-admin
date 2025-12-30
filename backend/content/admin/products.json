@@ -1,0 +1,30 @@
+{
+  "prod-3d-frame-12r": {
+    "active": true,
+    "showInGallery": true,
+    "frames": {
+      "glass": true,
+      "acrylic": true
+    },
+    "mainImage": null
+  },
+  "prod-3d-12r": {
+    "active": true,
+    "showInGallery": true,
+    "frames": {},
+    "mainImage": "/api/uploads/images/list-products/3D/12R/1.jpg"
+  },
+  "prod-3d-10r": {
+    "showInGallery": true,
+    "active": true
+  },
+  "prod-2d-12r": {
+    "showInGallery": true,
+    "active": true,
+    "frames": {},
+    "displayName": "2D Frame 12R",
+    "description": "",
+    "price": 348800,
+    "mainImageIndex": 5
+  }
+}

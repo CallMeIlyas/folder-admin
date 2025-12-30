@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaTachometerAlt, FaImage, FaEdit, FaVideo, FaSignOutAlt, FaBoxOpen, FaFileAlt } from 'react-icons/fa';
+import { FaTachometerAlt, FaImage, FaEdit, FaVideo, FaSignOutAlt, FaBoxOpen, FaFileAlt, FaSitemap } from 'react-icons/fa';
 
 const AdminSidebar: React.FC = () => {
   const location = useLocation();
@@ -11,7 +11,8 @@ const AdminSidebar: React.FC = () => {
     { path: '/admin/videos', label: 'Videos', icon: <FaVideo /> },
     { path: '/admin/text', label: 'Text', icon: <FaEdit /> },
     { path: '/admin/invoice', label: 'Invoice', icon: <FaFileAlt /> },
-    { path: "/admin/product", label: 'Product', icon: <FaBoxOpen /> },
+    { path: "/admin/product", label: 'Product manager', icon: <FaBoxOpen /> },
+    { path: "/admin/pagemanager", label: 'Page manager', icon: <FaSitemap /> }
   ];
 
   const logout = () => {

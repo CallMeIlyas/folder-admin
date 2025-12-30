@@ -1,6 +1,9 @@
 import fs from "fs";
 import path from "path";
 import { getPrice } from "../utils/getPrice";
+import { loadProductAdminConfig } from "../src/config/productConfig";
+
+const adminConfig = loadProductAdminConfig();
 
 export interface Product {
   id: string;
@@ -17,11 +20,12 @@ export interface Product {
   allImages?: string[];
   specialVariations?: { label: string; value: string }[];
   shadingOptions?: { label: string; value: string; preview?: string }[];
-    options?: {
+  options?: {
     variations?: string[];
   };
   sizeFrameOptions?: { label: string; value: string; image: string }[];
   details?: Record<string, any>;
+  showInGallery?: boolean;
 }
 
 // === Mapping Folder → Nama Kategori Custom ===
@@ -140,17 +144,7 @@ const get2DSizeFrameOptions = () => {
   return options;
 };
 
-// === Generate Semua Produk (IDENTIK) ===
-export const allProducts: Product[] = Object.entries(groupedImages).map(
-  ([groupKey, images], index) => {
-    const [rawCategory, subcategory] = groupKey.split("/");
-    const mappedCategory =
-      categoryMapping[rawCategory.toUpperCase()] || rawCategory;
-
-const decodedImages = images.map(img => decodeURIComponent(img));
-
-
-// frame variation
+// === Helper untuk mendapatkan default frame variations ===
 const getFrameVariations = (category: string, name: string): string[] => {
   const c = category.toLowerCase();
   const n = name.toLowerCase();
@@ -174,8 +168,46 @@ const getFrameVariations = (category: string, name: string): string[] => {
   return [];
 };
 
-// 🔴 PRIORITAS MAIN IMAGE
+// === Generate Semua Produk (IDENTIK) ===
+export const allProducts: Product[] = Object.entries(groupedImages)
+  .map(([groupKey, images], index) => {
+    const [rawCategory, subcategory] = groupKey.split("/");
+    const mappedCategory =
+      categoryMapping[rawCategory.toUpperCase()] || rawCategory;
+
+    // ✅ FIX: Deklarasi cleanSub dan fileName DI AWAL
+    const cleanSub = subcategory?.trim() || null;
+    const fileName = cleanSub || `Product ${index + 1}`;
+
+    // Generate product ID
+    const productId = `prod-${rawCategory.toLowerCase()}-${(cleanSub || "default")
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "-")}`;
+
+    // Get admin config untuk product ini
+    const admin = adminConfig[productId];
+
+    // Skip produk jika tidak aktif di admin config
+    if (admin?.active === false) {
+      return null;
+    }
+
+    const decodedImages = images.map(img => decodeURIComponent(img));
+
+    // ✅ FIX: SEKARANG fileName SUDAH ADA untuk digunakan di sini
+    // FRAME OVERRIDE LOGIC: Ganti dengan admin config jika ada
+    const defaultFrames = getFrameVariations(mappedCategory, fileName);
+    let frameVariations = defaultFrames;
+    
+    if (admin?.frames) {
+      frameVariations = [];
+      if (admin.frames.glass) frameVariations.push("frameGlass");
+      if (admin.frames.acrylic) frameVariations.push("frameAcrylic");
+    }
+
+    // 🔴 PRIORITAS MAIN IMAGE
 const mainImage =
+  admin?.mainImage ||
   decodedImages.find(img => {
     const f = img.split("/").pop()?.toLowerCase() || "";
     return f === "main image.jpg";
@@ -190,44 +222,45 @@ const mainImage =
   }) ||
   decodedImages[0];
 
-// 🔴 PAKSA MAIN IMAGE DI INDEX 0
-const orderedImages = [
-  mainImage,
-  ...decodedImages.filter(img => img !== mainImage),
-];
+    // 🔴 PAKSA MAIN IMAGE DI INDEX 0
+    const orderedImages = [
+      mainImage,
+      ...decodedImages.filter(img => img !== mainImage),
+    ];
 
-    const cleanSub = subcategory?.trim() || null;
-    const fileName = cleanSub || `Product ${index + 1}`;
+    // Show in gallery default to true jika tidak ada config
+    const showInGallery = admin?.showInGallery !== false;
 
-return {
-  id: `prod-${rawCategory.toLowerCase()}-${(subcategory || "default")
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "-")}`,
-  imageUrl: mainImage,
-  name: fileName,
-  displayName: subcategory
-    ? `${mappedCategory} ${subcategory.replace(/-\s*\d+\s*x\s*\d+\s*cm/i, "").trim()}`
-    : mappedCategory,
-  size: "Custom",
-  category: mappedCategory,
-  subcategory: subcategory || null,
-  fullPath: `${mappedCategory}${subcategory ? " / " + subcategory : ""}`,
-  price: getPrice(mappedCategory, fileName),
-  shippedFrom: ["Bogor", "Jakarta"],
-  shippedTo: ["Worldwide"],
-  allImages: orderedImages,
+    return {
+      id: productId,
+      imageUrl: mainImage,
+      name: fileName,
+      displayName: subcategory
+        ? `${mappedCategory} ${subcategory.replace(/-\s*\d+\s*x\s*\d+\s*cm/i, "").trim()}`
+        : mappedCategory,
+      size: "Custom",
+      category: mappedCategory,
+      subcategory: subcategory || null,
+      fullPath: `${mappedCategory}${subcategory ? " / " + subcategory : ""}`,
+      price: getPrice(mappedCategory, fileName),
+      shippedFrom: ["Bogor", "Jakarta"],
+      shippedTo: ["Worldwide"],
+      allImages: orderedImages,
 
-  options: {
-    variations: getFrameVariations(mappedCategory, fileName),
-  },
+      options: {
+        variations: frameVariations,
+      },
 
-  shadingOptions:
-    mappedCategory === "2D Frame" ? get2DShadingOptions() : undefined,
-  sizeFrameOptions:
-    mappedCategory === "2D Frame" ? get2DSizeFrameOptions() : undefined,
-};
-  }
-);
+      shadingOptions:
+        mappedCategory === "2D Frame" ? get2DShadingOptions() : undefined,
+      sizeFrameOptions:
+        mappedCategory === "2D Frame" ? get2DSizeFrameOptions() : undefined,
+      
+      // Tambahkan showInGallery dari admin config
+      showInGallery: showInGallery
+    };
+  })
+  .filter(Boolean) as Product[]; // Filter out null products
 
 // === Custom Ordering (TIDAK DIUBAH SATU KARAKTER) ===
 const baris1 = [
@@ -270,5 +303,8 @@ let orderedProducts = [...part1, ...part2, ...part3, ...part4];
 const usedIds = new Set(orderedProducts.map(p => p.id));
 const remainingProducts = allProducts.filter(p => !usedIds.has(p.id));
 orderedProducts = [...orderedProducts, ...remainingProducts];
+
+// Export produk untuk gallery (hanya yang showInGallery true)
+export const galleryProducts = allProducts.filter(p => p.showInGallery !== false);
 
 export { orderedProducts };

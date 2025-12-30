@@ -1,18 +1,23 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch, apiAsset } from "@/utils/api";
 import { useScrollFloat } from "../../utils/scrollFloat";
-import { allProducts } from "../../data/productDataLoader";
-import type { Product } from "../../data/productDataLoader";
 import { useTranslation } from "react-i18next";
 
 type BestSellingItem = {
   key: string;
   displayName: string;
-  match: string;
-  target3D: string;
   imageUrl: string;
 };
+
+type Product = {
+  id: string;
+  displayName: string;
+  category: string;
+};
+
+const normalize = (v: string) =>
+  v.toLowerCase().replace(/\s+/g, "").replace(/-/g, "");
 
 const BestSelling = () => {
   const navigate = useNavigate();
@@ -21,82 +26,77 @@ const BestSelling = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [title, setTitle] = useState("");
   const [items, setItems] = useState<BestSellingItem[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
 
-  // PANGGIL HOOK DI TOP LEVEL
   useScrollFloat(".scroll-float", items.length > 0);
 
-  // Deteksi mobile
+  /* ===== MOBILE ===== */
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const resize = () => setIsMobile(window.innerWidth <= 768);
+    resize();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
   }, []);
 
-  // Fetch best selling dari backend
+  /* ===== BEST SELLING CONTENT ===== */
   useEffect(() => {
     apiFetch(`/api/content/bestselling?lang=${i18n.language}`)
       .then(res => res.json())
       .then(data => {
         setTitle(data.title || "");
-        setItems(data.items || []);
+        setItems(Array.isArray(data.items) ? data.items : []);
       })
       .catch(console.error);
   }, [i18n.language]);
 
-  // Cocokkan dengan product internal
+  /* ===== PRODUCTS FROM BACKEND ===== */
+  useEffect(() => {
+    apiFetch("/api/content/products")
+      .then(res => res.json())
+      .then(data => {
+        setProducts(Array.isArray(data.items) ? data.items : []);
+      })
+      .catch(console.error);
+  }, []);
+
+  /* ===== MATCHING (FINAL) ===== */
   const bestSellingProducts = items
     .map(item => {
-      const found = allProducts.find(
+      const product = products.find(
         p =>
           p.category === "3D Frame" &&
-          p.name.toLowerCase().includes(item.match.toLowerCase())
+          normalize(p.displayName).includes(normalize(item.key))
       );
 
-      return found
-        ? {
-            ...found,
-            displayName: item.displayName,
-            target3D: item.target3D,
-            imageUrl: item.imageUrl
-          }
-        : null;
+      if (!product) return null;
+
+      return {
+        id: product.id,
+        displayName: item.displayName,
+        imageUrl: item.imageUrl
+      };
     })
-    .filter(Boolean) as (Product & {
-    displayName: string;
-    target3D: string;
-    imageUrl: string;
-  })[];
+    .filter(Boolean) as {
+      id: string;
+      displayName: string;
+      imageUrl: string;
+    }[];
 
-  const handleCardClick = (product: Product & { target3D: string }) => {
-    const targetName = product.target3D.trim().toLowerCase();
-    const targetProduct = allProducts.find(
-      p =>
-        p.category === "3D Frame" &&
-        p.name.trim().toLowerCase() === targetName
-    );
-
-    if (targetProduct) {
-      navigate(`/product/${targetProduct.id}`, {
-        state: {
-          ...targetProduct,
-          specialVariations: targetProduct.specialVariations || [],
-          details: targetProduct.details || {}
-        }
-      });
-    }
+  /* ===== NAVIGATION ===== */
+  const handleClick = (id: string) => {
+    navigate(`/product/${id}`);
   };
 
   return (
     <>
-      <div className="relative my-10 text-center h-[1px] scroll-float">
-        <div className="absolute top-0 left-0 w-1/4 border-t-[5px] border-black"></div>
-        <div className="absolute top-0 right-0 w-1/4 border-t-[5px] border-black"></div>
+      <div className="relative my-10 h-[1px] scroll-float">
+        <div className="absolute left-0 w-1/4 border-t-[5px] border-black" />
+        <div className="absolute right-0 w-1/4 border-t-[5px] border-black" />
       </div>
 
       <section className={`bg-white ${isMobile ? "py-8" : "py-16"} scroll-float`}>
         <h2
-          className={`font-nataliecaydence text-center text-black ${
+          className={`font-nataliecaydence text-center ${
             isMobile ? "text-3xl mb-6" : "text-[46px] mb-10"
           }`}
         >
@@ -110,19 +110,19 @@ const BestSelling = () => {
               : "grid-cols-4 gap-5 px-10 max-w-6xl mx-auto"
           }`}
         >
-          {bestSellingProducts.map(product => (
+          {bestSellingProducts.map(item => (
             <div
-              key={product.id}
-              onClick={() => handleCardClick(product)}
-              className="cursor-pointer text-center bg-white p-5 rounded-xl shadow-md hover:shadow-hover hover:-translate-y-1 transform transition-all duration-500 scroll-float group"
+              key={item.id}
+              onClick={() => handleClick(item.id)}
+              className="cursor-pointer text-center bg-white p-5 rounded-xl shadow-md hover:-translate-y-1 transition-all duration-500 scroll-float"
             >
               <img
-                src={apiAsset(product.imageUrl)}
-                alt={product.displayName}
-                className="w-full h-48 object-cover rounded-lg mb-4 group-hover:scale-110 transition-transform duration-500"
+                src={apiAsset(item.imageUrl)}
+                alt={item.displayName}
+                className="w-full h-48 object-cover rounded-lg mb-4"
               />
-              <p className="m-2.5 font-poppinsBold text-gray-600 text-base">
-                {product.displayName}
+              <p className="font-poppinsBold text-gray-600">
+                {item.displayName}
               </p>
             </div>
           ))}

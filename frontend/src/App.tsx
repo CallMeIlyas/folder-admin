@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 import { useState, useCallback } from "react"
 import Layout from "./components/Layout"
 import Home from "./pages/Home"
@@ -23,7 +23,10 @@ import ImageManagerPage from "./pages/admin/ImageManagerPage"
 import TextEditorPage from "./pages/admin/TextEditorPage"
 import VideoManagerPage from "./pages/admin/VideoManagerPage"
 import InvoiceManagerPage from "./pages/admin/InvoiceManagerPage"
-import ProductManagerPage from "./pages/admin/ProductManagerPage";
+import ProductManagerPage from "./pages/admin/ProductManagerPage"
+import PageManagerPage from "./pages/admin/PageManagerPage"
+// Import ProductDetailPage untuk admin (edit produk)
+import ProductDetailPage from "./pages/admin/detail/ProductDetailPage"
 
 // Import AuthGuard dan AdminLayout
 import AuthGuard from "./components/admin/auth/AuthGuard"
@@ -105,20 +108,33 @@ const App = () => {
               </AuthGuard>
             }
           >
-            <Route index element={<AdminDashboard />} />
+            {/* Default redirect ke dashboard */}
+            <Route index element={<Navigate to="dashboard" replace />} />
+            
+            {/* Dashboard */}
             <Route path="dashboard" element={<AdminDashboard />} />
+            
+            {/* Content Management */}
             <Route path="images" element={<ImageManagerPage />} />
             <Route path="text" element={<TextEditorPage />} />
             <Route path="videos" element={<VideoManagerPage />} />
+            
+            {/* Invoice Management */}
             <Route path="invoice" element={<InvoiceManagerPage />} />
-            <Route path="product" element ={<ProductManagerPage />} />
+            
+            {/* Page Management */}
+            <Route path="pagemanager" element={<PageManagerPage />} />
+            
+            {/* Product Management */}
+            <Route path="product" element={<ProductManagerPage />} />
+            <Route path="product/:id" element={<ProductDetailPage />} />
           </Route>
 
-          {/* Redirect untuk admin yang tidak login */}
-          <Route path="/admin/*" element={<AdminLoginPage />} />
+          {/* Redirect untuk admin yang tidak login - arahkan ke login */}
+          <Route path="/admin/*" element={<Navigate to="/admin/login" replace />} />
           
           {/* Catch all - redirect to home */}
-          <Route path="*" element={<Home />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </CartProvider>

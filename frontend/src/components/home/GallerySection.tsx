@@ -54,11 +54,6 @@ const GallerySection: FC = () => {
   const currentLang = i18n.language;
   const { addToCart } = useOutletContext<LayoutContext>();
 
-  // Fungsi untuk mendapatkan nama produk lengkap dari backend
-  const getFullProductName = (label: string) => {
-    const backendPhoto = galleryData?.photos.find(p => p.label === label);
-    return backendPhoto?.productName || label;
-  };
 
   const findMatchingProduct = (label: string) => {
     // Cari dari data backend
@@ -462,7 +457,7 @@ const GallerySection: FC = () => {
                 if (!selectedPhoto?.label) return null
 
                 const matchingProduct = findMatchingProduct(selectedPhoto.label)
-                const fullProductName = getFullProductName(selectedPhoto.label)
+                const fullProductName = selectedPhoto.label
 
                 return (
                   <div
@@ -570,12 +565,12 @@ const GallerySection: FC = () => {
                 if (!selectedPhoto?.label) return null
 
                 const matchingProduct = findMatchingProduct(selectedPhoto.label)
-                const fullProductName = getFullProductName(selectedPhoto.label)
+                const fullProductName = selectedPhoto.label
 
                 return (
                   <div
                     className="
-                      absolute top-12 right-0
+                      absolute top-0 right-0
                       bg-white/95 backdrop-blur-sm
                       rounded-l-lg
                       shadow-lg
