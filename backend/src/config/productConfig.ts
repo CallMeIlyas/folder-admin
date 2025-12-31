@@ -9,11 +9,18 @@ const CONFIG_PATH = path.join(
 export type ProductAdminConfig = {
   active?: boolean;
   showInGallery?: boolean;
+
+  displayName?: string;
+  description?: string;
+  price?: number;
+
   frames?: {
     glass?: boolean;
     acrylic?: boolean;
   };
+
   mainImage?: string | null;
+  mainImageIndex?: number;
 };
 
 export const loadProductAdminConfig = (): Record<string, ProductAdminConfig> => {

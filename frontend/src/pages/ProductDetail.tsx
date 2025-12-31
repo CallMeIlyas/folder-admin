@@ -404,25 +404,9 @@ shadingStyles: is2D
         setProduct(productData);
         
         // Set default image
-        const findFirstNonVideo = () => {
-          if (!productData.images?.gallery || productData.images.gallery.length === 0) {
-            return apiAsset(productData.images?.main || "");
-          }
-          
-          const nonVideo = productData.images.gallery.find(
-            img => !isVideo(apiAsset(img))
-          );
-          
-          if (nonVideo) {
-            return apiAsset(nonVideo);
-          }
-          
-          return apiAsset(productData.images.gallery[0] || productData.images?.main || "");
-        };
-        
-        const firstImage = findFirstNonVideo();
-        setSelectedImage(firstImage);
-        setDisplayedPrice(productData.price || 0);
+const mainImage = apiAsset(productData.images.main);
+setSelectedImage(mainImage);
+setDisplayedPrice(productData.price || 0);
         
         // Fetch additional products if not Additional or Softcopy
         if (!["Additional", "Softcopy Design"].includes(productData.category)) {

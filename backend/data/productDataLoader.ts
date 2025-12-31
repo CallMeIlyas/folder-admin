@@ -198,7 +198,7 @@ export const getAllProducts = (): Product[] => {
 
       const decodedImages = images.map(img => decodeURIComponent(img));
 
-      const defaultFrames = getFrameVariations(mappedCategory, fileName);
+      
       
       
 let frameVariations: string[] = []
@@ -215,59 +215,52 @@ if (admin?.frames) {
   frameVariations = getFrameVariations(mappedCategory, fileName)
 }
 
-      const mainImage =
-        decodedImages.find(img => {
-          const f = img.split("/").pop()?.toLowerCase() || "";
-          return f === "main image.jpg";
-        }) ||
-        decodedImages.find(img => {
-          const f = img.split("/").pop()?.toLowerCase() || "";
-          return f.includes("main image") || f.includes("mainimage");
-        }) ||
-        decodedImages.find(img => {
-          const f = img.split("/").pop()?.toLowerCase() || "";
-          return f === "1.jpg";
-        }) ||
-        decodedImages[0];
+// urutan gambar harus STABIL
+const orderedImages = [...decodedImages];
 
-      const orderedImages = [
-        mainImage,
-        ...decodedImages.filter(img => img !== mainImage),
-      ];
+// ambil index dari admin
+const mainIndex = admin?.mainImageIndex ?? 0;
+
+// ambil main image dari index
+const mainImage = orderedImages[mainIndex] ?? orderedImages[0];
 
       return {
-        id: productId,
-        imageUrl: mainImage,
-        name: fileName,
-        displayName: subcategory
-          ? `${mappedCategory} ${subcategory.replace(/-\s*\d+\s*x\s*\d+\s*cm/i, "").trim()}`
-          : mappedCategory,
-        size: "Custom",
-        category: mappedCategory,
-        subcategory: subcategory || null,
-        fullPath: `${mappedCategory}${subcategory ? " / " + subcategory : ""}`,
-        price: getPrice(mappedCategory, fileName),
-        shippedFrom: ["Bogor", "Jakarta"],
-        shippedTo: ["Worldwide"],
-        allImages: orderedImages,
+  id: productId,
+  imageUrl: mainImage,
+  name: fileName,
+  displayName: subcategory
+    ? `${mappedCategory} ${subcategory.replace(/-\s*\d+\s*x\s*\d+\s*cm/i, "").trim()}`
+    : mappedCategory,
+  size: "Custom",
+  category: mappedCategory,
+  subcategory: subcategory || null,
+  fullPath: `${mappedCategory}${subcategory ? " / " + subcategory : ""}`,
+  price: getPrice(mappedCategory, fileName),
+  shippedFrom: ["Bogor", "Jakarta"],
+  shippedTo: ["Worldwide"],
 
-        admin: {
-          active: admin?.active !== false,
-          frames: admin?.frames || { glass: false, acrylic: false },
-          mainImageIndex: admin?.mainImageIndex ?? 0,
-        },
+  allImages: orderedImages,
 
-        options: {
-          variations: frameVariations,
-        },
+admin: {
+  active: admin?.active !== false,
+  showInGallery: admin?.showInGallery !== false,
+  frames: admin?.frames || { glass: false, acrylic: false },
+  mainImageIndex: mainIndex,
+  description: admin?.description,
+},
 
-        shadingOptions:
-          mappedCategory === "2D Frame" ? get2DShadingOptions() : undefined,
-        sizeFrameOptions:
-          mappedCategory === "2D Frame" ? get2DSizeFrameOptions() : undefined,
+  options: {
+    variations: frameVariations,
+  },
 
-        showInGallery: admin?.showInGallery !== false,
-      };
+  shadingOptions:
+    mappedCategory === "2D Frame" ? get2DShadingOptions() : undefined,
+  sizeFrameOptions:
+    mappedCategory === "2D Frame" ? get2DSizeFrameOptions() : undefined,
+
+  showInGallery: admin?.showInGallery !== false,
+};
+      
     })
     .filter(Boolean) as Product[];
 };
@@ -334,5 +327,3 @@ export {
   getOrderedProducts,
   getGalleryProducts
 };
-
-export { getAllProducts, getOrderedProducts, getGalleryProducts };

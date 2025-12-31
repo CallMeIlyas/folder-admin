@@ -8,7 +8,10 @@ type ProductDetail = {
   category: string;
   subcategory: string | null;
   price: number;
-  description: string;
+  description: {
+  en?: string
+  id?: string
+}
   shippedFrom: string[];
   shippedTo: string[];
   allImages: string[];
@@ -33,9 +36,13 @@ const ProductDetailPage: React.FC = () => {
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [langTab, setLangTab] = useState<"en" | "id">("en")
   const [formData, setFormData] = useState({
   displayName: "",
-  description: "",
+  description: { 
+    en: "",
+    id: "" 
+  },
   price: 0,
   active: true,
   showInGallery: true,
@@ -61,7 +68,13 @@ const ProductDetailPage: React.FC = () => {
       setProduct(data);
       setFormData({
         displayName: data.displayName,
-        description: data.description || "",
+description:
+  typeof data.description === "string"
+    ? { en: data.description, id: "" }
+    : {
+        en: data.description?.en || "",
+        id: data.description?.id || ""
+      },
         price: data.price,
         active: data.admin.active,
         showInGallery: data.admin.showInGallery,
@@ -263,13 +276,35 @@ const ProductDetailPage: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Deskripsi Produk
                 </label>
-                <textarea
-                  value={formData.description || ""}
-                  onChange={(e) => handleChange("description", e.target.value)}
-                  rows={4}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Masukkan deskripsi produk"
-                />
+<div className="flex gap-2 mb-2">
+  <button
+    onClick={() => setLangTab("en")}
+    className={langTab === "en" ? "font-bold" : ""}
+  >
+    EN
+  </button>
+  <button
+    onClick={() => setLangTab("id")}
+    className={langTab === "id" ? "font-bold" : ""}
+  >
+    ID
+  </button>
+</div>
+
+<textarea
+  value={formData.description[langTab]}
+  onChange={(e) =>
+    setFormData({
+      ...formData,
+      description: {
+        ...formData.description,
+        [langTab]: e.target.value
+      }
+    })
+  }
+  rows={6}
+  className="w-full px-4 py-2 border rounded-lg"
+/>
               </div>
 
               {/* Harga */}

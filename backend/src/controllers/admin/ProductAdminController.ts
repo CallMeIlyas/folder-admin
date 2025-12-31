@@ -118,17 +118,22 @@ export const getProductAdminById = (req: Request, res: Response) => {
 
   const admin = adminConfig[id] || {}
 
-  const descriptionObject = getProductDescription(
-    product.category,
-    product.name
-  )
+const descriptionText =
+  admin.description ??
+  (() => {
+    const descriptionObject = getProductDescription(
+      product.category,
+      product.name
+    )
 
-  const descriptionText = descriptionObject
-    ? Object.entries(descriptionObject)
-        .filter(([key]) => key !== "title")
-        .map(([key, value]) => `${key}: ${value}`)
-        .join("\n")
-    : ""
+    return descriptionObject
+      ? Object.entries(descriptionObject)
+          .filter(([key]) => key !== "title")
+          .map(([key, value]) => `${key}: ${value}`)
+          .join("\n")
+      : ""
+  })()
+
 
 const frameVariations = product.options?.variations || []
 
