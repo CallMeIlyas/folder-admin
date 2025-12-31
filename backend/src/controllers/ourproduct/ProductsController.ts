@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { getOrderedProducts } from "../../../data/productDataLoader";
+import { Request, Response } from "express"
+import { getOrderedProducts } from "../../../data/productDataLoader"
 import { productService } from "../../services/productService"
 
 // =====================
@@ -18,127 +18,152 @@ const SEMANTIC_KEYWORDS: Record<string, string[]> = {
 
   softcopy: ["Softcopy Design"],
   desain: ["Softcopy Design"],
-  "desain aja": ["Softcopy Design"],
 
   tambahan: ["Additional"],
   additional: ["Additional"],
 
   kado: ["2D Frame", "3D Frame", "Acrylic Stand"],
   hadiah: ["2D Frame", "3D Frame", "Acrylic Stand"],
-  hampers: ["2D Frame", "3D Frame", "Acrylic Stand"],
-};
+  hampers: ["2D Frame", "3D Frame", "Acrylic Stand"]
+}
+
+const LOCATION_EXCLUDED_CATEGORIES = [
+  "Additional",
+  "Softcopy Design"
+]
 
 export const getProducts = (req: Request, res: Response) => {
   const {
     search = "",
     category = "",
+    shippedFrom = "",
+    shippedTo = "",
     sort = "",
     page = "1",
-    limit = "16",
-  } = req.query;
+    limit = "16"
+  } = req.query
 
   // =====================
-  // LOAD DATA REALTIME
+  // LOAD DATA
   // =====================
-  let results = [...getOrderedProducts()];
+  let results = [...getOrderedProducts()]
 
   // =====================
-  // ADMIN ACTIVE FILTER
+  // ACTIVE PRODUCT ONLY
   // =====================
-  results = results.filter(p => p.admin?.active !== false);
+  results = results.filter(p => p.admin.active !== false)
+
+  // =====================
+  // SHIPPED FROM FILTER
+  // =====================
+if (shippedFrom) {
+  const fromList = String(shippedFrom)
+    .split(",")
+    .map(v => v.trim())
+
+  results = results.filter(p => {
+    if (LOCATION_EXCLUDED_CATEGORIES.includes(p.category)) {
+      return false
+    }
+
+    return p.admin.shippedFrom.some(loc =>
+      fromList.includes(loc)
+    )
+  })
+}
+
+  // =====================
+  // SHIPPED TO FILTER
+  // =====================
+if (shippedTo) {
+  const toList = String(shippedTo)
+    .split(",")
+    .map(v => v.trim())
+
+  results = results.filter(p => {
+    if (LOCATION_EXCLUDED_CATEGORIES.includes(p.category)) {
+      return false
+    }
+
+    return p.admin.shippedTo.some(dest =>
+      toList.includes(dest)
+    )
+  })
+}
 
   // =====================
   // SEARCH
   // =====================
   if (search) {
-    const q = String(search).toLowerCase().trim();
+    const q = String(search).toLowerCase().trim()
 
-    // HARD RULE A3
-    if (q.includes("a3")) {
-      results = results.filter(p => {
-        const name = p.displayName.toLowerCase();
-        const cat = p.category.toLowerCase();
+    let semanticMatch: string[] | null = null
 
-        if (
-          cat.includes("3d") &&
-          name.includes("12r") &&
-          !name.includes("by ai")
-        ) return true;
+    for (const key in SEMANTIC_KEYWORDS) {
+      if (q.includes(key)) {
+        semanticMatch = SEMANTIC_KEYWORDS[key]
+        break
+      }
+    }
 
-        if (
-          cat === "additional" &&
-          name.includes("ekspress") &&
-          name.includes("12r")
-        ) return true;
-
-        return false;
-      });
+    if (semanticMatch) {
+      results = results.filter(p =>
+        semanticMatch!.some(cat =>
+          p.category.toLowerCase() === cat.toLowerCase()
+        )
+      )
     } else {
-      let matchedCategories: string[] | null = null;
-
-      for (const key in SEMANTIC_KEYWORDS) {
-        if (q.includes(key)) {
-          matchedCategories = SEMANTIC_KEYWORDS[key];
-          break;
-        }
-      }
-
-      if (matchedCategories) {
-        results = results.filter(p =>
-          matchedCategories!.some(cat =>
-            p.category.toLowerCase().includes(cat.toLowerCase())
-          )
-        );
-      } else {
-        results = results.filter(p =>
-          p.displayName.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q)
-        );
-      }
+      results = results.filter(p =>
+        p.displayName.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q)
+      )
     }
   }
 
   // =====================
-  // CATEGORY FILTER
+  // CATEGORY + SUBCATEGORY
   // =====================
   if (category) {
     const categories = String(category)
       .split(",")
-      .map(c => c.toLowerCase().trim());
+      .map(c => c.toLowerCase().trim())
 
     results = results.filter(p =>
-      categories.includes(p.category.toLowerCase())
-    );
+      categories.some(c =>
+        p.category.toLowerCase() === c ||
+        `${p.category}/${p.name}`.toLowerCase() === c
+      )
+    )
   }
 
   // =====================
   // SORT
   // =====================
   if (sort === "price-asc") {
-    results.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+    results.sort((a, b) => a.price - b.price)
   }
 
   if (sort === "price-desc") {
-    results.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+    results.sort((a, b) => b.price - a.price)
   }
 
-if (sort === "best-selling") {
-  results = results.filter(p =>
-    productService.isBestSelling(p.id, "id").isBestSelling === true
-  );
-}
+  if (sort === "best-selling") {
+    results = results.filter(p =>
+      productService.isBestSelling(p.id, "id").isBestSelling === true
+    )
+  }
 
   // =====================
   // PAGINATION
   // =====================
-  const pageNum = Math.max(parseInt(page as string), 1);
-  const limitNum = Math.max(parseInt(limit as string), 1);
+  const pageNum = Math.max(parseInt(page as string), 1)
+  const limitNum = Math.max(parseInt(limit as string), 1)
 
-  const totalItems = results.length;
-  const totalPages = Math.max(Math.ceil(totalItems / limitNum), 1);
+  const totalItems = results.length
+  const totalPages = Math.max(Math.ceil(totalItems / limitNum), 1)
 
-  const start = (pageNum - 1) * limitNum;
-  const paginated = results.slice(start, start + limitNum);
+  const start = (pageNum - 1) * limitNum
+  const paginated = results.slice(start, start + limitNum)
 
   // =====================
   // RESPONSE
@@ -146,15 +171,15 @@ if (sort === "best-selling") {
   res.json({
     items: paginated.map(p => ({
       id: p.id,
-      displayName: p.displayName,
+      displayName: `${p.category} ${p.displayName}`,
       category: p.category,
       price: p.price,
       imageUrl: p.imageUrl,
-      shippedFrom: p.shippedFrom,
-      shippedTo: p.shippedTo,
+      shippedFrom: p.admin.shippedFrom,
+      shippedTo: p.admin.shippedTo
     })),
     page: pageNum,
     totalPages,
-    totalItems,
-  });
-};
+    totalItems
+  })
+}

@@ -1,8 +1,6 @@
 import { FC, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import ProductCard from "./ProductCard";
 import Pagination from "./Pagination";
-import type { FilterOptions } from "../../types/types";
 
 interface Product {
   id: string;
@@ -19,8 +17,14 @@ interface ApiResponse {
   totalItems: number;
 }
 
+interface Filters {
+  categories?: string[];
+  shippedFrom?: string[];
+  shippedTo?: string[];
+}
+
 interface Props {
-  filters: FilterOptions;
+  filters: Filters;
   searchQuery: string;
   sortOption: string;
 }
@@ -28,15 +32,19 @@ interface Props {
 const ProductGridWithPagination: FC<Props> = ({
   filters,
   searchQuery,
-  sortOption,
+  sortOption
 }) => {
-  const location = useLocation();
-
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
+  // reset page ketika filter berubah
+  useEffect(() => {
+    setPage(1);
+  }, [JSON.stringify(filters), searchQuery, sortOption]);
+
+  // fetch data
   useEffect(() => {
     const params = new URLSearchParams();
 
@@ -46,8 +54,22 @@ const ProductGridWithPagination: FC<Props> = ({
     if (searchQuery) params.set("search", searchQuery);
     if (sortOption) params.set("sort", sortOption);
 
-    if (filters.categories.length > 0) {
+    if (filters.categories?.length) {
       params.set("category", filters.categories.join(","));
+    } else {
+      params.delete("category");
+    }
+
+    if (filters.shippedFrom?.length) {
+      params.set("shippedFrom", filters.shippedFrom.join(","));
+    } else {
+      params.delete("shippedFrom");
+    }
+
+    if (filters.shippedTo?.length) {
+      params.set("shippedTo", filters.shippedTo.join(","));
+    } else {
+      params.delete("shippedTo");
     }
 
     setLoading(true);
@@ -59,7 +81,7 @@ const ProductGridWithPagination: FC<Props> = ({
         setTotalPages(data.totalPages || 1);
       })
       .finally(() => setLoading(false));
-  }, [page, filters, searchQuery, sortOption, location.search]);
+  }, [page, JSON.stringify(filters), searchQuery, sortOption]);
 
   return (
     <div className="pb-10 bg-white">

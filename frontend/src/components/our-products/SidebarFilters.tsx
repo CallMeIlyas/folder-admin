@@ -2,11 +2,14 @@ import { useState } from "react";
 import type { FC } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import SplitBorder from "./SplitBorder";
-import type { FilterOptions } from "../../types/types";
 import { useTranslation } from "react-i18next";
 
 interface SidebarFiltersProps {
-  onFilterChange: React.Dispatch<React.SetAction<FilterOptions>>;
+  onFilterChange: (filters: {
+    categories?: string[];
+    shippedFrom?: string[];
+    shippedTo?: string[];
+  }) => void;
   onMobileCategoryClick?: () => void;
 }
 
@@ -17,203 +20,109 @@ const SidebarFilters: FC<SidebarFiltersProps> = ({
   const { t } = useTranslation();
 
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
-  const [selectedMainCategories, setSelectedMainCategories] = useState<Set<string>>(new Set());
-  const [selectedSubcategories, setSelectedSubcategories] = useState<Set<string>>(new Set());
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [selectedShippedFrom, setSelectedShippedFrom] = useState<Set<string>>(new Set());
   const [selectedShippedTo, setSelectedShippedTo] = useState<Set<string>>(new Set());
 
-  // ===== MAPPING UNTUK FILTER =====
-  // Mapping UI → Category (sesuai dengan product data loader)
-  const uiToCategoryMap: Record<string, string> = {
-    [t("side.categories.3d")]: "3D Frame",
-    [t("side.categories.2d")]: "2D Frame", 
-    [t("side.categories.additional")]: "Additional",
-    [t("side.categories.acrylic")]: "Acrylic Stand",
-    [t("side.categories.softcopy")]: "Softcopy Design",
-  };
-
-  // 3D subcategories → Product name
-  const threeDSizeToNameMap: Record<string, string> = {
-    "12R": "12R",
-    "10R": "10R", 
-    "8R": "8R",
-    "20x20cm": "20X20CM",
-    "6R": "6R", 
-    "15x15cm": "15X15CM",
-    "4R": "4R",
-    "A2": "A2-40X55CM",
-    "A1": "A1-55X80CM",
-    "A0": "A0-80X110CM"
-  };
-
-  // 2D subcategories → Product name
-  const twoDSizeToNameMap: Record<string, string> = {
-    "12R": "12R",
-    "15cm": "15cm",
-    "4R": "4R", 
-    "6R": "6R",
-    "8R": "8R"
-  };
-
-  // Other subcategories → Product name
-  const otherSubcategoryToNameMap: Record<string, Record<string, string>> = {
-    [t("side.categories.additional")]: {
-      [t("side.subcategories.backgroundCustom") || "Background Custom"]: "BACKGROUND CUSTOM",
-      [t("side.subcategories.additionalFaces") || "Additional Faces"]: "BIAYA TAMBAHAN WAJAH KARIKATUR",
-    },
-    [t("side.categories.acrylic")]: {
-      [t("side.subcategories.2cm") || "2CM"]: "2CM",
-      [t("side.subcategories.3mm") || "3MM"]: "3MM",
-    },
-    [t("side.categories.softcopy")]: {
-      [t("side.subcategories.backgroundCatalog") || "With Background Catalog"]: "WITH BACKGROUND CATALOG",
-      [t("side.subcategories.backgroundCustomSoftcopy") || "With Background Custom"]: "WITH BACKGROUND CUSTOM", 
-      [t("side.subcategories.withoutBackground") || "Without Background"]: "WITHOUT BACKGROUND"
-    }
-  };
-
   // ===== UI CONFIGURATION =====
-  const customCategories = {
-    [t("side.categories.3d")]: [
-      "12R",
-      "10R", 
-      "8R",
-      "20x20cm",
-      "6R",
-      "15x15cm",
-      "4R",
-      "A2",
-      "A1",
-      "A0"
-    ],
-    [t("side.categories.2d")]: [
-    ],
-    
-    [t("side.categories.additional")]: [
-      t("side.subcategories.backgroundCustom") || "Background Custom",
-      t("side.subcategories.additionalFaces") || "Additional Faces"
-    ],
-    [t("side.categories.acrylic")]: [
-      t("side.subcategories.2cm") || "2CM",
-      t("side.subcategories.3mm") || "3MM"
-    ],
-    [t("side.categories.softcopy")]: [
-      t("side.subcategories.backgroundCatalog") || "With Background Catalog",
-      t("side.subcategories.backgroundCustomSoftcopy") || "With Background Custom",
-      t("side.subcategories.withoutBackground") || "Without Background"
-    ]
-  };
+  const categoryConfig = [
+    {
+      value: "3D Frame",
+      label: t("side.categories.3d"),
+      subcategories: ["12R", "10R", "8R", "20x20cm", "6R", "15x15cm", "4R", "A2", "A1", "A0"]
+    },
+    {
+      value: "2D Frame",
+      label: t("side.categories.2d"),
+      subcategories: []
+    },
+    {
+      value: "Additional",
+      label: t("side.categories.additional"),
+      subcategories: ["BACKGROUND CUSTOM", "BIAYA TAMBAHAN WAJAH KARIKATUR"]
+    },
+    {
+      value: "Acrylic Stand",
+      label: t("side.categories.acrylic"),
+      subcategories: ["2CM", "3MM"]
+    },
+    {
+      value: "Softcopy Design",
+      label: t("side.categories.softcopy"),
+      subcategories: ["WITH BACKGROUND CATALOG", "WITH BACKGROUND CUSTOM", "WITHOUT BACKGROUND"]
+    }
+  ];
 
-  const toggleCategory = (category: string) => {
+  // ===== SIMPLE TOGGLE LOGIC =====
+  const toggleExpanded = (categoryValue: string) => {
     setExpandedCategories((prev) => {
       const newSet = new Set(prev);
-      newSet.has(category) ? newSet.delete(category) : newSet.add(category);
+      newSet.has(categoryValue) ? newSet.delete(categoryValue) : newSet.add(categoryValue);
       return newSet;
     });
   };
 
-  // ===== FILTER LOGIC =====
-  const handleMainCategoryChange = (category: string, isChecked: boolean) => {
-    const mappedCategory = uiToCategoryMap[category];
-    
-    setSelectedMainCategories((prev) => {
-      const newSet = new Set(prev);
-      isChecked ? newSet.add(category) : newSet.delete(category);
-      return newSet;
-    });
-    
-    onFilterChange((prev) => {
-      const newCategories = isChecked
-        ? [...prev.categories, mappedCategory]
-        : prev.categories.filter((cat) => cat !== mappedCategory);
-      return { ...prev, categories: newCategories };
-    });
-  };
-
-  const handleMainCategoryChangeMobile = (category: string, isChecked: boolean) => {
-    handleMainCategoryChange(category, isChecked);
-    
-    if (onMobileCategoryClick) {
-      setTimeout(() => onMobileCategoryClick(), 100);
-    }
-  };
-
-  const handleSubcategoryChange = (
-    mainCategory: string,
-    subcategory: string,
-    isChecked: boolean
-  ) => {
-    const mappedCategory = uiToCategoryMap[mainCategory];
-    let productName: string;
-    
-    if (mappedCategory === "3D Frame") {
-      productName = threeDSizeToNameMap[subcategory] || subcategory;
-    } 
-    else if (mappedCategory === "2D Frame") {
-      productName = twoDSizeToNameMap[subcategory] || subcategory;
-    }
-    else {
-      const map = otherSubcategoryToNameMap[mainCategory];
-      productName = map ? map[subcategory] || subcategory : subcategory;
-    }
-    
-    // Format: "Category/ProductName" untuk filter
-    const filterKey = `${mappedCategory}/${productName}`;
-    const displayKey = `${mainCategory}/${subcategory}`;
-
-    setSelectedSubcategories((prev) => {
-      const newSet = new Set(prev);
-      isChecked ? newSet.add(displayKey) : newSet.delete(displayKey);
-      return newSet;
-    });
-
-    onFilterChange((prev) => {
-      const newCategories = isChecked
-        ? [...prev.categories, filterKey]
-        : prev.categories.filter((cat) => cat !== filterKey);
-      return { ...prev, categories: newCategories };
+  const toggleCategory = (categoryValue: string, checked: boolean) => {
+    setSelectedCategories((prev) => {
+      const next = new Set(prev);
+      
+      if (checked) {
+        // Tambah category
+        next.add(categoryValue);
+      } else {
+        // Hapus category dan semua subcategory-nya
+        next.delete(categoryValue);
+        
+        // Hapus semua subcategory yang dimulai dengan category ini
+        Array.from(next).forEach((value) => {
+          if (value.startsWith(`${categoryValue}/`)) {
+            next.delete(value);
+          }
+        });
+      }
+      
+      // Kirim filter ke parent
+      onFilterChange({
+        categories: Array.from(next),
+        shippedFrom: Array.from(selectedShippedFrom),
+        shippedTo: Array.from(selectedShippedTo)
+      });
+      
+      return next;
     });
   };
 
-  const handleShippedFromChange = (location: string, isChecked: boolean) => {
+  const toggleShippedFrom = (value: string, checked: boolean) => {
     setSelectedShippedFrom((prev) => {
-      const newSet = new Set(prev);
-      isChecked ? newSet.add(location) : newSet.delete(location);
-      return newSet;
-    });
-
-    onFilterChange((prev) => {
-      const newShippedFrom = isChecked
-        ? [...prev.shippedFrom, location]
-        : prev.shippedFrom.filter((loc) => loc !== location);
-      return { ...prev, shippedFrom: newShippedFrom };
+      const next = new Set(prev);
+      checked ? next.add(value) : next.delete(value);
+      
+      onFilterChange({
+        categories: Array.from(selectedCategories),
+        shippedFrom: Array.from(next),
+        shippedTo: Array.from(selectedShippedTo)
+      });
+      
+      return next;
     });
   };
 
-  const handleShippedToChange = (destination: string, isChecked: boolean) => {
+  const toggleShippedTo = (value: string, checked: boolean) => {
     setSelectedShippedTo((prev) => {
-      const newSet = new Set(prev);
-      isChecked ? newSet.add(destination) : newSet.delete(destination);
-      return newSet;
-    });
-
-    onFilterChange((prev) => {
-      const newShippedTo = isChecked
-        ? [...prev.shippedTo, destination]
-        : prev.shippedTo.filter((dest) => dest !== destination);
-      return { ...prev, shippedTo: newShippedTo };
+      const next = new Set(prev);
+      checked ? next.add(value) : next.delete(value);
+      
+      onFilterChange({
+        categories: Array.from(selectedCategories),
+        shippedFrom: Array.from(selectedShippedFrom),
+        shippedTo: Array.from(next)
+      });
+      
+      return next;
     });
   };
 
-  const handleShippedToChangeMobile = (destination: string, isChecked: boolean) => {
-    handleShippedToChange(destination, isChecked);
-    
-    if (onMobileCategoryClick) {
-      setTimeout(() => onMobileCategoryClick(), 100);
-    }
-  };
-
-  // ===== COMPONENT RENDERING =====
+  // ===== DESKTOP LAYOUT =====
   const DesktopLayout = () => (
     <aside className="hidden md:block w-64 p-6 bg-white rounded-xl">
       <SplitBorder />
@@ -222,20 +131,18 @@ const SidebarFilters: FC<SidebarFiltersProps> = ({
           {t("side.category")}
         </h3>
 
-        {Object.entries(customCategories).map(([mainCategory, subcategories]) => {
-          const isExpanded = expandedCategories.has(mainCategory);
+        {categoryConfig.map(({ value, label, subcategories }) => {
+          const isExpanded = expandedCategories.has(value);
           const hasSubcategories = subcategories.length > 0;
+          const isMainSelected = selectedCategories.has(value);
 
           return (
-            <div key={mainCategory} className="mb-2">
+            <div key={value} className="mb-2">
               <div className="font-poppinsRegular flex items-center gap-2 mb-2 ml-6">
                 <input
                   type="checkbox"
-                  id={`desktop-${mainCategory.toLowerCase().replace(/\s+/g, "-")}`}
-                  checked={selectedMainCategories.has(mainCategory)}
-                  onChange={(e) =>
-                    handleMainCategoryChange(mainCategory, e.target.checked)
-                  }
+                  checked={isMainSelected}
+                  onChange={(e) => toggleCategory(value, e.target.checked)}
                   className="appearance-none w-4 h-4 border border-black rounded-sm
                              cursor-pointer transition-all duration-200 relative
                              checked:bg-white checked:border-black
@@ -248,16 +155,16 @@ const SidebarFilters: FC<SidebarFiltersProps> = ({
                 <div
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleMainCategoryChange(mainCategory, !selectedMainCategories.has(mainCategory));
+                    toggleCategory(value, !isMainSelected);
                   }}
                   className="text-sm cursor-pointer hover:text-primary flex-1"
                 >
-                  {mainCategory}
+                  {label}
                 </div>
 
                 {hasSubcategories && (
                   <button
-                    onClick={() => toggleCategory(mainCategory)}
+                    onClick={() => toggleExpanded(value)}
                     className="text-gray-500 hover:text-primary"
                   >
                     <FaChevronDown
@@ -272,19 +179,16 @@ const SidebarFilters: FC<SidebarFiltersProps> = ({
 
               {isExpanded && hasSubcategories && (
                 <div className="ml-10 space-y-2">
-                  {subcategories.map((subcat) => {
-                    const displayKey = `${mainCategory}/${subcat}`;
-                    const isChecked = selectedSubcategories.has(displayKey);
+                  {subcategories.map((subcatValue) => {
+                    const subcategoryFullValue = `${value}/${subcatValue}`;
+                    const isSubSelected = selectedCategories.has(subcategoryFullValue);
 
                     return (
-                      <div key={displayKey} className="font-poppinsRegular flex items-center gap-2">
+                      <div key={subcategoryFullValue} className="font-poppinsRegular flex items-center gap-2">
                         <input
                           type="checkbox"
-                          id={`desktop-${displayKey.toLowerCase().replace(/\s+/g, "-").replace(/\//g, "-")}`}
-                          checked={isChecked}
-                          onChange={(e) =>
-                            handleSubcategoryChange(mainCategory, subcat, e.target.checked)
-                          }
+                          checked={isSubSelected}
+                          onChange={(e) => toggleCategory(subcategoryFullValue, e.target.checked)}
                           className="appearance-none relative w-4 h-4 min-w-[16px] min-h-[16px] aspect-square 
                                      border border-black rounded-[3px] cursor-pointer flex-shrink-0
                                      checked:bg-white checked:border-black transition-all duration-200
@@ -296,11 +200,11 @@ const SidebarFilters: FC<SidebarFiltersProps> = ({
                         <div
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleSubcategoryChange(mainCategory, subcat, !isChecked);
+                            toggleCategory(subcategoryFullValue, !isSubSelected);
                           }}
                           className="text-sm cursor-pointer hover:text-primary"
                         >
-                          {subcat}
+                          {subcatValue}
                         </div>
                       </div>
                     );
@@ -318,15 +222,11 @@ const SidebarFilters: FC<SidebarFiltersProps> = ({
           {t("side.shippedFrom")}
         </h3>
         {["Bogor", "Jakarta"].map((item) => (
-          <div
-            key={item}
-            className="font-poppinsRegular flex items-center gap-2 mb-3 ml-6"
-          >
+          <div key={item} className="font-poppinsRegular flex items-center gap-2 mb-3 ml-6">
             <input
               type="checkbox"
-              id={`desktop-from-${item.toLowerCase()}`}
               checked={selectedShippedFrom.has(item)}
-              onChange={(e) => handleShippedFromChange(item, e.target.checked)}
+              onChange={(e) => toggleShippedFrom(item, e.target.checked)}
               className="appearance-none w-4 h-4 border border-black rounded-sm
                          cursor-pointer transition-all duration-200 relative
                          checked:bg-white checked:border-black
@@ -339,7 +239,7 @@ const SidebarFilters: FC<SidebarFiltersProps> = ({
             <div
               onClick={(e) => {
                 e.stopPropagation();
-                handleShippedFromChange(item, !selectedShippedFrom.has(item));
+                toggleShippedFrom(item, !selectedShippedFrom.has(item));
               }}
               className="text-sm cursor-pointer hover:text-primary"
             >
@@ -355,15 +255,11 @@ const SidebarFilters: FC<SidebarFiltersProps> = ({
           {t("side.shippedTo")}
         </h3>
         {["Worldwide"].map((dest) => (
-          <div
-            key={dest}
-            className="font-poppinsRegular flex items-center gap-2 mb-3 ml-6"
-          >
+          <div key={dest} className="font-poppinsRegular flex items-center gap-2 mb-3 ml-6">
             <input
               type="checkbox"
-              id={`desktop-to-${dest.toLowerCase()}`}
               checked={selectedShippedTo.has(dest)}
-              onChange={(e) => handleShippedToChange(dest, e.target.checked)}
+              onChange={(e) => toggleShippedTo(dest, e.target.checked)}
               className="appearance-none w-4 h-4 border border-black rounded-sm
                          cursor-pointer transition-all duration-200 relative
                          checked:bg-white checked:border-black
@@ -376,7 +272,7 @@ const SidebarFilters: FC<SidebarFiltersProps> = ({
             <div
               onClick={(e) => {
                 e.stopPropagation();
-                handleShippedToChange(dest, !selectedShippedTo.has(dest));
+                toggleShippedTo(dest, !selectedShippedTo.has(dest));
               }}
               className="text-sm cursor-pointer hover:text-primary"
             >
@@ -388,6 +284,7 @@ const SidebarFilters: FC<SidebarFiltersProps> = ({
     </aside>
   );
 
+  // ===== MOBILE LAYOUT =====
   const MobileLayout = () => (
     <aside className="block md:hidden w-full p-4 bg-white rounded-xl">
       <SplitBorder />
@@ -396,21 +293,25 @@ const SidebarFilters: FC<SidebarFiltersProps> = ({
           {t("side.category")}
         </h3>
   
-        {Object.entries(customCategories).map(([mainCategory, subcategories]) => {
-          const isMainCategorySelected = selectedMainCategories.has(mainCategory);
+        {categoryConfig.map(({ value, label }) => {
+          const isMainSelected = selectedCategories.has(value);
           
           return (
-            <div key={mainCategory} className="mb-2">
+            <div key={value} className="mb-2">
               <div 
                 className="font-poppinsRegular flex items-center gap-2 mb-2 ml-4 cursor-pointer hover:text-primary transition-colors"
-                onClick={() => handleMainCategoryChangeMobile(mainCategory, !isMainCategorySelected)}
+                onClick={() => {
+                  toggleCategory(value, !isMainSelected);
+                  if (onMobileCategoryClick) {
+                    setTimeout(() => onMobileCategoryClick(), 100);
+                  }
+                }}
               >
                 <div className="relative">
                   <input
                     type="checkbox"
-                    id={`mobile-${mainCategory.toLowerCase().replace(/\s+/g, "-")}`}
-                    checked={isMainCategorySelected}
-                    onChange={() => {}}
+                    checked={isMainSelected}
+                    readOnly
                     className="appearance-none w-4 h-4 border border-black rounded-sm
                                cursor-pointer transition-all duration-200 relative
                                checked:bg-white checked:border-black
@@ -422,7 +323,7 @@ const SidebarFilters: FC<SidebarFiltersProps> = ({
                   />
                 </div>
                 <div className="text-sm cursor-pointer hover:text-primary flex-1 py-1">
-                  {mainCategory}
+                  {label}
                 </div>
               </div>
             </div>
@@ -441,14 +342,18 @@ const SidebarFilters: FC<SidebarFiltersProps> = ({
             <div
               key={dest}
               className="font-poppinsRegular flex items-center gap-2 mb-3 ml-4 cursor-pointer hover:text-primary transition-colors"
-              onClick={() => handleShippedToChangeMobile(dest, !isSelected)}
+              onClick={() => {
+                toggleShippedTo(dest, !isSelected);
+                if (onMobileCategoryClick) {
+                  setTimeout(() => onMobileCategoryClick(), 100);
+                }
+              }}
             >
               <div className="relative">
                 <input
                   type="checkbox"
-                  id={`mobile-to-${dest.toLowerCase()}`}
                   checked={isSelected}
-                  onChange={() => {}}
+                  readOnly
                   className="appearance-none w-4 h-4 border border-black rounded-sm
                              cursor-pointer transition-all duration-200 relative
                              checked:bg-white checked:border-black

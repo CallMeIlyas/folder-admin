@@ -13,8 +13,6 @@ export interface Product {
   subcategory: string | null;
   fullPath: string;
   price: number;
-  shippedFrom: string[];
-  shippedTo: string[];
   allImages?: string[];
   specialVariations?: { label: string; value: string }[];
   shadingOptions?: { label: string; value: string; preview?: string }[];
@@ -23,14 +21,18 @@ export interface Product {
   };
   sizeFrameOptions?: { label: string; value: string; image: string }[];
   details?: Record<string, any>;
-  showInGallery?: boolean;
-  admin?: {
+  
+  // Admin sekarang WAJIB, bukan opsional
+  admin: {
     active: boolean;
-    frames?: {
+    showInGallery: boolean;
+    shippedFrom: string[];
+    shippedTo: string[];
+    frames: {
       glass: boolean;
       acrylic: boolean;
     };
-    mainImageIndex?: number;
+    mainImageIndex: number;
   };
 }
 
@@ -198,69 +200,69 @@ export const getAllProducts = (): Product[] => {
 
       const decodedImages = images.map(img => decodeURIComponent(img));
 
+      let frameVariations: string[] = []
+
+      if (admin?.frames) {
+        if (admin.frames.glass === true) {
+          frameVariations.push("frameGlass")
+        }
+
+        if (admin.frames.acrylic === true) {
+          frameVariations.push("frameAcrylic")
+        }
+      } else {
+        frameVariations = getFrameVariations(mappedCategory, fileName)
+      }
+
+      // urutan gambar harus STABIL
+      const orderedImages = [...decodedImages];
+
+      // ambil index dari admin
+      const mainIndex = admin?.mainImageIndex ?? 0;
+
+      // ambil main image dari index
+      const mainImage = orderedImages[mainIndex] ?? orderedImages[0];
+
+      const displayName = fileName.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
       
+      // Clean subcategory untuk fullPath jika ada
+      const pathSubcategory = cleanSub ? `/${cleanSub}` : '';
+      const fullPath = `/api/uploads/images/list-products/${rawCategory}${pathSubcategory}`;
+
+      // Get shading options hanya untuk 2D Frame
+      const shadingOptions = mappedCategory === "2D Frame" ? get2DShadingOptions() : undefined;
       
-      
-let frameVariations: string[] = []
+      // Get size frame options hanya untuk 2D Frame  
+      const sizeFrameOptions = mappedCategory === "2D Frame" ? get2DSizeFrameOptions() : undefined;
 
-if (admin?.frames) {
-  if (admin.frames.glass === true) {
-    frameVariations.push("frameGlass")
-  }
-
-  if (admin.frames.acrylic === true) {
-    frameVariations.push("frameAcrylic")
-  }
-} else {
-  frameVariations = getFrameVariations(mappedCategory, fileName)
-}
-
-// urutan gambar harus STABIL
-const orderedImages = [...decodedImages];
-
-// ambil index dari admin
-const mainIndex = admin?.mainImageIndex ?? 0;
-
-// ambil main image dari index
-const mainImage = orderedImages[mainIndex] ?? orderedImages[0];
+      // Admin object - SELALU ada dengan nilai default yang jelas
+      const adminObject = {
+        active: admin?.active !== false,
+        showInGallery: admin?.showInGallery !== false,
+        shippedFrom: admin?.shippedFrom ?? ["Bogor", "Jakarta"],
+        shippedTo: admin?.shippedTo ?? ["Worldwide"],
+        frames: admin?.frames || { glass: false, acrylic: false },
+        mainImageIndex: mainIndex,
+      };
 
       return {
-  id: productId,
-  imageUrl: mainImage,
-  name: fileName,
-  displayName: subcategory
-    ? `${mappedCategory} ${subcategory.replace(/-\s*\d+\s*x\s*\d+\s*cm/i, "").trim()}`
-    : mappedCategory,
-  size: "Custom",
-  category: mappedCategory,
-  subcategory: subcategory || null,
-  fullPath: `${mappedCategory}${subcategory ? " / " + subcategory : ""}`,
-  price: getPrice(mappedCategory, fileName),
-  shippedFrom: ["Bogor", "Jakarta"],
-  shippedTo: ["Worldwide"],
-
-  allImages: orderedImages,
-
-admin: {
-  active: admin?.active !== false,
-  showInGallery: admin?.showInGallery !== false,
-  frames: admin?.frames || { glass: false, acrylic: false },
-  mainImageIndex: mainIndex,
-  description: admin?.description,
-},
-
-  options: {
-    variations: frameVariations,
-  },
-
-  shadingOptions:
-    mappedCategory === "2D Frame" ? get2DShadingOptions() : undefined,
-  sizeFrameOptions:
-    mappedCategory === "2D Frame" ? get2DSizeFrameOptions() : undefined,
-
-  showInGallery: admin?.showInGallery !== false,
-};
-      
+        id: productId,
+        imageUrl: mainImage,
+        name: fileName,
+        displayName: displayName,
+        size: "Custom",
+        category: mappedCategory,
+        subcategory: subcategory || null,
+        fullPath: fullPath,
+        price: admin?.price ?? getPrice(mappedCategory, fileName),
+        allImages: orderedImages,
+        admin: adminObject, // SELALU ADA, tidak opsional
+        options: {
+          variations: frameVariations,
+        },
+        shadingOptions: shadingOptions,
+        sizeFrameOptions: sizeFrameOptions,
+      };
     })
     .filter(Boolean) as Product[];
 };
@@ -318,7 +320,7 @@ export const getOrderedProducts = (): Product[] => {
 // === Function untuk mendapatkan produk gallery ===
 export const getGalleryProducts = (): Product[] => {
   const allProducts = getAllProducts();
-  return allProducts.filter(p => p.showInGallery !== false);
+  return allProducts.filter(p => p.admin.showInGallery !== false);
 };
 
 // === Export untuk kompatibilitas backward ===

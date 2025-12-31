@@ -17,12 +17,19 @@
     },
     "mainImage": "/api/uploads/images/list-products/3D/12R/1.jpg",
     "mainImageIndex": 39,
-    "displayName": "3D Frame 12R",
+    "displayName": "12R",
     "description": {
       "en": "Frame material: Wood, Glass, back side MDF 2-3mm\nOverall frame size: ±35x45x4cm\nDepth: ± 3cm\nFrame Color: White, Wood Motif\nPacking: Black Hardbox + Paperbag\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 20 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping. For Cargo to different island or country, please choose acrylic frame.\nNote: 12R available for up to 20 people, more than 20 people please choose A2, A1, or A0",
       "id": "Produk: asli impor bahan dari jerman"
     },
-    "price": 598800
+    "price": 598800,
+    "shippedFrom": [
+      "Bogor",
+      "Jakarta"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ]
   },
   "prod-3d-10r": {
     "showInGallery": true,
@@ -61,15 +68,24 @@
   },
   "prod-3d-a2-40x55cm": {
     "mainImageIndex": 6,
-    "displayName": "3D Frame A2",
-    "description": "Frame material: Wood, Acrylic, back side MDF 2-3mm\nOverall frame size: ±46x61x6cm\nDepth: ± 5cm\nFrame Color: White\nPacking: Black Hardbox + Bubblewrap\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 30 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping. For Cargo to different island or country, please choose acrylic frame.\nNote: A2 available for up to 30 people, more than 30 people please choose A1 or A0",
+    "displayName": "A2 40X55CM",
+    "description": {
+      "en": "Frame material: Wood, Acrylic, back side MDF 2-3mm\nOverall frame size: ±46x61x6cm\nDepth: ± 5cm\nFrame Color: White\nPacking: Black Hardbox + Bubblewrap\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 30 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping. For Cargo to different island or country, please choose acrylic frame.\nNote: A2 available for up to 30 people, more than 30 people please choose A1 or A0",
+      "id": ""
+    },
     "price": 1428800,
     "active": true,
     "showInGallery": true,
     "frames": {
       "glass": false,
       "acrylic": true
-    }
+    },
+    "shippedFrom": [
+      "Bogor"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ]
   },
   "prod-3d-15x15cm": {
     "mainImageIndex": 3,
@@ -112,9 +128,90 @@
   },
   "prod-3d-20x20cm": {
     "mainImageIndex": 3,
-    "displayName": "3D Frame 20X20CM",
-    "description": "Frame material: Wood, Glass, back side MDF 2-3mm\nOverall frame size: ±25x25x3cm\nDepth: ± 3cm\nFrame Color: White\nPacking: Kraft Box + Paperbag\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 4 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping.\nNote: 20cm available for up to 4 people, more than 4 people please choose 8R, 10R, 12R, A2, A1, A0",
+    "displayName": "20X20CM",
+    "description": {
+      "en": "Frame material: Wood, Glass, back side MDF 2-3mm\nOverall frame size: ±25x25x3cm\nDepth: ± 3cm\nFrame Color: White\nPacking: Kraft Box + Paperbag\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 4 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping.\nNote: 20cm available for up to 4 people, more than 4 people please choose 8R, 10R, 12R, A2, A1, A0",
+      "id": ""
+    },
     "price": 313800,
+    "active": true,
+    "showInGallery": true,
+    "frames": {
+      "glass": false,
+      "acrylic": false
+    },
+    "shippedFrom": [
+      "Bogor"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ]
+  },
+  "prod-3d-a0-80x110cm": {
+    "displayName": "A0 80X110CM",
+    "description": {
+      "en": "Frame material: Wood, Acrylic, back side MDF 2-3mm\nOverall frame size: ±86x116x6cm\nDepth: ± 5cm\nFrame Color: White\nPacking: Bubblewrap Only\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 60 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping. For Cargo to different island or country, please choose acrylic frame.\nNote: A1 available for up to 60 people.",
+      "id": ""
+    },
+    "price": 3259800,
+    "shippedFrom": [
+      "Bogor"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ],
+    "active": true,
+    "showInGallery": true,
+    "frames": {
+      "glass": false,
+      "acrylic": true
+    }
+  },
+  "prod-3d-a1-55x80cm": {
+    "displayName": "A1 55X80CM",
+    "description": {
+      "en": "Frame material: Wood, Acrylic, back side MDF 2-3mm\nOverall frame size: ±61x86x6cm\nDepth: ± 5cm\nFrame Color: White\nPacking: Black Hardbox + Bubblewrap\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 40 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping. For Cargo to different island or country, please choose acrylic frame.\nNote: A1 available for up to 40 people, more than 40 people please choose A0",
+      "id": ""
+    },
+    "price": 2288800,
+    "shippedFrom": [
+      "Bogor"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ],
+    "active": true,
+    "showInGallery": true,
+    "frames": {
+      "glass": false,
+      "acrylic": true
+    }
+  },
+  "prod-acrylic stand-2cm": {
+    "displayName": "2CM",
+    "description": {
+      "en": "Material: Acrylic\nDepth: 1.5-2cm\nBox Colour: Blue Velvet\nPackaging: Kraft Box + Paperbag\nPrint: 2 side (front and back)\nNote: Price for 1 face caricature, for more than 1 face, please checkout additional faces.",
+      "id": ""
+    },
+    "price": 497800,
+    "shippedFrom": [],
+    "shippedTo": [],
+    "active": true,
+    "showInGallery": true,
+    "frames": {
+      "glass": false,
+      "acrylic": false
+    }
+  },
+  "prod-acrylic stand-3mm": {
+    "displayName": "3MM",
+    "description": {
+      "en": "Material: Acrylic\nDepth: 3mm\nPackaging: Kraft Box + Paperbag\nPrint: 1 side (only front)\nNote: Price for 1 face caricature, for more than 1 face, please checkout additional faces.",
+      "id": ""
+    },
+    "price": 324800,
+    "shippedFrom": [],
+    "shippedTo": [],
     "active": true,
     "showInGallery": true,
     "frames": {

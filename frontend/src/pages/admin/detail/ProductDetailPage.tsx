@@ -15,20 +15,23 @@ type ProductDetail = {
   shippedFrom: string[];
   shippedTo: string[];
   allImages: string[];
-  admin: {
-    active: boolean;
-    showInGallery: boolean;
-    frames: {
-      glass: boolean;
-      acrylic: boolean;
-    };
-    mainImageIndex: number;
+admin: {
+  active: boolean;
+  showInGallery: boolean;
+  shippedFrom: string[];
+  shippedTo: string[];
+  frames: {
+    glass: boolean;
+    acrylic: boolean;
   };
+  mainImageIndex: number;
+};
 };
 
 const ProductDetailPage: React.FC = () => {
   const API_BASE = "http://localhost:3001";
   const token = "admin-token-123";
+  const SHIPPED_FROM_OPTIONS = ["Bogor", "Jakarta"]
   
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -37,18 +40,20 @@ const ProductDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [langTab, setLangTab] = useState<"en" | "id">("en")
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
   displayName: "",
-  description: { 
+  description: {
     en: "",
-    id: "" 
+    id: ""
   },
   price: 0,
+  shippedFrom: [] as string[],
+  shippedTo: [] as string[],
   active: true,
   showInGallery: true,
   frames: {
     glass: false,
-    acrylic: false,
+    acrylic: false
   }
 });
 
@@ -66,20 +71,30 @@ const ProductDetailPage: React.FC = () => {
       });
       const data = await res.json();
       setProduct(data);
-      setFormData({
-        displayName: data.displayName,
-description:
-  typeof data.description === "string"
-    ? { en: data.description, id: "" }
-    : {
-        en: data.description?.en || "",
-        id: data.description?.id || ""
-      },
-        price: data.price,
-        active: data.admin.active,
-        showInGallery: data.admin.showInGallery,
-        frames: { ...data.admin.frames }
-      });
+setFormData({
+  displayName: data.displayName,
+
+  description:
+    typeof data.description === "string"
+      ? { en: data.description, id: "" }
+      : {
+          en: data.description?.en || "",
+          id: data.description?.id || ""
+        },
+
+  price: data.price,
+
+  shippedFrom: data.admin.shippedFrom || [],
+  shippedTo: data.admin.shippedTo || [],
+
+  active: data.admin.active,
+  showInGallery: data.admin.showInGallery,
+
+  frames: {
+    glass: data.admin.frames.glass,
+    acrylic: data.admin.frames.acrylic
+  }
+});
       setLoading(false);
     } catch (error) {
       console.error("Gagal mengambil data produk:", error);
@@ -116,14 +131,16 @@ description:
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({
-          displayName: formData.displayName,
-          description: formData.description,
-          price: formData.price,
-          active: formData.active,
-          showInGallery: formData.showInGallery,
-          frames: formData.frames
-        })
+body: JSON.stringify({
+  displayName: formData.displayName,
+  description: formData.description,
+  price: formData.price,
+  shippedFrom: formData.shippedFrom,
+  shippedTo: formData.shippedTo,
+  active: formData.active,
+  showInGallery: formData.showInGallery,
+  frames: formData.frames
+})
       });
       
       // Refresh data setelah simpan
@@ -386,18 +403,51 @@ description:
               <div className="border-t pt-6">
                 <h3 className="text-sm font-medium text-gray-700 mb-4">Info Produk</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <div className="text-gray-500">Dikirim Dari</div>
-                    <div className="font-medium">
-                      {product.shippedFrom?.join(", ") || "-"}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-gray-500">Dikirim Ke</div>
-                    <div className="font-medium">
-                      {product.shippedTo?.join(", ") || "-"}
-                    </div>
-                  </div>
+<div>
+  <div className="text-gray-500 mb-2">Dikirim Dari</div>
+
+  <div className="space-y-2">
+    {SHIPPED_FROM_OPTIONS.map(city => (
+      <label key={city} className="flex items-center gap-2 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={formData.shippedFrom.includes(city)}
+          onChange={(e) => {
+            const next = e.target.checked
+              ? [...formData.shippedFrom, city]
+              : formData.shippedFrom.filter(c => c !== city)
+
+            setFormData({
+              ...formData,
+              shippedFrom: next
+            })
+          }}
+          className="w-4 h-4"
+        />
+        <span className="text-sm">{city}</span>
+      </label>
+    ))}
+  </div>
+</div>
+<div>
+  <div className="text-gray-500 mb-2">Dikirim Ke</div>
+
+  <label className="relative inline-flex items-center cursor-pointer">
+    <input
+      type="checkbox"
+      className="sr-only peer"
+      checked={formData.shippedTo.includes("Worldwide")}
+      onChange={(e) =>
+        setFormData({
+          ...formData,
+          shippedTo: e.target.checked ? ["Worldwide"] : []
+        })
+      }
+    />
+    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-500 after:absolute after:top-[2px] after:left-[2px] after:bg-white after:h-5 after:w-5 after:rounded-full after:transition-all peer-checked:after:translate-x-full"></div>
+    <span className="ml-3 text-sm font-medium">Worldwide</span>
+  </label>
+</div>
                   <div>
                     <div className="text-gray-500">Kategori</div>
                     <div className="font-medium">{product.category}</div>

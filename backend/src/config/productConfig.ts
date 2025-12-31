@@ -7,21 +7,23 @@ const CONFIG_PATH = path.join(
 );
 
 export type ProductAdminConfig = {
-  active?: boolean;
-  showInGallery?: boolean;
+  active?: boolean
+  showInGallery?: boolean
 
-  displayName?: string;
-  description?: string;
-  price?: number;
+  displayName?: string
+  description?: any
+  price?: number
+
+  shippedFrom?: string[]
+  shippedTo?: string[]
 
   frames?: {
-    glass?: boolean;
-    acrylic?: boolean;
-  };
+    glass?: boolean
+    acrylic?: boolean
+  }
 
-  mainImage?: string | null;
-  mainImageIndex?: number;
-};
+  mainImageIndex?: number
+}
 
 export const loadProductAdminConfig = (): Record<string, ProductAdminConfig> => {
   if (!fs.existsSync(CONFIG_PATH)) return {};

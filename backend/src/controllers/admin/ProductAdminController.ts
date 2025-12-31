@@ -25,8 +25,8 @@ export const getAllProductsAdmin = (_req: Request, res: Response) => {
   const merged = products.map(p => ({
     ...p,
     admin: {
-      active: adminConfig[p.id]?.active ?? true,
-      showInGallery: adminConfig[p.id]?.showInGallery ?? true
+      ...p.admin,
+      ...adminConfig[p.id]
     }
   }))
 
@@ -145,11 +145,20 @@ const defaultFrameState = {
 res.json({
   ...product,
   description: descriptionText,
-  admin: {
-    active: admin.active ?? true,
-    showInGallery: admin.showInGallery ?? true,
-    frames: admin.frames ?? defaultFrameState,
-    mainImageIndex: admin.mainImageIndex ?? product.admin.mainImageIndex ?? 0
-  }
+admin: {
+  active: admin.active ?? true,
+  showInGallery: admin.showInGallery ?? true,
+  frames: admin.frames ?? defaultFrameState,
+  mainImageIndex: admin.mainImageIndex ?? 0,
+shippedFrom:
+  admin.shippedFrom ??
+  product.admin.shippedFrom ??
+  ["Bogor", "Jakarta"],
+
+shippedTo:
+  admin.shippedTo ??
+  product.admin.shippedTo ??
+  ["Worldwide"]
+}
 })
 }

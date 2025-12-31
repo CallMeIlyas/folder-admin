@@ -81,7 +81,7 @@ if (product.admin?.description) {
         details: details || {}
       },
 
-      price: productService.getBasePrice(product.id, language),
+      price: product.price ?? productService.getBasePrice(product.id, language),
 
       isBestSelling:
         productService.isBestSelling(product.id, language).isBestSelling,
