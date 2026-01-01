@@ -29,7 +29,8 @@
     ],
     "shippedTo": [
       "Worldwide"
-    ]
+    ],
+    "displayNameOverride": "12R"
   },
   "prod-3d-10r": {
     "showInGallery": true,
@@ -49,10 +50,21 @@
       "acrylic": false,
       "glass": true
     },
-    "displayName": "2D Frame 12R",
-    "description": "Frame material: Wood, Glass, back side MDF 2-3mm\nOverall frame size: ±35x45x4cm\nFrame Color: White, Wood Motif\nPacking: Black Hardbox + Paperbag\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 20 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping. For Cargo to different island or country, please choose acrylic frame.\nNote: 12R available for up to 20 people, more than 20 people please choose A2, A1, or A0",
+    "displayName": "12R prem",
+    "description": {
+      "en": "Frame material: Wood, Glass, back side MDF 2-3mm\nOverall frame size: ±35x45x4cm\nFrame Color: White, Wood Motif\nPacking: Black Hardbox + Paperbag\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 20 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping. For Cargo to different island or country, please choose acrylic frame.\nNote: 12R available for up to 20 people, more than 20 people please choose A2, A1, or A0",
+      "id": "Produk: admin"
+    },
     "price": 348800,
-    "mainImageIndex": 0
+    "mainImageIndex": 0,
+    "shippedFrom": [
+      "Bogor",
+      "Jakarta"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ],
+    "displayNameOverride": "12R prem"
   },
   "prod-3d-8r": {
     "mainImageIndex": 14,

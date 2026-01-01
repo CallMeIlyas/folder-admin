@@ -115,9 +115,11 @@ const ProductManagerPage: React.FC = () => {
 
               {/* Info Produk */}
               <div className="flex-1 min-w-0">
-                <div className="font-medium text-gray-800 truncate">
-                  {p.displayName}
-                </div>
+<div className="font-medium text-gray-800 truncate">
+  {p.admin?.displayNameOverride?.trim()
+    ? p.admin.displayNameOverride
+    : p.displayName}
+</div>
                 <div className="text-xs text-gray-500 mt-0.5">
                   {p.category}
                 </div>

@@ -10,7 +10,7 @@ export type ProductAdminConfig = {
   active?: boolean
   showInGallery?: boolean
 
-  displayName?: string
+  displayNameOverride?: string
   description?: any
   price?: number
 

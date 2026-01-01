@@ -13,7 +13,7 @@ export const getProductDetail = (req: Request, res: Response) => {
   const products = getAllProducts()
   const product = products.find(p => p.id === id)
 
-  if (!product || product.admin?.active === false) {
+  if (!product || product.admin.active === false) {
     return res.status(404).json({
       message:
         language === "id"
@@ -22,48 +22,60 @@ export const getProductDetail = (req: Request, res: Response) => {
     })
   }
 
-  // ===== DESKRIPSI FINAL =====
-let details: Record<string, string> | null = null
+  // =====================
+  // DESKRIPSI FINAL
+  // =====================
+  let details: Record<string, string> = {}
 
-if (product.admin?.description) {
-  const rawDesc =
-    typeof product.admin.description === "string"
-      ? product.admin.description
-      : product.admin.description[language]
+  if (product.description) {
+    const rawDesc =
+      typeof product.description === "string"
+        ? product.description
+        : product.description[language]
 
-  if (rawDesc) {
-    details = Object.fromEntries(
-      rawDesc
-        .split("\n")
-        .map(line => {
-          const idx = line.indexOf(":")
-          if (idx === -1) return null
-          return [
-            line.slice(0, idx).trim(),
-            line.slice(idx + 1).trim()
-          ]
-        })
-        .filter(Boolean) as [string, string][]
+    if (rawDesc) {
+      details = Object.fromEntries(
+        rawDesc
+          .split("\n")
+          .map(line => {
+            const idx = line.indexOf(":")
+            if (idx === -1) return null
+            return [
+              line.slice(0, idx).trim(),
+              line.slice(idx + 1).trim()
+            ]
+          })
+          .filter(Boolean) as [string, string][]
+      )
+    }
+  } else {
+    const fallback = getProductDescription(
+      product.category,
+      product.name
     )
-  }
-} else {
-  const fallback = getProductDescription(
-    product.category,
-    product.name
-  )
 
-  if (fallback) {
-    const { title, ...rest } = fallback as any
-    details = rest
+    if (fallback) {
+      const { title, ...rest } = fallback as any
+      details = rest
+    }
   }
-}
+
+  // =====================
+  // UI TEXT
+  // =====================
   const uiText = productLocaleService.getProductLocale(language)
 
+  // =====================
+  // RESPONSE
+  // =====================
   const response = productMapper.toProductDetail(
     {
       id: product.id,
+
       category: product.category,
-      name: product.name,
+
+      // NAMA PRODUK FINAL
+      name: product.displayName || product.name,
 
       images: {
         main: product.imageUrl,
@@ -78,10 +90,12 @@ if (product.admin?.description) {
 
       uiText: {
         ...uiText,
-        details: details || {}
+        details
       },
 
-      price: product.price ?? productService.getBasePrice(product.id, language),
+      price:
+        product.price ??
+        productService.getBasePrice(product.id, language),
 
       isBestSelling:
         productService.isBestSelling(product.id, language).isBestSelling,

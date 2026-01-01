@@ -171,7 +171,10 @@ if (shippedTo) {
   res.json({
     items: paginated.map(p => ({
       id: p.id,
-      displayName: `${p.category} ${p.displayName}`,
+displayName:
+  p.admin?.displayNameOverride?.trim()
+    ? p.admin.displayNameOverride
+    : `${p.category} ${p.displayName}`,
       category: p.category,
       price: p.price,
       imageUrl: p.imageUrl,

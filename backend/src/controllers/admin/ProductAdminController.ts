@@ -91,15 +91,38 @@ export const updateProductAdminConfig = (req: Request, res: Response) => {
 
   const config = loadProductAdminConfig()
 
-  config[id] = {
-    ...(config[id] || {}),
-    ...payload,
-    frames: {
-      ...(config[id]?.frames || {}),
-      ...(payload.frames || {})
-    }
-  }
+config[id] = {
+  ...(config[id] || {}),
 
+  displayNameOverride:
+    payload.displayNameOverride ??
+    config[id]?.displayNameOverride,
+
+  description:
+    payload.description ??
+    config[id]?.description,
+
+  price:
+    payload.price ??
+    config[id]?.price,
+
+  shippedFrom:
+    payload.shippedFrom ??
+    config[id]?.shippedFrom,
+
+  shippedTo:
+    payload.shippedTo ??
+    config[id]?.shippedTo,
+
+  frames: {
+    ...(config[id]?.frames || {}),
+    ...(payload.frames || {})
+  },
+
+  mainImageIndex:
+    payload.mainImageIndex ??
+    config[id]?.mainImageIndex
+}
   saveConfig(config)
   res.json({ success: true })
 }
@@ -144,21 +167,27 @@ const defaultFrameState = {
 
 res.json({
   ...product,
-  description: descriptionText,
-admin: {
-  active: admin.active ?? true,
-  showInGallery: admin.showInGallery ?? true,
-  frames: admin.frames ?? defaultFrameState,
-  mainImageIndex: admin.mainImageIndex ?? 0,
-shippedFrom:
-  admin.shippedFrom ??
-  product.admin.shippedFrom ??
-  ["Bogor", "Jakarta"],
+displayName:
+  admin.displayNameOverride?.trim()
+    ? admin.displayNameOverride
+    : product.displayName,
 
-shippedTo:
-  admin.shippedTo ??
-  product.admin.shippedTo ??
-  ["Worldwide"]
-}
+  description: descriptionText,
+
+  admin: {
+    active: admin.active ?? true,
+    showInGallery: admin.showInGallery ?? true,
+    frames: admin.frames ?? defaultFrameState,
+    mainImageIndex: admin.mainImageIndex ?? 0,
+    shippedFrom:
+      admin.shippedFrom ??
+      product.admin.shippedFrom ??
+      ["Bogor", "Jakarta"],
+    shippedTo:
+      admin.shippedTo ??
+      product.admin.shippedTo ??
+      ["Worldwide"],
+    displayNameOverride: admin.displayNameOverride ?? ""
+  }
 })
 }

@@ -72,7 +72,10 @@ const [formData, setFormData] = useState({
       const data = await res.json();
       setProduct(data);
 setFormData({
-  displayName: data.displayName,
+displayName:
+  data.admin?.displayNameOverride?.trim()
+    ? data.admin.displayNameOverride
+    : data.displayName,
 
   description:
     typeof data.description === "string"
@@ -132,7 +135,7 @@ setFormData({
           Authorization: `Bearer ${token}`
         },
 body: JSON.stringify({
-  displayName: formData.displayName,
+  displayNameOverride: formData.displayName,
   description: formData.description,
   price: formData.price,
   shippedFrom: formData.shippedFrom,

@@ -13,6 +13,7 @@ export interface Product {
   subcategory: string | null;
   fullPath: string;
   price: number;
+  description?: { en?: string; id?: string } | string | null;
   allImages?: string[];
   specialVariations?: { label: string; value: string }[];
   shadingOptions?: { label: string; value: string; preview?: string }[];
@@ -33,6 +34,7 @@ export interface Product {
       acrylic: boolean;
     };
     mainImageIndex: number;
+    displayNameOverride?: string;
   };
 }
 
@@ -198,6 +200,9 @@ export const getAllProducts = (): Product[] => {
 
       const admin = adminConfig[productId];
 
+      // LANGKAH 2: Resolve description
+      const resolvedDescription = admin?.description ?? null;
+
       const decodedImages = images.map(img => decodeURIComponent(img));
 
       let frameVariations: string[] = []
@@ -225,6 +230,9 @@ export const getAllProducts = (): Product[] => {
 
       const displayName = fileName.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
       
+      // Gunakan displayNameOverride jika ada, atau fallback ke displayName
+      const finalDisplayName = admin?.displayNameOverride?.trim() || displayName;
+      
       // Clean subcategory untuk fullPath jika ada
       const pathSubcategory = cleanSub ? `/${cleanSub}` : '';
       const fullPath = `/api/uploads/images/list-products/${rawCategory}${pathSubcategory}`;
@@ -243,18 +251,22 @@ export const getAllProducts = (): Product[] => {
         shippedTo: admin?.shippedTo ?? ["Worldwide"],
         frames: admin?.frames || { glass: false, acrylic: false },
         mainImageIndex: mainIndex,
+        displayNameOverride: admin?.displayNameOverride?.trim() || ""
       };
 
+      // LANGKAH 3: Return object dengan description
       return {
         id: productId,
         imageUrl: mainImage,
         name: fileName,
-        displayName: displayName,
+        displayName: finalDisplayName, // Gunakan finalDisplayName yang sudah include override
+        baseDisplayName: displayName, // Simpan displayName asli tanpa override
         size: "Custom",
         category: mappedCategory,
         subcategory: subcategory || null,
         fullPath: fullPath,
         price: admin?.price ?? getPrice(mappedCategory, fileName),
+        description: resolvedDescription, // LANGKAH 3: Tambahkan description ke return object
         allImages: orderedImages,
         admin: adminObject, // SELALU ADA, tidak opsional
         options: {
@@ -320,7 +332,7 @@ export const getOrderedProducts = (): Product[] => {
 // === Function untuk mendapatkan produk gallery ===
 export const getGalleryProducts = (): Product[] => {
   const allProducts = getAllProducts();
-  return allProducts.filter(p => p.admin.showInGallery !== false);
+return allProducts.filter(p => p.admin.showInGallery !== false);
 };
 
 // === Export untuk kompatibilitas backward ===

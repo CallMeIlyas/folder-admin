@@ -8,10 +8,13 @@ export const getProductCardContent = (_req: Request, res: Response) => {
     .filter(p => p.admin?.active !== false)
     .map(p => ({
       id: p.id,
-      displayName: p.displayName || p.name,
+      displayName:
+        p.admin?.displayNameOverride?.trim()
+          ? p.admin.displayNameOverride
+          : `${p.category} ${p.displayName}`,
       category: p.category,
       price: p.price,
-      imageUrl: p.imageUrl,
+      imageUrl: p.imageUrl
     }))
 
   res.json({ items })
