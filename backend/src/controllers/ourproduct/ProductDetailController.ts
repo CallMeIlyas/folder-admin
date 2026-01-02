@@ -67,6 +67,23 @@ export const getProductDetail = (req: Request, res: Response) => {
   // =====================
   const uiText = productLocaleService.getProductLocale(language)
 
+
+
+// variations
+
+const frameVariationLabelMap: Record<
+  string,
+  { id: string; en: string }
+> = {
+  frameGlass: {
+    id: "Frame Kaca",
+    en: "Glass Frame",
+  },
+  frameAcrylic: {
+    id: "Frame Acrylic",
+    en: "Acrylic Frame",
+  },
+}
   // =====================
   // RESPONSE
   // =====================
@@ -85,11 +102,12 @@ export const getProductDetail = (req: Request, res: Response) => {
       },
 
 options: {
-  variations: product.options?.variations?.map(v => ({
+variations:
+  product.options?.variations?.map(v => ({
     value: v,
-    label: tOption(v, v.replace(/_/g, " "))
+    label: frameVariationLabelMap[v]?.[language] ?? v,
   })) || [],
-
+  
   faceCountOptions:
     product.category.toLowerCase().includes("additional") &&
     product.name.toLowerCase().includes("wajah")
@@ -99,16 +117,25 @@ options: {
         ]
       : [],
 
-  expressOptions:
-    product.category.toLowerCase().includes("additional") &&
-    product.name.toLowerCase().includes("ekspress")
-      ? [
-          { value: "normal", label: tOption("Normal", "Normal") },
-          { value: "fast", label: tOption("Cepat", "Fast") },
-          { value: "same-day", label: tOption("Hari yang sama", "Same day") }
-        ]
-      : [],
-
+expressOptions:
+  product.category.toLowerCase().includes("additional") &&
+  product.name.toLowerCase().includes("ekspress")
+    ? [
+        {
+          value: "option-1",
+          label: "Option 1"
+        },
+        {
+          value: "option-2",
+          label: "Option 2"
+        },
+        {
+          value: "option-3",
+          label: "Option 3"
+        }
+      ]
+    : [],
+    
   acrylicSizes:
     product.category.toLowerCase().includes("additional") &&
     product.name.toLowerCase().includes("acrylic")

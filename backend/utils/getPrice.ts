@@ -74,9 +74,20 @@ export function getPrice(
       return k.includes("ai");
     }
 
-    // ===== EXPRESS =====
-    if (normalizedName.includes("ekspress") || normalizedName.includes("express")) {
-      return k.includes("ekspress");
+// ===== EXPRESS GENERAL (OPTION 1 / 2 / 3) =====
+    if (normalizedName.startsWith("biaya ekspress general")) {
+      return (
+        k === normalizedName ||
+        k.startsWith(normalizedName + " ")
+      );
+    }
+
+    // ===== EXPRESS KHUSUS (12R, A2, A1, A0) =====
+    if (
+      normalizedName.includes("ekspress") ||
+      normalizedName.includes("express")
+    ) {
+      return k.includes("ekspress") && !k.includes("general");
     }
 
     return k === normalizedName;

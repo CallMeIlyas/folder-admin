@@ -129,9 +129,18 @@ const resolveAdditionalKey = (productName: string, options: any, language: 'id' 
     return dict['packing'];
   }
 
-  if (name.includes("ekspress") || name.includes("express")) {
-    return options.expressOption || null;
+if (name.includes("ekspress general") || name.includes("express general")) {
+  if (options.expressOption === "option-1") {
+    return "Biaya Ekspress General";
   }
+  if (options.expressOption === "option-2") {
+    return "Biaya Ekspress General 2";
+  }
+  if (options.expressOption === "option-3") {
+    return "Biaya Ekspress General 3";
+  }
+  return null;
+}
 
   if (name.includes("ganti frame kaca ke acrylic") || name.includes("change glass frame to acrylic")) {
     if (options.acrylicSize) {
