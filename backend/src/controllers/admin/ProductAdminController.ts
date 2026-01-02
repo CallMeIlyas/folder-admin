@@ -22,13 +22,22 @@ export const getAllProductsAdmin = (_req: Request, res: Response) => {
   const adminConfig = loadProductAdminConfig()
   const products = getAllProducts()
 
-  const merged = products.map(p => ({
+ const merged = products.map(p => {
+  const admin = adminConfig[p.id] || {}
+
+  return {
     ...p,
+    displayName:
+      admin.displayNameOverride?.trim()
+        ? admin.displayNameOverride
+        : `${p.category} ${p.displayName}`,
+
     admin: {
       ...p.admin,
-      ...adminConfig[p.id]
+      ...admin
     }
-  }))
+  }
+})
 
   res.json(merged)
 }
@@ -165,12 +174,16 @@ const defaultFrameState = {
   acrylic: frameVariations.includes("frameAcrylic")
 }
 
+const composedDisplayName =
+  `${product.category} ${product.displayName}`
+
 res.json({
   ...product,
-displayName:
-  admin.displayNameOverride?.trim()
-    ? admin.displayNameOverride
-    : product.displayName,
+
+  displayName:
+    admin.displayNameOverride?.trim()
+      ? admin.displayNameOverride
+      : composedDisplayName,
 
   description: descriptionText,
 

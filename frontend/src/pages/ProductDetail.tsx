@@ -71,13 +71,13 @@ type Product = {
     gallery: string[];
   };
   options?: {
-    variations?: string[];
+    variations?: { value: string; label: string }[];
     frameSizes?: FrameSizeOption[];
     shadingStyles?: ShadingStyleOption[];
-    faceCountOptions?: string[];
-    expressOptions?: string[];
-    acrylicSizes?: string[];
-    acrylicStandOptions?: string[];
+    faceCountOptions?: { value: string; label: string }[];
+    expressOptions?: { value: string; label: string }[];
+    acrylicSizes?: { value: string; label: string }[];
+    acrylicStandOptions?: { value: string; label: string }[];
     packagingOptions?: PackagingOption[];
     specialVariations?: SpecialVariation[];
   };
@@ -127,68 +127,8 @@ type UserOptions = {
   specialVariation?: string;
 };
 
-// ===== OPTIONS DATA FALLBACK =====
-const getAdditionalOptions = (productName: string = "", productCategory: string = "") => {
-  const name = (productName || "").toLowerCase();
-  const category = (productCategory || "").toLowerCase();
-  
-  // Biaya Tambahan Wajah Karikatur
-  if (name.includes("biaya tambahan wajah karikatur") || name.includes("tambahan wajah karikatur")) {
-    return {
-      faceCountOptions: ["1–9 Wajah", "Di atas 10 Wajah"]
-    };
-  }
-  
-  // Biaya Tambahan Wajah Banyak (Design dari Customer)
-  if (name.includes("biaya tambahan wajah banyak") || name.includes("tambahan wajah banyak")) {
-    return {
-      faceCountOptions: ["1–9 Wajah", "Di atas 10 Wajah"]
-    };
-  }
-  
-  // Biaya Ekspress General
-  if (name.includes("biaya ekspress") || name.includes("biaya express") || name.includes("ekspress")) {
-    return {
-      expressOptions: ["Option 1", "Option 2", "Option 3"]
-    };
-  }
-  
-  // Biaya Tambahan Ganti Frame Kaca ke Acrylic
-  if (name.includes("ganti frame kaca ke acrylic") || name.includes("acrylic frame") || 
-      (category.includes("additional") && name.includes("acrylic"))) {
-    return {
-      acrylicSizes: ["A2", "A1", "A0"]
-    };
-  }
-  
-  // Background Custom
-  if (name.includes("background custom") || name.includes("custom background")) {
-    return {
-      variations: ["Default Background", "Custom Background"]
-    };
-  }
-  
-  // Acrylic Stand 3mm
-  if ((name.includes("acrylic stand") && name.includes("3mm")) || 
-      (category.includes("acrylic") && name.includes("3mm"))) {
-    return {
-      acrylicStandOptions: ["15x15cm 1 sisi", "A4 2 sisi", "A3 2 sisi"]
-    };
-  }
-  
-  // Additional Packing
-  if (name.includes("additional packing") || name.includes("tambahan packing") || 
-      name.includes("biaya tambahan packing")) {
-    return {
-      variations: ["Standard Packing", "Premium Packing"]
-    };
-  }
-  
-  return null;
-};
-
 // ===== 2D FRAME SIZE OPTIONS =====
-const get2DFrameSizes = () => [
+const get2DFrameSizes = (): FrameSizeOption[] => [
   {
     value: "4r",
     label: "4R",
@@ -233,6 +173,42 @@ const useDebounce = <T,>(value: T, delay: number): T => {
   return debouncedValue;
 };
 
+// ===== VALIDATION HOOK =====
+const useProductOptionsValidator = (options: any) => {
+  useEffect(() => {
+    if (!options) return;
+    
+    const validateOptionArray = (arr: any[], name: string) => {
+      if (!Array.isArray(arr)) {
+        console.warn(`[Option Validator] ${name} is not an array`);
+        return false;
+      }
+      
+      const hasInvalidItems = arr.some(item => 
+        !item || typeof item !== 'object' || !item.value || !item.label
+      );
+      
+      if (hasInvalidItems) {
+        console.warn(`[Option Validator] ${name} contains invalid items`, arr);
+        return false;
+      }
+      
+      return true;
+    };
+    
+    validateOptionArray(options.variations || [], 'variations');
+    validateOptionArray(options.frameSizes || [], 'frameSizes');
+    validateOptionArray(options.shadingStyles || [], 'shadingStyles');
+    validateOptionArray(options.faceCountOptions || [], 'faceCountOptions');
+    validateOptionArray(options.expressOptions || [], 'expressOptions');
+    validateOptionArray(options.acrylicSizes || [], 'acrylicSizes');
+    validateOptionArray(options.acrylicStandOptions || [], 'acrylicStandOptions');
+    validateOptionArray(options.packagingOptions || [], 'packagingOptions');
+    validateOptionArray(options.specialVariations || [], 'specialVariations');
+    
+  }, [options]);
+};
+
 // ===== MAIN COMPONENT =====
 const ProductDetail = () => {
   const { t, i18n } = useTranslation();
@@ -269,29 +245,25 @@ const ProductDetail = () => {
     const isAcrylicStand = category.includes("acrylic") || name.includes("acrylic");
     const isAdditional = category.includes("additional");
     const isSoftcopy = category.includes("softcopy");
-
-    // Jika Additional product, gunakan data dari getAdditionalOptions
-    if (isAdditional) {
-      const additionalOpts = getAdditionalOptions(product.name, product.category);
+    
+    if (isSoftcopy) {
       return {
-        // Prioritize product.options, then fallback to additionalOpts
-        variations: product.options?.variations || additionalOpts?.variations || [],
-        faceCountOptions: product.options?.faceCountOptions || additionalOpts?.faceCountOptions || [],
-        expressOptions: product.options?.expressOptions || additionalOpts?.expressOptions || [],
-        acrylicSizes: product.options?.acrylicSizes || additionalOpts?.acrylicSizes || [],
-        acrylicStandOptions: product.options?.acrylicStandOptions || additionalOpts?.acrylicStandOptions || [],
-        // Other options are typically not needed for additional products
-        frameSizes: product.options?.frameSizes || [],
-        shadingStyles: product.options?.shadingStyles || [],
-        packagingOptions: product.options?.packagingOptions || [],
-        specialVariations: product.options?.specialVariations || [],
+        variations: [],
+        frameSizes: [],
+        shadingStyles: [],
+        faceCountOptions: [],
+        expressOptions: [],
+        acrylicSizes: [],
+        acrylicStandOptions: [],
+        packagingOptions: [],
+        specialVariations: []
       };
     }
 
-    // Untuk produk reguler (non-additional)
+    // Gunakan data dari product.options atau array kosong
     return {
-variations: product.options?.variations ?? [],
-
+      variations: product.options?.variations || [],
+      
       // Frame Sizes - Hanya untuk 2D, 3D tidak perlu frame sizes
       frameSizes: product.options?.frameSizes?.length 
         ? product.options.frameSizes 
@@ -301,70 +273,61 @@ variations: product.options?.variations ?? [],
             ? get2DFrameSizes()
             : [],
 
-      // Shading Styles - Include Background Catalog (hanya untuk 2D)
-shadingStyles: is2D
-  ? [
-      {
-        value: "simple",
-        label: "Simple Shading",
-        image: apiAsset("images/list-products/2D/variation/shading/2D SIMPLE SHADING/2D SIMPLE SHADING.jpg")
-      },
-      {
-        value: "background-catalog",
-        label: "Background Catalog",
-        image: apiAsset("images/list-products/2D/variation/shading/2D BACKGROUND CATALOG/1.jpg")
-      },
-      {
-        value: "bold",
-        label: "Bold Shading",
-        image: apiAsset("images/list-products/2D/variation/shading/2D BOLD SHADING/2D BOLD SHADING.jpg")
-      },
-      {
-        value: "ai",
-        label: "AI Generated",
-        image: apiAsset("images/list-products/2D/variation/shading/2D BY AI/1.jpg")
-      }
-    ]
-  : product.options?.shadingStyles || [],
+      // Shading Styles - Hanya untuk 2D
+      shadingStyles: is2D
+        ? [
+            {
+              value: "simple",
+              label: "Simple Shading",
+              image: apiAsset("images/list-products/2D/variation/shading/2D SIMPLE SHADING/2D SIMPLE SHADING.jpg")
+            },
+            {
+              value: "background-catalog",
+              label: "Background Catalog",
+              image: apiAsset("images/list-products/2D/variation/shading/2D BACKGROUND CATALOG/1.jpg")
+            },
+            {
+              value: "bold",
+              label: "Bold Shading",
+              image: apiAsset("images/list-products/2D/variation/shading/2D BOLD SHADING/2D BOLD SHADING.jpg")
+            },
+            {
+              value: "ai",
+              label: "AI Generated",
+              image: apiAsset("images/list-products/2D/variation/shading/2D BY AI/1.jpg")
+            }
+          ]
+        : product.options?.shadingStyles || [],
 
       // Packaging Options untuk 8R (3D)
       packagingOptions: product.options?.packagingOptions?.length 
         ? product.options.packagingOptions 
         : is8R && is3D
           ? [
-              { value: "duskraft", label: "Dus Kraft + Paperbag", image: "/api/uploads/images/list-products/3D/12R/PACKING_HARDBOX.jpg" },
-              { value: "hardbox", label: "Black Hardbox + Paperbag", image: "/api/uploads/images/list-products/3D/12R/PACKING_HARDBOX.jpg" },
+              { 
+                value: "duskraft", 
+                label: "Dus Kraft + Paperbag", 
+                image: "/api/uploads/images/list-products/3D/12R/PACKING_HARDBOX.jpg" 
+              },
+              { 
+                value: "hardbox", 
+                label: "Black Hardbox + Paperbag", 
+                image: "/api/uploads/images/list-products/3D/12R/PACKING_HARDBOX.jpg" 
+              },
             ]
           : [],
 
       // Face Count Options
-      faceCountOptions: product.options?.faceCountOptions?.length 
-        ? product.options.faceCountOptions 
-        : name.includes("karikatur") || name.includes("wajah")
-          ? ["1–9 Wajah", "Di atas 10 Wajah"]
-          : [],
+      faceCountOptions: product.options?.faceCountOptions || [],
 
       // Express Options
-      expressOptions: product.options?.expressOptions?.length 
-        ? product.options.expressOptions 
-        : name.includes("express") || name.includes("ekspress")
-          ? ["Option 1", "Option 2", "Option 3"]
-          : [],
+      expressOptions: product.options?.expressOptions || [],
 
       // Acrylic Sizes
-      acrylicSizes: product.options?.acrylicSizes?.length 
-        ? product.options.acrylicSizes 
-        : (name.includes("acrylic") && name.includes("ganti")) || 
-          (isAdditional && name.includes("acrylic"))
-          ? ["A2", "A1", "A0"]
-          : [],
+      acrylicSizes: product.options?.acrylicSizes || [],
 
       // Acrylic Stand Options
-      acrylicStandOptions: product.options?.acrylicStandOptions?.length 
-        ? product.options.acrylicStandOptions 
-        : isAcrylicStand && name.includes("3mm")
-          ? ["15x15cm 1 sisi", "A4 2 sisi", "A3 2 sisi"]
-          : [],
+      acrylicStandOptions: product.options?.acrylicStandOptions || [],
 
       // Special Variations
       specialVariations: product.options?.specialVariations?.length 
@@ -376,6 +339,9 @@ shadingStyles: is2D
   }, [product]);
 
   const options = effectiveOptions;
+  
+  // Validasi options
+  useProductOptionsValidator(options);
 
   // ===== DEBOUNCE =====
   const debouncedOptions = useDebounce(selectedOptions, 200);
@@ -394,8 +360,8 @@ shadingStyles: is2D
         
         // Fetch product
         const productResponse = await apiFetch(
-  `/api/products/${id}?lang=${i18n.language}`
-);
+          `/api/products/${id}?lang=${i18n.language}`
+        );
         if (!productResponse.ok) {
           throw new Error(`Failed to fetch product: ${productResponse.status}`);
         }
@@ -404,9 +370,9 @@ shadingStyles: is2D
         setProduct(productData);
         
         // Set default image
-const mainImage = apiAsset(productData.images.main);
-setSelectedImage(mainImage);
-setDisplayedPrice(productData.price || 0);
+        const mainImage = apiAsset(productData.images.main);
+        setSelectedImage(mainImage);
+        setDisplayedPrice(productData.price || 0);
         
         // Fetch additional products if not Additional or Softcopy
         if (!["Additional", "Softcopy Design"].includes(productData.category)) {
@@ -444,7 +410,7 @@ setDisplayedPrice(productData.price || 0);
     
     // Set variation default
     if (options.variations?.[0]) {
-      defaults.variation = options.variations[0];
+      defaults.variation = options.variations[0].value;
     }
     
     // Set frame size default (hanya untuk 2D)
@@ -453,7 +419,7 @@ setDisplayedPrice(productData.price || 0);
     }
     
     // Set shading default (hanya untuk 2D)
-    if (options.shadingStyles?.length && product.category.toLowerCase().includes("2d")) {
+    if (options.shadingStyles?.[0] && product.category.toLowerCase().includes("2d")) {
       const simpleShading = options.shadingStyles.find(opt => 
         opt.label.toLowerCase().includes("simple")
       );
@@ -462,7 +428,7 @@ setDisplayedPrice(productData.price || 0);
     
     // Set face count default (khusus Additional)
     if (options.faceCountOptions?.[0] && product.category.includes("Additional")) {
-      defaults.faceCount = options.faceCountOptions[0];
+      defaults.faceCount = options.faceCountOptions[0].value;
     }
     
     // Set packaging default (untuk 3D 8R)
@@ -477,18 +443,18 @@ setDisplayedPrice(productData.price || 0);
     
     // Set express option default (khusus Additional)
     if (options.expressOptions?.[0] && product.category.includes("Additional")) {
-      defaults.expressOption = options.expressOptions[0];
+      defaults.expressOption = options.expressOptions[0].value;
     }
     
     // Set acrylic size default (khusus Additional)
     if (options.acrylicSizes?.[0] && product.category.includes("Additional")) {
-      defaults.acrylicSize = options.acrylicSizes[0];
+      defaults.acrylicSize = options.acrylicSizes[0].value;
     }
     
     // Set acrylic stand option default (khusus Additional/Acrylic)
     if (options.acrylicStandOptions?.[0] && 
         (product.category.includes("Additional") || product.category.includes("Acrylic"))) {
-      defaults.acrylicStandOption = options.acrylicStandOptions[0];
+      defaults.acrylicStandOption = options.acrylicStandOptions[0].value;
     }
 
     if (Object.keys(defaults).length > 0) {
@@ -508,6 +474,11 @@ setDisplayedPrice(productData.price || 0);
             value && value.trim() !== ""
           )
         );
+        
+        if (product.category.includes("Softcopy")) {
+          setDisplayedPrice(product.price)
+          return
+        }
 
         if (Object.keys(sanitizedOptions).length === 0) {
           setDisplayedPrice(product.price || 0);
@@ -549,25 +520,25 @@ setDisplayedPrice(productData.price || 0);
   }, []);
 
   const handleFrameSizeSelect = useCallback((size: string, images?: string[]) => {
-  setSelectedOptions(prev => ({
-    ...prev,
-    frameSize: size
-  }));
+    setSelectedOptions(prev => ({
+      ...prev,
+      frameSize: size
+    }));
 
-  if (images && images.length > 0) {
-    const apiImages = images.map(img => apiAsset(img));
+    if (images && images.length > 0) {
+      const apiImages = images.map(img => apiAsset(img));
 
-    setVariationImages(apiImages);
-    setSelectedPreviewImage(apiImages[0]); // WAJIB
-    setShowPreview(true);
-    setIsZoomOpen(false); // reset modal
-  } else {
-    setVariationImages([]);
-    setSelectedPreviewImage(null);
-    setShowPreview(false);
-    setIsZoomOpen(false);
-  }
-}, []);
+      setVariationImages(apiImages);
+      setSelectedPreviewImage(apiImages[0]);
+      setShowPreview(true);
+      setIsZoomOpen(false);
+    } else {
+      setVariationImages([]);
+      setSelectedPreviewImage(null);
+      setShowPreview(false);
+      setIsZoomOpen(false);
+    }
+  }, []);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -657,19 +628,19 @@ setDisplayedPrice(productData.price || 0);
           Pilih jumlah wajah yang ingin ditambahkan
         </p>
         <div className="flex gap-2 md:gap-4 flex-wrap">
-          {options.faceCountOptions.map((option) => (
+          {options.faceCountOptions.map((opt) => (
             <div
-              key={option}
-              onClick={() => handleOptionChange("faceCount", option)}
+              key={opt.value}
+              onClick={() => handleOptionChange("faceCount", opt.value)}
               className={`cursor-pointer box-border overflow-hidden rounded-xl flex flex-col items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 w-28 h-28 md:w-36 md:h-36 transition-all duration-150 border ${
-                selectedOptions.faceCount === option
+                selectedOptions.faceCount === opt.value
                   ? "ring-2 ring-blue-500 border-transparent"
                   : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
               }`}
             >
               <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center bg-gray-100 rounded-xl">
                 <span className="text-[14px] md:text-lg font-semibold text-gray-800 text-center leading-tight px-2">
-                  {option}
+                  {opt.label}
                 </span>
               </div>
             </div>
@@ -692,19 +663,19 @@ setDisplayedPrice(productData.price || 0);
           Pilih opsi express yang diinginkan
         </p>
         <div className="flex gap-2 md:gap-4 flex-wrap">
-          {options.expressOptions.map((option) => (
+          {options.expressOptions.map((opt) => (
             <div
-              key={option}
-              onClick={() => handleOptionChange("expressOption", option)}
+              key={opt.value}
+              onClick={() => handleOptionChange("expressOption", opt.value)}
               className={`cursor-pointer box-border overflow-hidden rounded-xl flex flex-col items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 w-28 h-28 md:w-36 md:h-36 transition-all duration-150 border ${
-                selectedOptions.expressOption === option
+                selectedOptions.expressOption === opt.value
                   ? "ring-2 ring-blue-500 border-transparent"
                   : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
               }`}
             >
               <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center bg-gray-100 rounded-xl">
                 <span className="text-[13px] md:text-[15px] font-semibold text-gray-800 text-center leading-tight">
-                  {option}
+                  {opt.label}
                 </span>
               </div>
             </div>
@@ -727,20 +698,20 @@ setDisplayedPrice(productData.price || 0);
           Pilih ukuran acrylic yang diinginkan
         </p>
         <div className="flex gap-2 md:gap-4 flex-wrap">
-          {options.acrylicSizes.map((size) => (
+          {options.acrylicSizes.map((opt) => (
             <div
-              key={size}
-              onClick={() => handleOptionChange("acrylicSize", size)}
+              key={opt.value}
+              onClick={() => handleOptionChange("acrylicSize", opt.value)}
               className={`cursor-pointer box-border overflow-hidden rounded-xl flex flex-col items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 w-28 h-28 md:w-36 md:h-36 transition-all duration-150 border ${
-                selectedOptions.acrylicSize === size
+                selectedOptions.acrylicSize === opt.value
                   ? "ring-2 ring-blue-500 border-transparent"
                   : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
               }`}
             >
               <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center bg-gray-100 rounded-xl">
-                <span className="text-3xl md:text-4xl font-bold text-gray-400">{size}</span>
+                <span className="text-3xl md:text-4xl font-bold text-gray-400">{opt.label}</span>
               </div>
-              <span className="text-[13px] md:text-base font-medium text-gray-800 text-center">{size}</span>
+              <span className="text-[13px] md:text-base font-medium text-gray-800 text-center">{opt.label}</span>
             </div>
           ))}
         </div>
@@ -758,19 +729,19 @@ setDisplayedPrice(productData.price || 0);
           {t("product.chooseSizeAndSides")}
         </label>
         <div className="flex gap-2 md:gap-4 flex-wrap">
-          {options.acrylicStandOptions.map((option) => (
+          {options.acrylicStandOptions.map((opt) => (
             <div
-              key={option}
-              onClick={() => handleOptionChange("acrylicStandOption", option)}
+              key={opt.value}
+              onClick={() => handleOptionChange("acrylicStandOption", opt.value)}
               className={`cursor-pointer box-border overflow-hidden rounded-xl flex flex-col items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 w-28 h-28 md:w-36 md:h-36 transition-all duration-150 border ${
-                selectedOptions.acrylicStandOption === option
+                selectedOptions.acrylicStandOption === opt.value
                   ? "ring-2 ring-blue-500 border-transparent"
                   : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
               }`}
             >
               <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center bg-gray-100 rounded-xl">
                 <span className="text-[13px] md:text-[15px] font-semibold text-gray-800 text-center leading-tight px-2">
-                  {option}
+                  {opt.label}
                 </span>
               </div>
             </div>
@@ -904,14 +875,14 @@ setDisplayedPrice(productData.price || 0);
                   : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
               }`}
             >
-<img
-  src={opt.image || opt.preview || "/api/uploads/images/placeholder/shading-default.jpg"}
-  alt={opt.label}
-  className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl"
-  onError={(e) => {
-    e.currentTarget.src = "/api/uploads/images/placeholder/shading-default.jpg";
-  }}
-/>
+              <img
+                src={opt.image || opt.preview || "/api/uploads/images/placeholder/shading-default.jpg"}
+                alt={opt.label}
+                className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl"
+                onError={(e) => {
+                  e.currentTarget.src = "/api/uploads/images/placeholder/shading-default.jpg";
+                }}
+              />
               <span className="text-[13px] md:text-base font-medium text-gray-800 text-center">
                 {opt.label}
               </span>
@@ -931,17 +902,17 @@ setDisplayedPrice(productData.price || 0);
           {product?.uiText?.variation || t("product.variation")}
         </label>
         <div className="flex flex-row flex-wrap gap-2 md:-translate-x-[165px] md:translate-y-2 font-poppinsRegular">
-          {options.variations.map((variation) => (
+          {options.variations.map(opt => (
             <button
-              key={variation}
-              onClick={() => handleOptionChange("variation", variation)}
+              key={opt.value}
+              onClick={() => handleOptionChange("variation", opt.value)}
               className={`px-4 md:px-6 py-2 border rounded-md text-[13px] md:text-sm transition-colors ${
-                selectedOptions.variation === variation
+                selectedOptions.variation === opt.value
                   ? "bg-[#dcbec1] border-[#bfa4a6]"
                   : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
               }`}
             >
-              {t(`product.${variation}`)}
+              {opt.label}
             </button>
           ))}
         </div>
@@ -1013,6 +984,7 @@ setDisplayedPrice(productData.price || 0);
   const isAdditional = (product.category || "").includes("Additional");
   const is2D = (product.category || "").toLowerCase().includes("2d");
   const is3D = (product.category || "").toLowerCase().includes("3d");
+  const isSoftcopy = (product.category || "").toLowerCase().includes("softcopy");
 
   // ===== MAIN RENDER =====
   return (
@@ -1245,8 +1217,10 @@ setDisplayedPrice(productData.price || 0);
                 {renderSpecialVariations()}
                 {renderPackagingOptions()}
               </>
+            ) : isSoftcopy ? (
+              null
             ) : (
-              // Options untuk produk lainnya (Acrylic, Softcopy, dll)
+              // Fallback untuk produk lainnya
               <>
                 {renderVariationOptions()}
                 {renderSpecialVariations()}

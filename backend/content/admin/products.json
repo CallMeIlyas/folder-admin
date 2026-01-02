@@ -30,7 +30,7 @@
     "shippedTo": [
       "Worldwide"
     ],
-    "displayNameOverride": "12R"
+    "displayNameOverride": "3D Frame 12R"
   },
   "prod-3d-10r": {
     "showInGallery": true,
@@ -64,19 +64,30 @@
     "shippedTo": [
       "Worldwide"
     ],
-    "displayNameOverride": "12R prem"
+    "displayNameOverride": ""
   },
   "prod-3d-8r": {
     "mainImageIndex": 14,
     "displayName": "3D Frame 8R",
-    "description": "Frame material: Wood, Glass, back side MDF 2-3mm\nOverall frame size: ±25x30x3cm\nDepth: ± 3cm\nFrame Color: White, Wood Motif\nPacking: Black Hardbox + Paperbag or Kraft Box + Paperbag\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 6 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping.\nNote: 8R available for up to 6 people, more than 6 people please choose 10R, 12R, A2, A1, A0",
+    "description": {
+      "en": "Frame material: Wood, Glass, back side MDF 2-3mm\nOverall frame size: ±25x30x3cm\nDepth: ± 3cm\nFrame Color: White, Wood Motif\nPacking: Black Hardbox + Paperbag or Kraft Box + Paperbag\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 6 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping.\nNote: 8R available for up to 6 people, more than 6 people please choose 10R, 12R, A2, A1, A0",
+      "id": ""
+    },
     "price": 365800,
     "active": true,
     "showInGallery": true,
     "frames": {
       "glass": true,
       "acrylic": false
-    }
+    },
+    "displayNameOverride": "3D Frame 8R",
+    "shippedFrom": [
+      "Bogor",
+      "Jakarta"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ]
   },
   "prod-3d-a2-40x55cm": {
     "mainImageIndex": 6,
@@ -97,7 +108,8 @@
     ],
     "shippedTo": [
       "Worldwide"
-    ]
+    ],
+    "displayNameOverride": ""
   },
   "prod-3d-15x15cm": {
     "mainImageIndex": 3,

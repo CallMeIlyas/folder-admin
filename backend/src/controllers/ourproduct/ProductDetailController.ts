@@ -9,6 +9,8 @@ export const getProductDetail = (req: Request, res: Response) => {
   const { id } = req.params
   const lang = req.query.lang === "en" ? "en" : "id"
   const language: "id" | "en" = lang
+  const tOption = (id: string, en: string) =>
+  language === "id" ? id : en
 
   const products = getAllProducts()
   const product = products.find(p => p.id === id)
@@ -82,11 +84,41 @@ export const getProductDetail = (req: Request, res: Response) => {
         gallery: product.allImages || []
       },
 
-      options: {
-        variations: product.options?.variations || [],
-        shadingOptions: product.shadingOptions,
-        sizeFrameOptions: product.sizeFrameOptions
-      },
+options: {
+  variations: product.options?.variations?.map(v => ({
+    value: v,
+    label: tOption(v, v.replace(/_/g, " "))
+  })) || [],
+
+  faceCountOptions:
+    product.category.toLowerCase().includes("additional") &&
+    product.name.toLowerCase().includes("wajah")
+      ? [
+          { value: "1-9", label: tOption("1–9 Wajah", "1–9 Faces") },
+          { value: "10+", label: tOption("Di atas 10 Wajah", "Above 10 Faces") }
+        ]
+      : [],
+
+  expressOptions:
+    product.category.toLowerCase().includes("additional") &&
+    product.name.toLowerCase().includes("ekspress")
+      ? [
+          { value: "normal", label: tOption("Normal", "Normal") },
+          { value: "fast", label: tOption("Cepat", "Fast") },
+          { value: "same-day", label: tOption("Hari yang sama", "Same day") }
+        ]
+      : [],
+
+  acrylicSizes:
+    product.category.toLowerCase().includes("additional") &&
+    product.name.toLowerCase().includes("acrylic")
+      ? [
+          { value: "a2", label: "A2" },
+          { value: "a1", label: "A1" },
+          { value: "a0", label: "A0" }
+        ]
+      : [],
+},
 
       uiText: {
         ...uiText,
