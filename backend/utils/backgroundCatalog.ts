@@ -13,5 +13,5 @@ export const getBackgroundCatalogImages = (catalog: string) => {
   return fs
     .readdirSync(baseDir)
     .filter(file => /\.(jpg|jpeg|png|webp)$/i.test(file))
-    .map(file => `images/bg-catalog/${catalog}/${file}`);
+    .map(file => `/api/uploads/images/bg-catalog/${catalog}/${file}`);
 };

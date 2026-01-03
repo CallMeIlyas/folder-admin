@@ -9,13 +9,14 @@ export const getProductDetail = (req: Request, res: Response) => {
   const { id } = req.params
   const lang = req.query.lang === "en" ? "en" : "id"
   const language: "id" | "en" = lang
+
   const tOption = (id: string, en: string) =>
-  language === "id" ? id : en
+    language === "id" ? id : en
 
   const products = getAllProducts()
   const product = products.find(p => p.id === id)
 
-  if (!product || product.admin.active === false) {
+  if (!product || product.admin?.active === false) {
     return res.status(404).json({
       message:
         language === "id"
@@ -25,7 +26,7 @@ export const getProductDetail = (req: Request, res: Response) => {
   }
 
   // =====================
-  // DESKRIPSI FINAL
+  // DESKRIPSI PRODUK
   // =====================
   let details: Record<string, string> = {}
 
@@ -67,25 +68,36 @@ export const getProductDetail = (req: Request, res: Response) => {
   // =====================
   const uiText = productLocaleService.getProductLocale(language)
 
-
-
-// variations
-
-const frameVariationLabelMap: Record<
-  string,
-  { id: string; en: string }
-> = {
-  frameGlass: {
-    id: "Frame Kaca",
-    en: "Glass Frame",
-  },
-  frameAcrylic: {
-    id: "Frame Acrylic",
-    en: "Acrylic Frame",
-  },
-}
   // =====================
-  // RESPONSE
+  // FRAME SIZE + PREVIEW
+  // =====================
+  const frameSizes =
+    product.options?.frameSizes?.map(fs => ({
+      value: fs.value,
+      label: fs.label,
+      image: fs.image,
+      allImages: fs.allImages || []
+    })) || []
+
+  // =====================
+  // VARIATIONS
+  // =====================
+  const frameVariationLabelMap: Record<
+    string,
+    { id: string; en: string }
+  > = {
+    frameGlass: {
+      id: "Frame Kaca",
+      en: "Glass Frame"
+    },
+    frameAcrylic: {
+      id: "Frame Acrylic",
+      en: "Acrylic Frame"
+    }
+  }
+
+  // =====================
+  // RESPONSE FINAL
   // =====================
   const response = productMapper.toProductDetail(
     {
@@ -93,7 +105,6 @@ const frameVariationLabelMap: Record<
 
       category: product.category,
 
-      // NAMA PRODUK FINAL
       name: product.displayName || product.name,
 
       images: {
@@ -101,51 +112,44 @@ const frameVariationLabelMap: Record<
         gallery: product.allImages || []
       },
 
-options: {
-variations:
-  product.options?.variations?.map(v => ({
-    value: v,
-    label: frameVariationLabelMap[v]?.[language] ?? v,
-  })) || [],
-  
-  faceCountOptions:
-    product.category.toLowerCase().includes("additional") &&
-    product.name.toLowerCase().includes("wajah")
-      ? [
-          { value: "1-9", label: tOption("1–9 Wajah", "1–9 Faces") },
-          { value: "10+", label: tOption("Di atas 10 Wajah", "Above 10 Faces") }
-        ]
-      : [],
+      options: {
+        frameSizes,
 
-expressOptions:
-  product.category.toLowerCase().includes("additional") &&
-  product.name.toLowerCase().includes("ekspress")
-    ? [
-        {
-          value: "option-1",
-          label: "Option 1"
-        },
-        {
-          value: "option-2",
-          label: "Option 2"
-        },
-        {
-          value: "option-3",
-          label: "Option 3"
-        }
-      ]
-    : [],
-    
-  acrylicSizes:
-    product.category.toLowerCase().includes("additional") &&
-    product.name.toLowerCase().includes("acrylic")
-      ? [
-          { value: "a2", label: "A2" },
-          { value: "a1", label: "A1" },
-          { value: "a0", label: "A0" }
-        ]
-      : [],
-},
+        variations:
+          product.options?.variations?.map(v => ({
+            value: v,
+            label: frameVariationLabelMap[v]?.[language] ?? v
+          })) || [],
+
+        faceCountOptions:
+          product.category.toLowerCase().includes("additional") &&
+          product.name.toLowerCase().includes("wajah")
+            ? [
+                { value: "1-9", label: tOption("1–9 Wajah", "1–9 Faces") },
+                { value: "10+", label: tOption("Di atas 10 Wajah", "Above 10 Faces") }
+              ]
+            : [],
+
+        expressOptions:
+          product.category.toLowerCase().includes("additional") &&
+          product.name.toLowerCase().includes("ekspress")
+            ? [
+                { value: "option-1", label: "Option 1" },
+                { value: "option-2", label: "Option 2" },
+                { value: "option-3", label: "Option 3" }
+              ]
+            : [],
+
+        acrylicSizes:
+          product.category.toLowerCase().includes("additional") &&
+          product.name.toLowerCase().includes("acrylic")
+            ? [
+                { value: "a2", label: "A2" },
+                { value: "a1", label: "A1" },
+                { value: "a0", label: "A0" }
+              ]
+            : []
+      },
 
       uiText: {
         ...uiText,

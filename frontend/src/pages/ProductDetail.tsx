@@ -217,6 +217,7 @@ const ProductDetail = () => {
   const { addToCart } = useOutletContext<LayoutContext>();
 
   // ===== STATE =====
+  const [activeFrameSize, setActiveFrameSize] = useState<string | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<UserOptions>({});
   const [displayedPrice, setDisplayedPrice] = useState<number>(0);
   const [product, setProduct] = useState<Product | null>(null);
@@ -279,22 +280,22 @@ const ProductDetail = () => {
             {
               value: "simple",
               label: "Simple Shading",
-              image: apiAsset("images/list-products/2D/variation/shading/2D SIMPLE SHADING/2D SIMPLE SHADING.jpg")
+              image: apiAsset("/api/uploads/images/list-products/2D/variation/shading/2D SIMPLE SHADING/2D SIMPLE SHADING.jpg")
             },
             {
               value: "background-catalog",
               label: "Background Catalog",
-              image: apiAsset("images/list-products/2D/variation/shading/2D BACKGROUND CATALOG/1.jpg")
+              image: apiAsset("/api/uploads/images/list-products/2D/variation/shading/2D BACKGROUND CATALOG/1.jpg")
             },
             {
               value: "bold",
               label: "Bold Shading",
-              image: apiAsset("images/list-products/2D/variation/shading/2D BOLD SHADING/2D BOLD SHADING.jpg")
+              image: apiAsset("/api/uploads/images/list-products/2D/variation/shading/2D BOLD SHADING/2D BOLD SHADING.jpg")
             },
             {
               value: "ai",
               label: "AI Generated",
-              image: apiAsset("images/list-products/2D/variation/shading/2D BY AI/1.jpg")
+              image: apiAsset("/api/uploads/images/list-products/2D/variation/shading/2D BY AI/1.jpg")
             }
           ]
         : product.options?.shadingStyles || [],
@@ -307,12 +308,12 @@ const ProductDetail = () => {
               { 
                 value: "duskraft", 
                 label: "Dus Kraft + Paperbag", 
-                image: "/api/uploads/images/list-products/3D/12R/PACKING_HARDBOX.jpg" 
+                image: "/api/uploads/images/3d-package-photo/8R/PACKING DUS KRAFT.jpg" 
               },
               { 
                 value: "hardbox", 
                 label: "Black Hardbox + Paperbag", 
-                image: "/api/uploads/images/list-products/3D/12R/PACKING_HARDBOX.jpg" 
+                image: "/api/uploads/images/3d-package-photo/8R/PACKING HARDBOX.jpg" 
               },
             ]
           : [],
@@ -414,9 +415,35 @@ const ProductDetail = () => {
     }
     
     // Set frame size default (hanya untuk 2D)
-    if (options.frameSizes?.[0] && product.category.toLowerCase().includes("2d")) {
-      defaults.frameSize = options.frameSizes[0].value;
-    }
+if (product.category.toLowerCase().includes("2d") && options.frameSizes?.length) {
+  const detectedSize = extractFrameSizeFromProduct(
+    product.name || product.title || ""
+  );
+
+  const matchedFrame = detectedSize
+    ? options.frameSizes.find(f => f.value === detectedSize)
+    : null;
+
+  defaults.frameSize = matchedFrame
+    ? matchedFrame.value
+    : options.frameSizes[0].value;
+}
+    if (
+  defaults.frameSize &&
+  options.frameSizes?.length &&
+  variationImages.length === 0
+) {
+  const frame = options.frameSizes.find(
+    f => f.value === defaults.frameSize
+  );
+
+  if (frame?.image) {
+    const preview = apiAsset(frame.image);
+    setVariationImages([preview]);
+    setSelectedPreviewImage(preview);
+    setShowPreview(true);
+  }
+}
     
     // Set shading default (hanya untuk 2D)
     if (options.shadingStyles?.[0] && product.category.toLowerCase().includes("2d")) {
@@ -460,7 +487,17 @@ const ProductDetail = () => {
     if (Object.keys(defaults).length > 0) {
       setSelectedOptions(defaults);
     }
+    
   }, [product, options, selectedOptions]);
+    const extractFrameSizeFromProduct = (name: string) => {
+  const lower = name.toLowerCase();
+  if (lower.includes("4r")) return "4r";
+  if (lower.includes("6r")) return "6r";
+  if (lower.includes("8r")) return "8r";
+  if (lower.includes("12r")) return "12r";
+  if (lower.includes("15")) return "15cm";
+  return null;
+};
 
   // ===== CALCULATE PRICE =====
   useEffect(() => {
@@ -519,26 +556,22 @@ const ProductDetail = () => {
     }));
   }, []);
 
-  const handleFrameSizeSelect = useCallback((size: string, images?: string[]) => {
+const handleFrameSizeSelect = useCallback(
+  (size: string, image: string) => {
     setSelectedOptions(prev => ({
       ...prev,
       frameSize: size
     }));
 
-    if (images && images.length > 0) {
-      const apiImages = images.map(img => apiAsset(img));
+    const preview = apiAsset(image);
 
-      setVariationImages(apiImages);
-      setSelectedPreviewImage(apiImages[0]);
-      setShowPreview(true);
-      setIsZoomOpen(false);
-    } else {
-      setVariationImages([]);
-      setSelectedPreviewImage(null);
-      setShowPreview(false);
-      setIsZoomOpen(false);
-    }
-  }, []);
+    setVariationImages([preview]);
+    setSelectedPreviewImage(preview);
+    setShowPreview(true);
+    setIsZoomOpen(false);
+  },
+  []
+);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -828,7 +861,7 @@ const ProductDetail = () => {
           {sortedFrameSizes.map((opt) => (
             <div
               key={opt.value}
-              onClick={() => handleFrameSizeSelect(opt.value, opt.allImages)}
+              onClick={() => handleFrameSizeSelect(opt.value, opt.image)}
               className={`cursor-pointer box-border overflow-hidden rounded-xl flex flex-col items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 w-28 h-28 md:w-36 md:h-36 transition-all duration-150 border ${
                 selectedOptions.frameSize === opt.value
                   ? "ring-2 ring-blue-500 border-transparent"
