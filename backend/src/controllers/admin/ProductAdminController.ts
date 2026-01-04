@@ -5,6 +5,7 @@ import {
   ProductAdminConfig
 } from "../../config/productConfig"
 import { getProductDescription } from "../../../data/productDescriptions"
+import { resolveProductOptions } from "../../services/productOptionResolver"
 import fs from "fs"
 import path from "path"
 
@@ -16,6 +17,7 @@ const CONFIG_PATH = path.join(
 const saveConfig = (config: Record<string, ProductAdminConfig>) => {
   fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2))
 }
+
 
 // ================= LIST =================
 export const getAllProductsAdmin = (_req: Request, res: Response) => {
@@ -177,8 +179,12 @@ const defaultFrameState = {
 const composedDisplayName =
   `${product.category} ${product.displayName}`
 
+const optionsResolved = resolveProductOptions(product)
+
 res.json({
   ...product,
+
+  optionsResolved,
 
   displayName:
     admin.displayNameOverride?.trim()
@@ -190,16 +196,22 @@ res.json({
   admin: {
     active: admin.active ?? true,
     showInGallery: admin.showInGallery ?? true,
+
+    hasOptions: !!optionsResolved,
+
     frames: admin.frames ?? defaultFrameState,
     mainImageIndex: admin.mainImageIndex ?? 0,
+
     shippedFrom:
       admin.shippedFrom ??
       product.admin.shippedFrom ??
       ["Bogor", "Jakarta"],
+
     shippedTo:
       admin.shippedTo ??
       product.admin.shippedTo ??
       ["Worldwide"],
+
     displayNameOverride: admin.displayNameOverride ?? ""
   }
 })

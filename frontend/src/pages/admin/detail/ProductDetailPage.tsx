@@ -1,6 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
+type OptionItem = {
+  value: string
+  label: {
+    en?: string
+    id?: string
+  }
+  image?: string
+}
+
+type OptionGroup = {
+  id: string
+  label: {
+    en?: string
+    id?: string
+  }
+  type: "image" | "text"
+  options: OptionItem[]
+}
+
 type ProductDetail = {
   id: string;
   imageUrl: string;
@@ -9,14 +28,30 @@ type ProductDetail = {
   subcategory: string | null;
   price: number;
   description: {
-  en?: string
-  id?: string
-}
+    en?: string
+    id?: string
+  }
   shippedFrom: string[];
   shippedTo: string[];
   allImages: string[];
-admin: {
+
+  optionsResolved?: {
+    basePrice: number
+    groups: {
+      id: string
+      label: { en?: string; id?: string }
+      type: "image" | "text"
+      options: {
+        value: string
+        label: { en?: string; id?: string }
+        image?: string
+      }[]
+    }[]
+  }
+
+  admin: {
   active: boolean;
+  hasOptions: boolean;
   showInGallery: boolean;
   shippedFrom: string[];
   shippedTo: string[];
@@ -35,7 +70,7 @@ const ProductDetailPage: React.FC = () => {
   
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({})
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -60,6 +95,10 @@ const [formData, setFormData] = useState({
   useEffect(() => {
     fetchProduct();
   }, [id]);
+  
+  useEffect(() => {
+  setSelectedOptions({})
+}, [product?.id])
 
   const fetchProduct = async () => {
     try {
@@ -345,10 +384,63 @@ body: JSON.stringify({
                   />
                 </div>
               </div>
+              
+              {/* Product Options */}
+{product.admin.hasOptions &&
+ product.optionsResolved?.groups?.length > 0 && (
+  <div className="border-t pt-6 space-y-6">
+    {product.optionsResolved.groups.map(group => (
+      <div key={group.id}>
+        <h3 className="text-sm font-medium text-gray-700 mb-3">
+          {group.label[langTab] || group.label.en}
+        </h3>
 
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {group.options.map(opt => {
+            const isActive = selectedOptions[group.id] === opt.value
+            const showImage = !!opt.image
+
+            return (
+              <div
+                key={opt.value}
+                onClick={() =>
+                  setSelectedOptions(prev => ({
+                    ...prev,
+                    [group.id]: opt.value
+                  }))
+                }
+                className={`border rounded-lg p-2 cursor-pointer transition
+                  ${isActive
+                    ? "border-black ring-2 ring-black"
+                    : "hover:border-black"}
+                `}
+              >
+                {showImage && (
+                  <img
+                    src={`${API_BASE}${opt.image}`}
+                    alt={opt.label[langTab] || opt.label.en || opt.value}
+                    className="w-full h-24 object-cover rounded mb-2"
+                  />
+                )}
+
+                <div className="text-xs text-center">
+                  {opt.label[langTab] || opt.label.en || opt.value}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    ))}
+  </div>
+)}
               {/* Frame Options */}
-              <div className="border-t pt-6">
-                <h3 className="text-sm font-medium text-gray-700 mb-4">Pilihan Frame</h3>
+{product.admin.hasOptions &&
+ product.category.includes("Frame") && (
+  <div className="border-t pt-6">
+    <h3 className="text-sm font-medium text-gray-700 mb-4">
+      Pilihan Frame
+    </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <label className="flex items-center space-x-3 cursor-pointer">
                     <input
@@ -377,6 +469,7 @@ body: JSON.stringify({
                   </label>
                 </div>
               </div>
+              )}
 
               {/* Pengaturan */}
               <div className="border-t pt-6">

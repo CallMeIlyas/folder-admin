@@ -26,6 +26,7 @@ export interface Product {
   // Admin sekarang WAJIB, bukan opsional
   admin: {
     active: boolean;
+    hasOptions: boolean
     showInGallery: boolean;
     shippedFrom: string[];
     shippedTo: string[];
@@ -131,24 +132,31 @@ const get2DShadingOptions = () => {
 
 const get2DSizeFrameOptions = () => {
   const options: { label: string; value: string; image: string }[] = [];
-  const sizeDir = path.join(BASE_DIR, "2D/variations/size frame");
+  const sizeDir = path.join(BASE_DIR, "2D/variation/frame");
 
   if (!fs.existsSync(sizeDir)) return options;
 
-  fs.readdirSync(sizeDir).forEach(file => {
-    const sizeName = file.replace(/\.(jpg|jpeg|png)$/i, "");
+  fs.readdirSync(sizeDir).forEach(folder => {
+    const folderPath = path.join(sizeDir, folder);
+    if (!fs.statSync(folderPath).isDirectory()) return;
+
+    const files = fs.readdirSync(folderPath)
+      .filter(f => /\.(jpg|jpeg|png)$/i.test(f));
+
+    if (!files.length) return;
+
     options.push({
-      label: sizeName,
-      value: sizeName.toLowerCase().replace(/\s+/g, "_"),
-      image: `/api/uploads/images/list-products/2D/variations/size frame/${file}`
+      label: folder.toUpperCase(),
+      value: folder,
+      image: `/api/uploads/images/list-products/2D/variation/frame/${folder}/${files[0]}`
     });
   });
 
-  const sizeOrder = ["4R", "6R", "8R", "12R", "15cm"];
+  const order = ["4R", "6R", "8R", "12R", "15CM"];
   options.sort(
     (a, b) =>
-      (sizeOrder.indexOf(a.label) === -1 ? 99 : sizeOrder.indexOf(a.label)) -
-      (sizeOrder.indexOf(b.label) === -1 ? 99 : sizeOrder.indexOf(b.label))
+      (order.indexOf(a.label) === -1 ? 99 : order.indexOf(a.label)) -
+      (order.indexOf(b.label) === -1 ? 99 : order.indexOf(b.label))
   );
 
   return options;
@@ -245,14 +253,27 @@ export const getAllProducts = (): Product[] => {
 
       // Admin object - SELALU ada dengan nilai default yang jelas
       const adminObject = {
-        active: admin?.active !== false,
-        showInGallery: admin?.showInGallery !== false,
-        shippedFrom: admin?.shippedFrom ?? ["Bogor", "Jakarta"],
-        shippedTo: admin?.shippedTo ?? ["Worldwide"],
-        frames: admin?.frames || { glass: false, acrylic: false },
-        mainImageIndex: mainIndex,
-        displayNameOverride: admin?.displayNameOverride?.trim() || ""
-      };
+  active: admin?.active !== false,
+  showInGallery: admin?.showInGallery !== false,
+
+  hasOptions:
+    mappedCategory === "2D Frame" ||
+    mappedCategory === "3D Frame" ||
+    mappedCategory === "Acrylic Stand" ||
+    (
+      mappedCategory === "Additional" &&
+      ["WAJAH", "EKSPRESS", "GANTI FRAME", "3MM"]
+        .some(k => fileName.toUpperCase().includes(k))
+    ),
+
+  shippedFrom: admin?.shippedFrom ?? ["Bogor", "Jakarta"],
+  shippedTo: admin?.shippedTo ?? ["Worldwide"],
+
+  frames: admin?.frames ?? { glass: false, acrylic: false },
+
+  mainImageIndex: mainIndex,
+  displayNameOverride: admin?.displayNameOverride?.trim() || ""
+}
 
       // LANGKAH 3: Return object dengan description
       return {

@@ -75,7 +75,10 @@
     "shippedTo": [
       "Worldwide"
     ],
-    "displayNameOverride": ""
+    "displayNameOverride": "2D Frame 12R",
+    "optionsOverride": {
+      "items": []
+    }
   },
   "prod-3d-8r": {
     "mainImageIndex": 14,
