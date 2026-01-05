@@ -70,6 +70,7 @@ const ProductDetailPage: React.FC = () => {
   
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null)
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({})
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -92,6 +93,8 @@ const [formData, setFormData] = useState({
   }
 });
 
+
+// useEffect
   useEffect(() => {
     fetchProduct();
   }, [id]);
@@ -99,6 +102,50 @@ const [formData, setFormData] = useState({
   useEffect(() => {
   setSelectedOptions({})
 }, [product?.id])
+
+useEffect(() => {
+  if (!product) {
+    setCalculatedPrice(null)
+    return
+  }
+
+  if (Object.keys(selectedOptions).length === 0) {
+    setCalculatedPrice(null)
+    return
+  }
+
+  const fetchPrice = async () => {
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/products/calculate-price`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            productId: product.id,
+            options: selectedOptions
+          })
+        }
+      )
+
+      if (!res.ok) {
+        setCalculatedPrice(null)
+        return
+      }
+
+      const data = await res.json()
+      setCalculatedPrice(
+        typeof data.price === "number" ? data.price : null
+      )
+    } catch {
+      setCalculatedPrice(null)
+    }
+  }
+
+  fetchPrice()
+}, [selectedOptions, product?.id])
 
   const fetchProduct = async () => {
     try {
@@ -366,24 +413,36 @@ body: JSON.stringify({
 />
               </div>
 
-              {/* Harga */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Harga (IDR)
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                    Rp
-                  </span>
-                  <input
-                    type="number"
-                    value={formData.price || 0}
-                    onChange={(e) => handleChange("price", parseInt(e.target.value) || 0)}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="0"
-                  />
-                </div>
-              </div>
+{/* Harga Dasar */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Harga (IDR)
+  </label>
+
+  <div className="relative">
+    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+      Rp
+    </span>
+    <input
+      type="number"
+      value={formData.price || 0}
+      onChange={(e) =>
+        handleChange("price", parseInt(e.target.value) || 0)
+      }
+      className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      placeholder="0"
+    />
+  </div>
+
+  {calculatedPrice !== null && (
+    <div className="mt-2 text-sm text-gray-600">
+      Harga setelah option:
+      <span className="font-semibold ml-1">
+        Rp {calculatedPrice.toLocaleString("id-ID")}
+      </span>
+    </div>
+  )}
+</div>
               
               {/* Product Options */}
 {product.admin.hasOptions &&

@@ -1246,9 +1246,9 @@ const handleFrameSizeSelect = useCallback(
             ) : is3D ? (
               // Options untuk produk 3D
               <>
+                {renderPackagingOptions()}
                 {renderVariationOptions()}
                 {renderSpecialVariations()}
-                {renderPackagingOptions()}
               </>
             ) : isSoftcopy ? (
               null

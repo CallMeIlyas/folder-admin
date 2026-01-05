@@ -284,7 +284,8 @@
     "frames": {
       "glass": false,
       "acrylic": false
-    }
+    },
+    "displayNameOverride": "Acrylic Stand 3MM"
   },
   "prod-2d-15cm": {
     "displayNameOverride": "2D Frame 15cm",

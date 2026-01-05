@@ -150,7 +150,7 @@ export const resolveProductOptions = (product) => {
             "A4 2 sisi",
             "A3 2 sisi"
           ].map(o => ({
-            value: o,
+            value: `Acrylic Stand 3mm size ${o}`,
             label: { id: o, en: o }
           }))
         }
