@@ -70,6 +70,7 @@ const ProductDetailPage: React.FC = () => {
   
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [priceOverride, setPriceOverride] = useState<number | null>(null)
   const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null)
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({})
   const [product, setProduct] = useState<ProductDetail | null>(null);
@@ -103,49 +104,58 @@ const [formData, setFormData] = useState({
   setSelectedOptions({})
 }, [product?.id])
 
-useEffect(() => {
-  if (!product) {
-    setCalculatedPrice(null)
-    return
-  }
+  useEffect(() => {
+  setPriceOverride(null)
+}, [product?.id, selectedOptions])
 
-  if (Object.keys(selectedOptions).length === 0) {
-    setCalculatedPrice(null)
-    return
-  }
-
-  const fetchPrice = async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/products/calculate-price`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            productId: product.id,
-            options: selectedOptions
-          })
-        }
-      )
-
-      if (!res.ok) {
-        setCalculatedPrice(null)
-        return
-      }
-
-      const data = await res.json()
-      setCalculatedPrice(
-        typeof data.price === "number" ? data.price : null
-      )
-    } catch {
+  useEffect(() => {
+    if (!product) {
       setCalculatedPrice(null)
+      return
     }
-  }
-
-  fetchPrice()
-}, [selectedOptions, product?.id])
+  
+    if (Object.keys(selectedOptions).length === 0) {
+      setCalculatedPrice(null)
+      return
+    }
+  
+    const fetchPrice = async () => {
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/products/calculate-price`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              productId: product.id,
+              options: selectedOptions
+            })
+          }
+        )
+  
+        if (!res.ok) {
+          setCalculatedPrice(null)
+          return
+        }
+  
+        const data = await res.json()
+        setCalculatedPrice(
+          typeof data.price === "number" ? data.price : null
+        )
+      } catch {
+        setCalculatedPrice(null)
+      }
+    }
+  
+    fetchPrice()
+  }, [selectedOptions, product?.id])
+  
+  const finalPrice =
+  priceOverride !== null
+    ? priceOverride
+    : calculatedPrice ?? formData.price
 
   const fetchProduct = async () => {
     try {
@@ -223,7 +233,7 @@ displayName:
 body: JSON.stringify({
   displayNameOverride: formData.displayName,
   description: formData.description,
-  price: formData.price,
+  price: finalPrice,
   shippedFrom: formData.shippedFrom,
   shippedTo: formData.shippedTo,
   active: formData.active,
@@ -413,7 +423,7 @@ body: JSON.stringify({
 />
               </div>
 
-{/* Harga Dasar */}
+{/* Harga */}
 <div>
   <label className="block text-sm font-medium text-gray-700 mb-2">
     Harga (IDR)
@@ -423,23 +433,30 @@ body: JSON.stringify({
     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
       Rp
     </span>
+
     <input
       type="number"
-      value={formData.price || 0}
-      onChange={(e) =>
-        handleChange("price", parseInt(e.target.value) || 0)
-      }
+      value={finalPrice || 0}
+      onChange={(e) => {
+        const v = parseInt(e.target.value)
+        setPriceOverride(isNaN(v) ? null : v)
+      }}
       className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-      placeholder="0"
     />
   </div>
 
   {calculatedPrice !== null && (
     <div className="mt-2 text-sm text-gray-600">
-      Harga setelah option:
+      Harga sistem:
       <span className="font-semibold ml-1">
         Rp {calculatedPrice.toLocaleString("id-ID")}
       </span>
+    </div>
+  )}
+
+  {priceOverride !== null && (
+    <div className="mt-1 text-xs text-blue-600">
+      Harga diubah manual oleh admin
     </div>
   )}
 </div>

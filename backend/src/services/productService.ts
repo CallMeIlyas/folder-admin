@@ -264,6 +264,30 @@ const isBest =
       }
       return 0;
     }
+    
+    const normalizedOptions = {
+  ...options,
+
+  // acrylic stand
+  acrylicStandOption:
+    options.acrylicStandOption ??
+    options.stand_type,
+
+  // additional wajah
+  faceCount:
+    options.faceCount ??
+    options.face_count,
+
+  // express
+  expressOption:
+    options.expressOption ??
+    options.express_level,
+
+  // acrylic size
+  acrylicSize:
+    options.acrylicSize ??
+    options.acrylic_size,
+};
 
     const category = product.category.toLowerCase();
     let price = 0;
@@ -282,7 +306,7 @@ const isBest =
     // ===== ADDITIONAL (HARD RULE)
     // =========================
     if (category.includes("additional")) {
-      const key = resolveAdditionalKey(product.name, options, language);
+      const key = resolveAdditionalKey(product.name, normalizedOptions, language);
       if (key) {
         price = getPrice("Additional", key);
         if (process.env.DEBUG_PRICE === "true") {
@@ -345,7 +369,7 @@ const isBest =
     // ===== ACRYLIC STAND =====
     // =========================
     else if (category.includes("acrylic stand")) {
-      const opt = options.acrylicStandOption;
+      const opt = normalizedOptions.acrylicStandOption;
 
       if (opt) {
         const key = `Acrylic Stand 3mm size ${opt}`;

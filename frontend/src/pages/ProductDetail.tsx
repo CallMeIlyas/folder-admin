@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   useParams,
   Link,
@@ -31,30 +31,16 @@ const isVideo = (url: string): boolean => {
 };
 
 // ===== TYPES =====
-type FrameSizeOption = {
-  value: string;
-  label: string;
-  image: string;
-  allImages?: string[];
-};
-
-type PackagingOption = {
-  value: string;
-  label: string;
-  image: string;
-};
-
-type ShadingStyleOption = {
-  value: string;
-  label: string;
-  image: string;
-  preview?: string;
-};
-
-type SpecialVariation = {
-  value: string;
-  label: string;
-  image?: string;
+type OptionGroup = {
+  id: string;
+  type: 'text' | 'image' | 'preview';
+  label?: Record<string, string> | string;
+  options: Array<{
+    value: string;
+    label: Record<string, string> | string;
+    image?: string;
+    preview?: string;
+  }>;
 };
 
 type Product = {
@@ -63,23 +49,10 @@ type Product = {
   title: string;
   category: string;
   subcategory?: string;
-  size?: string;
-  type?: string;
   price: number;
   images: {
     main: string;
     gallery: string[];
-  };
-  options?: {
-    variations?: { value: string; label: string }[];
-    frameSizes?: FrameSizeOption[];
-    shadingStyles?: ShadingStyleOption[];
-    faceCountOptions?: { value: string; label: string }[];
-    expressOptions?: { value: string; label: string }[];
-    acrylicSizes?: { value: string; label: string }[];
-    acrylicStandOptions?: { value: string; label: string }[];
-    packagingOptions?: PackagingOption[];
-    specialVariations?: SpecialVariation[];
   };
   uiText: {
     addToCart: string;
@@ -98,11 +71,11 @@ type Product = {
   };
   isBestSelling?: boolean;
   bestSellingLabel?: string;
-  shadingOptions?: ShadingStyleOption[];
-  sizeFrameOptions?: FrameSizeOption[];
-  specialVariations?: SpecialVariation[];
   details?: Record<string, string>;
-  hasDescriptionData?: boolean;
+  // Field dari backend - SUMBER KEBENARAN SATU-SATUNYA
+  optionsResolved?: {
+    groups: OptionGroup[];
+  };
 };
 
 type AdditionalProduct = {
@@ -115,48 +88,10 @@ type AdditionalProduct = {
   targetProduct: string;
 };
 
-type UserOptions = {
-  frameSize?: string;
-  shading?: string;
-  variation?: string;
-  faceCount?: string;
-  expressOption?: string;
-  acrylicSize?: string;
-  acrylicStandOption?: string;
-  packagingOption?: string;
-  specialVariation?: string;
-};
+// HANYA INI TYPE UNTUK OPTIONS
+type UserOptions = Record<string, string>;
 
-// ===== 2D FRAME SIZE OPTIONS =====
-const get2DFrameSizes = (): FrameSizeOption[] => [
-  {
-    value: "4r",
-    label: "4R",
-    image: "/api/uploads/images/list-products/2D/variation/frame/4R/4R.jpg"
-  },
-  {
-    value: "15cm",
-    label: "15x15cm",
-    image: "/api/uploads/images/list-products/2D/variation/frame/15cm/15cm.jpg"
-  },
-  {
-    value: "6r",
-    label: "6R",
-    image: "/api/uploads/images/list-products/2D/variation/frame/6R/6R.jpg"
-  },
-  {
-    value: "8r",
-    label: "8R",
-    image: "/api/uploads/images/list-products/2D/variation/frame/8R/8R.jpg"
-  },
-  {
-    value: "12r",
-    label: "12R",
-    image: "/api/uploads/images/list-products/2D/variation/frame/12R/12R.jpg"
-  }
-];
-
-// ===== CUSTOM HOOKS =====
+// ===== CUSTOM HOOK: DEBOUNCE =====
 const useDebounce = <T,>(value: T, delay: number): T => {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
@@ -173,40 +108,52 @@ const useDebounce = <T,>(value: T, delay: number): T => {
   return debouncedValue;
 };
 
-// ===== VALIDATION HOOK =====
-const useProductOptionsValidator = (options: any) => {
+// ===== CUSTOM HOOK: RESOLVED OPTIONS =====
+const useResolvedOptions = (product: Product | null, i18n: any) => {
+  const [selectedOptions, setSelectedOptions] = useState<UserOptions>({});
+  
+  // Set default options saat product atau groups berubah
   useEffect(() => {
-    if (!options) return;
-    
-    const validateOptionArray = (arr: any[], name: string) => {
-      if (!Array.isArray(arr)) {
-        console.warn(`[Option Validator] ${name} is not an array`);
-        return false;
-      }
-      
-      const hasInvalidItems = arr.some(item => 
-        !item || typeof item !== 'object' || !item.value || !item.label
-      );
-      
-      if (hasInvalidItems) {
-        console.warn(`[Option Validator] ${name} contains invalid items`, arr);
-        return false;
-      }
-      
-      return true;
-    };
-    
-    validateOptionArray(options.variations || [], 'variations');
-    validateOptionArray(options.frameSizes || [], 'frameSizes');
-    validateOptionArray(options.shadingStyles || [], 'shadingStyles');
-    validateOptionArray(options.faceCountOptions || [], 'faceCountOptions');
-    validateOptionArray(options.expressOptions || [], 'expressOptions');
-    validateOptionArray(options.acrylicSizes || [], 'acrylicSizes');
-    validateOptionArray(options.acrylicStandOptions || [], 'acrylicStandOptions');
-    validateOptionArray(options.packagingOptions || [], 'packagingOptions');
-    validateOptionArray(options.specialVariations || [], 'specialVariations');
-    
-  }, [options]);
+  if (!product?.optionsResolved?.groups) return;
+
+  // Jangan override kalau user sudah pilih manual
+  if (Object.keys(selectedOptions).length > 0) return;
+
+  const defaults: UserOptions = {};
+  const productKey = (product.name || product.title || "").toLowerCase();
+
+  product.optionsResolved.groups.forEach(group => {
+    // Cari option yang relevan dengan produk
+    const matchedOption = group.options.find(opt =>
+      productKey.includes(opt.value.toLowerCase())
+    );
+
+    defaults[group.id] = matchedOption
+      ? matchedOption.value
+      : group.options[0]?.value;
+  });
+
+  if (Object.keys(defaults).length > 0) {
+    setSelectedOptions(defaults);
+  }
+}, [
+  product?.optionsResolved?.groups,
+  product?.name,
+  product?.title
+]);
+  
+  const handleOptionChange = useCallback((groupId: string, value: string) => {
+    setSelectedOptions(prev => ({
+      ...prev,
+      [groupId]: value
+    }));
+  }, []);
+  
+  return {
+    selectedOptions,
+    handleOptionChange,
+    setSelectedOptions
+  };
 };
 
 // ===== MAIN COMPONENT =====
@@ -217,9 +164,6 @@ const ProductDetail = () => {
   const { addToCart } = useOutletContext<LayoutContext>();
 
   // ===== STATE =====
-  const [activeFrameSize, setActiveFrameSize] = useState<string | null>(null);
-  const [selectedOptions, setSelectedOptions] = useState<UserOptions>({});
-  const [displayedPrice, setDisplayedPrice] = useState<number>(0);
   const [product, setProduct] = useState<Product | null>(null);
   const [additionalProducts, setAdditionalProducts] = useState<AdditionalProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -228,124 +172,41 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedPreviewImage, setSelectedPreviewImage] = useState<string | null>(null);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
-  const [variationImages, setVariationImages] = useState<string[]>([]);
   const [showPreview, setShowPreview] = useState<boolean>(false);
   const previewRef = useRef<HTMLDivElement | null>(null);
   const additionalSectionRef = useRef<HTMLDivElement | null>(null);
-
-  // ===== EFFECTIVE OPTIONS CALCULATION =====
-  const effectiveOptions = useMemo(() => {
-    if (!product) return null;
-
-    const category = (product.category || "").toLowerCase();
-    const name = (product.name || "").toLowerCase();
-    const title = (product.title || "").toLowerCase();
-    const is3D = category.includes("3d");
-    const is2D = category.includes("2d");
-    const is8R = name.includes("8r") || title.includes("8r");
-    const isAcrylicStand = category.includes("acrylic") || name.includes("acrylic");
-    const isAdditional = category.includes("additional");
-    const isSoftcopy = category.includes("softcopy");
-    
-    if (isSoftcopy) {
-      return {
-        variations: [],
-        frameSizes: [],
-        shadingStyles: [],
-        faceCountOptions: [],
-        expressOptions: [],
-        acrylicSizes: [],
-        acrylicStandOptions: [],
-        packagingOptions: [],
-        specialVariations: []
-      };
-    }
-
-    // Gunakan data dari product.options atau array kosong
-    return {
-      variations: product.options?.variations || [],
-      
-      // Frame Sizes - Hanya untuk 2D, 3D tidak perlu frame sizes
-      frameSizes: product.options?.frameSizes?.length 
-        ? product.options.frameSizes 
-        : product.sizeFrameOptions?.length
-          ? product.sizeFrameOptions
-          : is2D
-            ? get2DFrameSizes()
-            : [],
-
-      // Shading Styles - Hanya untuk 2D
-      shadingStyles: is2D
-        ? [
-            {
-              value: "simple",
-              label: "Simple Shading",
-              image: apiAsset("/api/uploads/images/list-products/2D/variation/shading/2D SIMPLE SHADING/2D SIMPLE SHADING.jpg")
-            },
-            {
-              value: "background-catalog",
-              label: "Background Catalog",
-              image: apiAsset("/api/uploads/images/list-products/2D/variation/shading/2D BACKGROUND CATALOG/1.jpg")
-            },
-            {
-              value: "bold",
-              label: "Bold Shading",
-              image: apiAsset("/api/uploads/images/list-products/2D/variation/shading/2D BOLD SHADING/2D BOLD SHADING.jpg")
-            },
-            {
-              value: "ai",
-              label: "AI Generated",
-              image: apiAsset("/api/uploads/images/list-products/2D/variation/shading/2D BY AI/1.jpg")
-            }
-          ]
-        : product.options?.shadingStyles || [],
-
-      // Packaging Options untuk 8R (3D)
-      packagingOptions: product.options?.packagingOptions?.length 
-        ? product.options.packagingOptions 
-        : is8R && is3D
-          ? [
-              { 
-                value: "duskraft", 
-                label: "Dus Kraft + Paperbag", 
-                image: "/api/uploads/images/3d-package-photo/8R/PACKING DUS KRAFT.jpg" 
-              },
-              { 
-                value: "hardbox", 
-                label: "Black Hardbox + Paperbag", 
-                image: "/api/uploads/images/3d-package-photo/8R/PACKING HARDBOX.jpg" 
-              },
-            ]
-          : [],
-
-      // Face Count Options
-      faceCountOptions: product.options?.faceCountOptions || [],
-
-      // Express Options
-      expressOptions: product.options?.expressOptions || [],
-
-      // Acrylic Sizes
-      acrylicSizes: product.options?.acrylicSizes || [],
-
-      // Acrylic Stand Options
-      acrylicStandOptions: product.options?.acrylicStandOptions || [],
-
-      // Special Variations
-      specialVariations: product.options?.specialVariations?.length 
-        ? product.options.specialVariations 
-        : product.specialVariations?.length
-          ? product.specialVariations
-          : [],
-    };
-  }, [product]);
-
-  const options = effectiveOptions;
+  const [displayedPrice, setDisplayedPrice] = useState<number>(0);
   
-  // Validasi options
-  useProductOptionsValidator(options);
+  // Gunakan hook untuk resolved options
+  const { selectedOptions, handleOptionChange, setSelectedOptions } = useResolvedOptions(product, i18n);
+  
+  // ===== AUTO PREVIEW DARI RESOLVER (WAJIB) =====
+useEffect(() => {
+  if (!product?.optionsResolved?.groups) return;
 
-  // ===== DEBOUNCE =====
-  const debouncedOptions = useDebounce(selectedOptions, 200);
+  // Cari group yang punya image atau preview
+  const previewGroup = product.optionsResolved.groups.find(g =>
+    g.options.some(o => o.image || o.preview)
+  );
+
+  if (!previewGroup) return;
+
+  const selectedValue = selectedOptions[previewGroup.id];
+  const option = previewGroup.options.find(o => o.value === selectedValue);
+
+  if (!option) return;
+
+  const previewSrc = option.preview || option.image;
+  if (!previewSrc) return;
+
+  const preview = apiAsset(previewSrc);
+
+  setSelectedPreviewImage(preview);
+  setShowPreview(true);
+}, [product?.optionsResolved?.groups, selectedOptions]);
+  
+  // Debounce untuk price calculation
+  const debouncedOptions = useDebounce(selectedOptions, 300);
 
   // ===== FETCH PRODUCT DATA =====
   useEffect(() => {
@@ -370,12 +231,18 @@ const ProductDetail = () => {
         const productData: Product = await productResponse.json();
         setProduct(productData);
         
-        // Set default image
+        console.log("Product data loaded:", {
+          id: productData.id,
+          hasOptionsResolved: !!productData.optionsResolved,
+          groups: productData.optionsResolved?.groups?.length || 0
+        });
+        
+        // Set default image dan harga
         const mainImage = apiAsset(productData.images.main);
         setSelectedImage(mainImage);
         setDisplayedPrice(productData.price || 0);
         
-        // Fetch additional products if not Additional or Softcopy
+        // Fetch additional products jika bukan Additional atau Softcopy
         if (!["Additional", "Softcopy Design"].includes(productData.category)) {
           try {
             const additionalResponse = await apiFetch(
@@ -400,105 +267,6 @@ const ProductDetail = () => {
     fetchProductData();
   }, [id, i18n.language]);
 
-  // ===== SET DEFAULT OPTIONS =====
-  useEffect(() => {
-    if (!product || !options) return;
-    
-    // Only set defaults if selectedOptions is empty
-    if (Object.keys(selectedOptions).length > 0) return;
-
-    const defaults: UserOptions = {};
-    
-    // Set variation default
-    if (options.variations?.[0]) {
-      defaults.variation = options.variations[0].value;
-    }
-    
-    // Set frame size default (hanya untuk 2D)
-if (product.category.toLowerCase().includes("2d") && options.frameSizes?.length) {
-  const detectedSize = extractFrameSizeFromProduct(
-    product.name || product.title || ""
-  );
-
-  const matchedFrame = detectedSize
-    ? options.frameSizes.find(f => f.value === detectedSize)
-    : null;
-
-  defaults.frameSize = matchedFrame
-    ? matchedFrame.value
-    : options.frameSizes[0].value;
-}
-    if (
-  defaults.frameSize &&
-  options.frameSizes?.length &&
-  variationImages.length === 0
-) {
-  const frame = options.frameSizes.find(
-    f => f.value === defaults.frameSize
-  );
-
-  if (frame?.image) {
-    const preview = apiAsset(frame.image);
-    setVariationImages([preview]);
-    setSelectedPreviewImage(preview);
-    setShowPreview(true);
-  }
-}
-    
-    // Set shading default (hanya untuk 2D)
-    if (options.shadingStyles?.[0] && product.category.toLowerCase().includes("2d")) {
-      const simpleShading = options.shadingStyles.find(opt => 
-        opt.label.toLowerCase().includes("simple")
-      );
-      defaults.shading = simpleShading ? simpleShading.value : options.shadingStyles[0].value;
-    }
-    
-    // Set face count default (khusus Additional)
-    if (options.faceCountOptions?.[0] && product.category.includes("Additional")) {
-      defaults.faceCount = options.faceCountOptions[0].value;
-    }
-    
-    // Set packaging default (untuk 3D 8R)
-    if (options.packagingOptions?.[0]) {
-      defaults.packagingOption = options.packagingOptions[0].value;
-    }
-    
-    // Set special variation default
-    if (options.specialVariations?.[0]) {
-      defaults.specialVariation = options.specialVariations[0].value;
-    }
-    
-    // Set express option default (khusus Additional)
-    if (options.expressOptions?.[0] && product.category.includes("Additional")) {
-      defaults.expressOption = options.expressOptions[0].value;
-    }
-    
-    // Set acrylic size default (khusus Additional)
-    if (options.acrylicSizes?.[0] && product.category.includes("Additional")) {
-      defaults.acrylicSize = options.acrylicSizes[0].value;
-    }
-    
-    // Set acrylic stand option default (khusus Additional/Acrylic)
-    if (options.acrylicStandOptions?.[0] && 
-        (product.category.includes("Additional") || product.category.includes("Acrylic"))) {
-      defaults.acrylicStandOption = options.acrylicStandOptions[0].value;
-    }
-
-    if (Object.keys(defaults).length > 0) {
-      setSelectedOptions(defaults);
-    }
-    
-  }, [product, options, selectedOptions]);
-    const extractFrameSizeFromProduct = (name: string) => {
-  const lower = name.toLowerCase();
-  if (lower.includes("4r")) return "4r";
-  if (lower.includes("6r")) return "6r";
-  if (lower.includes("8r")) return "8r";
-  if (lower.includes("12r")) return "12r";
-  if (lower.includes("15")) return "15cm";
-  return null;
-};
-
   // ===== CALCULATE PRICE =====
   useEffect(() => {
     if (!product?.id) return;
@@ -506,21 +274,28 @@ if (product.category.toLowerCase().includes("2d") && options.frameSizes?.length)
 
     const fetchCalculatedPrice = async () => {
       try {
+        // Filter hanya options yang memiliki nilai
         const sanitizedOptions = Object.fromEntries(
           Object.entries(debouncedOptions).filter(([_, value]) => 
             value && value.trim() !== ""
           )
         );
-        
+
+        // Untuk Softcopy, harga tetap
         if (product.category.includes("Softcopy")) {
-          setDisplayedPrice(product.price)
-          return
+          setDisplayedPrice(product.price);
+          return;
         }
 
         if (Object.keys(sanitizedOptions).length === 0) {
           setDisplayedPrice(product.price || 0);
           return;
         }
+
+        console.log('Calculating price with options:', {
+          productId: product.id,
+          options: sanitizedOptions
+        });
 
         const response = await apiFetch("/api/products/calculate-price", {
           method: "POST",
@@ -536,8 +311,12 @@ if (product.category.toLowerCase().includes("2d") && options.frameSizes?.length)
         }
         
         const data = await response.json();
+        console.log('Price calculation result:', data);
+        
         if (typeof data.price === 'number') {
           setDisplayedPrice(data.price);
+        } else {
+          setDisplayedPrice(product.price || 0);
         }
       } catch (err) {
         console.error("Error calculating price:", err);
@@ -548,78 +327,79 @@ if (product.category.toLowerCase().includes("2d") && options.frameSizes?.length)
     fetchCalculatedPrice();
   }, [product, debouncedOptions]);
 
-  // ===== HANDLERS =====
-  const handleOptionChange = useCallback((optionType: keyof UserOptions, value: string) => {
-    setSelectedOptions(prev => ({
-      ...prev,
-      [optionType]: value
-    }));
-  }, []);
-
-const handleFrameSizeSelect = useCallback(
-  (size: string, image: string) => {
-    setSelectedOptions(prev => ({
-      ...prev,
-      frameSize: size
-    }));
-
-    const preview = apiAsset(image);
-
-    setVariationImages([preview]);
-    setSelectedPreviewImage(preview);
-    setShowPreview(true);
-    setIsZoomOpen(false);
-  },
-  []
-);
-
-  const handleAddToCart = () => {
-    if (!product) return;
-
-    // Prepare cart item berdasarkan tipe produk
-    const cartItem = {
-      id: product.id,
-      name: product.name || product.title,
-      title: product.title,
-      price: displayedPrice,
-      quantity: quantity,
-      imageUrl: apiAsset(product.images?.main || ""),
-      options: selectedOptions,
-      productType: (product.category || "").toLowerCase().includes("frame") ? "frame" : "other",
-      timestamp: Date.now(),
-      category: product.category,
-      attributes: {
-        // Attributes umum
-        frameSize: selectedOptions.frameSize,
-        shadingStyle: selectedOptions.shading,
-        variation: selectedOptions.variation,
-        packagingOption: selectedOptions.packagingOption,
-        
-        // Attributes khusus Additional
-        faceCount: selectedOptions.faceCount,
-        expressOption: selectedOptions.expressOption,
-        acrylicSize: selectedOptions.acrylicSize,
-        acrylicStandOption: selectedOptions.acrylicStandOption,
-        specialVariation: selectedOptions.specialVariation,
-        
-        // Flags
-        isAdditionalProduct: (product.category || "").includes("Additional"),
-        isAcrylicStand: (product.category || "").includes("Acrylic"),
-        isKarikaturProduct: (product.name || "").toLowerCase().includes("karikatur") || false,
-        isManyFacesProduct: (product.name || "").toLowerCase().includes("wajah banyak") || false,
-        isExpressProduct: (product.name || "").toLowerCase().includes("ekspress") || false,
-        isAcrylicChange: (product.name || "").toLowerCase().includes("ganti frame") || false,
-      }
-    };
-
-    addToCart(cartItem);
-  };
-
-  const handleAdditionalProductClick = (additionalProduct: AdditionalProduct) => {
-    navigate(`/product/${additionalProduct.id}`);
-  };
-
   // ===== RENDER FUNCTIONS =====
+  
+  // SATU-SATUNYA RENDERER UNTUK OPTIONS
+  const renderOptionGroups = () => {
+    if (!product?.optionsResolved?.groups?.length) return null;
+
+    console.log("Rendering option groups:", product.optionsResolved.groups);
+
+    return product.optionsResolved.groups.map(group => {
+      // Resolve label berdasarkan bahasa
+      const groupLabel = typeof group.label === 'object' 
+        ? group.label[i18n.language] || group.label['en'] || group.id
+        : group.label || group.id;
+
+      return (
+        <div key={group.id} className="mt-4 md:mt-6 mb-3 md:mb-4">
+          <label className="block text-[16px] md:text-[18px] font-poppinsSemiBold mb-2 md:mb-3">
+            {groupLabel}
+          </label>
+          
+          <div className="flex gap-2 md:gap-4 flex-wrap">
+            {group.options.map(opt => {
+              const optionLabel = typeof opt.label === 'object'
+                ? opt.label[i18n.language] || opt.label['en'] || opt.value
+                : opt.label || opt.value;
+
+              const isSelected = selectedOptions[group.id] === opt.value;
+
+              return (
+                <div
+                  key={opt.value}
+                  onClick={() => {
+                    console.log(`Setting ${group.id} to ${opt.value}`);
+                    handleOptionChange(group.id, opt.value);
+                    
+                  }}
+                  className={`cursor-pointer box-border overflow-hidden rounded-xl flex flex-col items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 w-28 h-28 md:w-36 md:h-36 transition-all duration-150 border ${
+                    isSelected
+                      ? "ring-2 ring-blue-500 border-transparent"
+                      : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
+                  }`}
+                >
+                  {opt.image && (
+                    <img
+                      src={apiAsset(opt.image)}
+                      alt={optionLabel}
+                      className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl"
+                      onError={(e) => {
+                        e.currentTarget.src = "/api/uploads/images/placeholder/option-default.jpg";
+                      }}
+                    />
+                  )}
+                  
+                  {!opt.image && (
+                    <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center bg-gray-100 rounded-xl">
+                      <span className="text-[13px] md:text-[15px] font-semibold text-gray-800 text-center leading-tight px-2">
+                        {optionLabel}
+                      </span>
+                    </div>
+                  )}
+                  
+                  <span className="text-[13px] md:text-base font-medium text-gray-800 text-center">
+                    {optionLabel}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    });
+  };
+
   const renderBestSellingLabel = () => {
     if (!product) return null;
 
@@ -648,348 +428,30 @@ const handleFrameSizeSelect = useCallback(
     return null;
   };
 
-  // Function untuk merender Face Count Options (khusus Additional)
-  const renderFaceCountOptions = () => {
-    if (!options?.faceCountOptions?.length) return null;
+  // ===== HANDLERS =====
+  const handleAddToCart = () => {
+    if (!product) return;
 
-    return (
-      <div className="mt-4 md:mt-6 mb-3 md:mb-4">
-        <label className="block text-[16px] md:text-[18px] font-poppinsSemiBold mb-2 md:mb-3">
-          {t("product.chooseFaceCount")}
-        </label>
-        <p className="text-[13px] md:text-[15px] font-poppinsRegular text-gray-700 mb-2 md:mb-3">
-          Pilih jumlah wajah yang ingin ditambahkan
-        </p>
-        <div className="flex gap-2 md:gap-4 flex-wrap">
-          {options.faceCountOptions.map((opt) => (
-            <div
-              key={opt.value}
-              onClick={() => handleOptionChange("faceCount", opt.value)}
-              className={`cursor-pointer box-border overflow-hidden rounded-xl flex flex-col items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 w-28 h-28 md:w-36 md:h-36 transition-all duration-150 border ${
-                selectedOptions.faceCount === opt.value
-                  ? "ring-2 ring-blue-500 border-transparent"
-                  : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
-              }`}
-            >
-              <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center bg-gray-100 rounded-xl">
-                <span className="text-[14px] md:text-lg font-semibold text-gray-800 text-center leading-tight px-2">
-                  {opt.label}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  // Function untuk merender Express Options (khusus Additional)
-  const renderExpressOptions = () => {
-    if (!options?.expressOptions?.length) return null;
-
-    return (
-      <div className="mt-4 md:mt-6 mb-3 md:mb-4">
-        <label className="block text-[16px] md:text-[18px] font-poppinsSemiBold mb-2 md:mb-3">
-          {t("product.chooseExpress")}
-        </label>
-        <p className="text-[13px] md:text-[15px] font-poppinsRegular text-gray-700 mb-2 md:mb-3">
-          Pilih opsi express yang diinginkan
-        </p>
-        <div className="flex gap-2 md:gap-4 flex-wrap">
-          {options.expressOptions.map((opt) => (
-            <div
-              key={opt.value}
-              onClick={() => handleOptionChange("expressOption", opt.value)}
-              className={`cursor-pointer box-border overflow-hidden rounded-xl flex flex-col items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 w-28 h-28 md:w-36 md:h-36 transition-all duration-150 border ${
-                selectedOptions.expressOption === opt.value
-                  ? "ring-2 ring-blue-500 border-transparent"
-                  : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
-              }`}
-            >
-              <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center bg-gray-100 rounded-xl">
-                <span className="text-[13px] md:text-[15px] font-semibold text-gray-800 text-center leading-tight">
-                  {opt.label}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  // Function untuk merender Acrylic Size Options (khusus Additional)
-  const renderAcrylicSizeOptions = () => {
-    if (!options?.acrylicSizes?.length) return null;
-
-    return (
-      <div className="mt-4 md:mt-6 mb-3 md:mb-4">
-        <label className="block text-[16px] md:text-[18px] font-poppinsSemiBold mb-2 md:mb-3">
-          {t("product.chooseAcrylicSize")}
-        </label>
-        <p className="text-[13px] md:text-[15px] font-poppinsRegular text-gray-700 mb-2 md:mb-3">
-          Pilih ukuran acrylic yang diinginkan
-        </p>
-        <div className="flex gap-2 md:gap-4 flex-wrap">
-          {options.acrylicSizes.map((opt) => (
-            <div
-              key={opt.value}
-              onClick={() => handleOptionChange("acrylicSize", opt.value)}
-              className={`cursor-pointer box-border overflow-hidden rounded-xl flex flex-col items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 w-28 h-28 md:w-36 md:h-36 transition-all duration-150 border ${
-                selectedOptions.acrylicSize === opt.value
-                  ? "ring-2 ring-blue-500 border-transparent"
-                  : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
-              }`}
-            >
-              <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center bg-gray-100 rounded-xl">
-                <span className="text-3xl md:text-4xl font-bold text-gray-400">{opt.label}</span>
-              </div>
-              <span className="text-[13px] md:text-base font-medium text-gray-800 text-center">{opt.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  // Function untuk merender Acrylic Stand Options
-  const renderAcrylicStandOptions = () => {
-    if (!options?.acrylicStandOptions?.length) return null;
-
-    return (
-      <div className="mt-4 md:mt-6 mb-3 md:mb-4">
-        <label className="block text-[16px] md:text-[18px] font-poppinsSemiBold mb-2 md:mb-3">
-          {t("product.chooseSizeAndSides")}
-        </label>
-        <div className="flex gap-2 md:gap-4 flex-wrap">
-          {options.acrylicStandOptions.map((opt) => (
-            <div
-              key={opt.value}
-              onClick={() => handleOptionChange("acrylicStandOption", opt.value)}
-              className={`cursor-pointer box-border overflow-hidden rounded-xl flex flex-col items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 w-28 h-28 md:w-36 md:h-36 transition-all duration-150 border ${
-                selectedOptions.acrylicStandOption === opt.value
-                  ? "ring-2 ring-blue-500 border-transparent"
-                  : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
-              }`}
-            >
-              <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center bg-gray-100 rounded-xl">
-                <span className="text-[13px] md:text-[15px] font-semibold text-gray-800 text-center leading-tight px-2">
-                  {opt.label}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const renderPackagingOptions = () => {
-    if (!options?.packagingOptions?.length) return null;
-
-    return (
-      <div className="mt-4 md:mt-6 mb-3 md:mb-4 font-poppinsSemiBold">
-        <label className="block text-[16px] md:text-[18px] font-poppinsSemiBold mb-2 md:mb-3">
-          {product?.uiText?.packagingOption || t("product.packagingOption")}
-        </label>
-        <div className="flex gap-2 md:gap-4 flex-wrap">
-          {options.packagingOptions.map((opt) => (
-            <div
-              key={opt.value}
-              onClick={() => handleOptionChange("packagingOption", opt.value)}
-              className={`cursor-pointer box-border overflow-hidden rounded-xl flex flex-col items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 w-28 h-28 md:w-36 md:h-36 transition-all duration-150 border ${
-                selectedOptions.packagingOption === opt.value
-                  ? "ring-2 ring-blue-500 border-transparent"
-                  : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
-              }`}
-            >
-              <img
-                src={apiAsset(opt.image)}
-                alt={opt.label}
-                className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl"
-                onError={(e) => {
-                  e.currentTarget.src = "/api/uploads/images/placeholder/packaging-default.jpg";
-                }}
-              />
-              <span className="text-[13px] md:text-base font-medium text-gray-800 text-center">
-                {opt.label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const renderFrameSizeOptions = () => {
-    // Hanya render untuk produk 2D
-    if (!options?.frameSizes?.length || !product?.category.toLowerCase().includes("2d")) {
-      return null;
-    }
-
-    // Urutkan frame sizes
-    const sortedFrameSizes = [...options.frameSizes].sort((a, b) => {
-      const order = ["4r", "15cm", "6r", "8r", "12r"];
-      const aIndex = order.indexOf(a.value.toLowerCase());
-      const bIndex = order.indexOf(b.value.toLowerCase());
-      
-      if (aIndex === -1 && bIndex === -1) return 0;
-      if (aIndex === -1) return 1;
-      if (bIndex === -1) return -1;
-      
-      return aIndex - bIndex;
-    });
-
-    // Fungsi untuk mendapatkan label yang benar
-    const getDisplayLabel = (value: string) => {
-      const labelMap: Record<string, string> = {
-        "4r": "4R",
-        "15cm": "15x15cm",
-        "6r": "6R",
-        "8r": "8R",
-        "12r": "12R"
-      };
-      return labelMap[value.toLowerCase()] || value;
+    const cartItem = {
+      id: product.id,
+      name: product.name || product.title,
+      title: product.title,
+      price: displayedPrice,
+      quantity: quantity,
+      imageUrl: apiAsset(product.images?.main || ""),
+      // INI YANG PENTING: Kirim semua options ASLI
+      options: selectedOptions,
+      productType: (product.category || "").toLowerCase().includes("frame") ? "frame" : "other",
+      timestamp: Date.now(),
+      category: product.category,
     };
 
-    return (
-      <div className="mt-4 md:mt-6 mb-3 md:mb-4">
-        <label className="block text-[16px] md:text-[18px] font-poppinsSemiBold mb-2 md:mb-3">
-          {product?.uiText?.frameSize || t("product.frameSize")}
-        </label>
-        <div className="flex gap-2 md:gap-4 flex-wrap">
-          {sortedFrameSizes.map((opt) => (
-            <div
-              key={opt.value}
-              onClick={() => handleFrameSizeSelect(opt.value, opt.image)}
-              className={`cursor-pointer box-border overflow-hidden rounded-xl flex flex-col items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 w-28 h-28 md:w-36 md:h-36 transition-all duration-150 border ${
-                selectedOptions.frameSize === opt.value
-                  ? "ring-2 ring-blue-500 border-transparent"
-                  : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
-              }`}
-            >
-              <img
-                src={apiAsset(opt.image)}
-                alt={opt.label}
-                className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl"
-                onError={(e) => {
-                  e.currentTarget.src = "/api/uploads/images/placeholder/frame-default.jpg";
-                }}
-              />
-              <span className="text-[13px] md:text-base font-medium text-gray-800 text-center">
-                {getDisplayLabel(opt.value)}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+    console.log('Adding to cart:', cartItem);
+    addToCart(cartItem);
   };
 
-  const renderShadingOptions = () => {
-    // Hanya render untuk produk 2D
-    if (!options?.shadingStyles?.length || !product?.category.toLowerCase().includes("2d")) {
-      return null;
-    }
-
-    return (
-      <div className="mt-4 md:mt-6 mb-3 md:mb-4">
-        <label className="block text-[16px] md:text-[18px] font-poppinsSemiBold mb-2 md:mb-3">
-          {product?.uiText?.shadingStyle || t("product.shadingStyle")}
-        </label>
-        <div className="flex gap-2 md:gap-4 flex-wrap">
-          {options.shadingStyles.map((opt) => (
-            <div
-              key={opt.value}
-              onClick={() => handleOptionChange("shading", opt.value)}
-              className={`cursor-pointer box-border overflow-hidden rounded-xl flex flex-col items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 w-28 h-28 md:w-36 md:h-36 transition-all duration-150 border ${
-                selectedOptions.shading === opt.value
-                  ? "ring-2 ring-blue-500 border-transparent"
-                  : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
-              }`}
-            >
-              <img
-                src={opt.image || opt.preview || "/api/uploads/images/placeholder/shading-default.jpg"}
-                alt={opt.label}
-                className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl"
-                onError={(e) => {
-                  e.currentTarget.src = "/api/uploads/images/placeholder/shading-default.jpg";
-                }}
-              />
-              <span className="text-[13px] md:text-base font-medium text-gray-800 text-center">
-                {opt.label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const renderVariationOptions = () => {
-    if (!options?.variations?.length) return null;
-
-    return (
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between mt-4 space-y-2 md:space-y-0">
-        <label className="block text-[16px] md:text-[18px] font-poppinsSemiBold md:translate-y-3">
-          {product?.uiText?.variation || t("product.variation")}
-        </label>
-        <div className="flex flex-row flex-wrap gap-2 md:-translate-x-[165px] md:translate-y-2 font-poppinsRegular">
-          {options.variations.map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => handleOptionChange("variation", opt.value)}
-              className={`px-4 md:px-6 py-2 border rounded-md text-[13px] md:text-sm transition-colors ${
-                selectedOptions.variation === opt.value
-                  ? "bg-[#dcbec1] border-[#bfa4a6]"
-                  : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const renderSpecialVariations = () => {
-    if (!options?.specialVariations?.length) return null;
-
-    return (
-      <div className="mt-4 md:mt-6 mb-3 md:mb-4 font-poppinsSemiBold">
-        <label className="block text-[16px] md:text-[18px] font-poppinsSemiBold mb-2 md:mb-3">
-          {t("product.packagingOption")}
-        </label>
-        <div className="flex gap-2 md:gap-4 flex-wrap">
-          {options.specialVariations.map((opt) => (
-            <div
-              key={opt.value}
-              onClick={() => handleOptionChange("specialVariation", opt.value)}
-              className={`cursor-pointer box-border overflow-hidden rounded-xl flex flex-col items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 w-28 h-28 md:w-36 md:h-36 transition-all duration-150 border ${
-                selectedOptions.specialVariation === opt.value
-                  ? "ring-2 ring-blue-500 border-transparent"
-                  : "border-gray-300 hover:border-blue-400 hover:shadow-sm"
-              }`}
-            >
-              {opt.image && (
-                <img
-                  src={apiAsset(opt.image)}
-                  alt={opt.label}
-                  className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl"
-                  onError={(e) => {
-                    e.currentTarget.src = "/api/uploads/images/placeholder/variation-default.jpg";
-                  }}
-                />
-              )}
-              <span className="text-[13px] md:text-base font-medium text-gray-800 text-center">
-                {opt.label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+  const handleAdditionalProductClick = (additionalProduct: AdditionalProduct) => {
+    navigate(`/product/${additionalProduct.id}`);
   };
 
   // ===== LOADING & ERROR STATES =====
@@ -1013,7 +475,7 @@ const handleFrameSizeSelect = useCallback(
     );
   }
 
-  // Check if product is Additional
+  // Check product type
   const isAdditional = (product.category || "").includes("Additional");
   const is2D = (product.category || "").toLowerCase().includes("2d");
   const is3D = (product.category || "").toLowerCase().includes("3d");
@@ -1136,7 +598,7 @@ const handleFrameSizeSelect = useCallback(
             )}
             
             {/* Preview Images */}
-            {variationImages.length > 0 && (
+            {selectedPreviewImage && showPreview && (
               <div
                 ref={previewRef}
                 className="mt-6 md:mt-8"
@@ -1147,39 +609,18 @@ const handleFrameSizeSelect = useCallback(
                 }}
               >
                 <h3 className="text-[16px] md:text-[18px] font-poppinsSemiBold mb-3 md:mb-4">
-                  {product.uiText?.preview || t("product.preview")} {selectedOptions.frameSize}
+                  {product.uiText?.preview || t("product.preview")}
                 </h3>
             
-                {selectedPreviewImage && (
-                  <img
-                    src={selectedPreviewImage}
-                    alt={`Preview ${selectedOptions.frameSize}`}
-                    onClick={() => setIsZoomOpen(true)}
-                    className="w-full h-auto object-contain rounded-lg border border-gray-300 mb-3 md:mb-4 transition-all duration-300 cursor-zoom-in hover:scale-[1.02]"
-                    onError={(e) => {
-                      e.currentTarget.src = "/api/uploads/images/placeholder/preview-default.jpg";
-                    }}
-                  />
-                )}
-            
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-4">
-                  {variationImages.map((img, i) => (
-                    <img
-                      key={i}
-                      src={img}
-                      alt={`${selectedOptions.frameSize} ${i + 1}`}
-                      onClick={() => setSelectedPreviewImage(img)}
-                      className={`w-full aspect-square object-cover rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                        selectedPreviewImage === img
-                          ? "border-blue-500 scale-105"
-                          : "border-gray-200 hover:border-blue-400 hover:shadow-lg"
-                      }`}
-                      onError={(e) => {
-                        e.currentTarget.src = "/api/uploads/images/placeholder/variation-thumb.jpg";
-                      }}
-                    />
-                  ))}
-                </div>
+                <img
+                  src={selectedPreviewImage}
+                  alt="Preview"
+                  onClick={() => setIsZoomOpen(true)}
+                  className="w-full h-auto object-contain rounded-lg border border-gray-300 mb-3 md:mb-4 transition-all duration-300 cursor-zoom-in hover:scale-[1.02]"
+                  onError={(e) => {
+                    e.currentTarget.src = "/api/uploads/images/placeholder/preview-default.jpg";
+                  }}
+                />
               </div>
             )}
           </div>
@@ -1224,44 +665,8 @@ const handleFrameSizeSelect = useCallback(
               Rp {displayedPrice.toLocaleString("id-ID")}
             </p>
             
-            {/* Render semua options berdasarkan tipe produk */}
-            {isAdditional ? (
-              // Options khusus Additional Products
-              <>
-                {renderFaceCountOptions()}
-                {renderExpressOptions()}
-                {renderAcrylicSizeOptions()}
-                {renderAcrylicStandOptions()}
-                {renderVariationOptions()}
-              </>
-            ) : is2D ? (
-              // Options untuk produk 2D
-              <>
-                {renderFrameSizeOptions()}
-                {renderShadingOptions()}
-                {renderVariationOptions()}
-                {renderSpecialVariations()}
-                {renderPackagingOptions()}
-              </>
-            ) : is3D ? (
-              // Options untuk produk 3D
-              <>
-                {renderPackagingOptions()}
-                {renderVariationOptions()}
-                {renderSpecialVariations()}
-              </>
-            ) : isSoftcopy ? (
-              null
-            ) : (
-              // Fallback untuk produk lainnya
-              <>
-                {renderVariationOptions()}
-                {renderSpecialVariations()}
-                {renderPackagingOptions()}
-                {renderAcrylicStandOptions()}
-                {renderAcrylicSizeOptions()}
-              </>
-            )}
+            {/* SATU-SATUNYA RENDERER OPTIONS */}
+            {renderOptionGroups()}
             
             {/* Quantity */}
             <div className="mt-6 md:mt-10">
