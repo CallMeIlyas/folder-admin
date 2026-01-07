@@ -21,6 +21,28 @@ export type ProductAdminConfig = {
     glass?: boolean
     acrylic?: boolean
   }
+  
+  options?: {
+  groups: Array<{
+    id: string
+    type: "text" | "image" | "preview"
+    label: {
+      id: string
+      en: string
+    }
+    defaultValue?: string
+    items: Array<{
+      value: string
+      label: {
+        id: string
+        en: string
+      }
+      image?: string
+      preview?: string
+      active?: boolean
+    }>
+  }>
+}
 
   mainImageIndex?: number
 }

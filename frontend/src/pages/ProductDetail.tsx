@@ -158,12 +158,14 @@ const useResolvedOptions = (product: Product | null, i18n: any) => {
 
 // ===== MAIN COMPONENT =====
 const ProductDetail = () => {
+
   const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart } = useOutletContext<LayoutContext>();
 
   // ===== STATE =====
+  const [selectedVariation, setSelectedVariation] = useState<string | null>(null)
   const [product, setProduct] = useState<Product | null>(null);
   const [additionalProducts, setAdditionalProducts] = useState<AdditionalProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -179,6 +181,32 @@ const ProductDetail = () => {
   
   // Gunakan hook untuk resolved options
   const { selectedOptions, handleOptionChange, setSelectedOptions } = useResolvedOptions(product, i18n);
+  
+  // default set variations
+  useEffect(() => {
+  if (!product?.frames) return
+
+  const { glass, acrylic } = product.frames
+
+  const variations: string[] = []
+  if (glass) variations.push("Frame Kaca")
+  if (acrylic) variations.push("Frame Acrylic")
+
+  if (variations.length === 0) return
+
+  // Jangan override kalau user sudah memilih
+  if (selectedVariation) return
+
+  // Auto pilih variant pertama
+  const defaultVariation = variations[0]
+
+  setSelectedVariation(defaultVariation)
+
+  setSelectedOptions(prev => ({
+    ...prev,
+    frame: defaultVariation === "Frame Kaca" ? "glass" : "acrylic"
+  }))
+}, [product?.frames])
   
   // ===== AUTO PREVIEW DARI RESOLVER (WAJIB) =====
 useEffect(() => {
@@ -399,6 +427,56 @@ useEffect(() => {
       );
     });
   };
+  
+const renderFrameOptions = () => {
+  if (!product?.frames) return null
+  if (!product.category.toLowerCase().includes("frame")) return null
+
+  const { glass, acrylic } = product.frames
+  if (!glass && !acrylic) return null
+
+  const variations: string[] = []
+  if (glass) variations.push("Frame Kaca")
+  if (acrylic) variations.push("Frame Acrylic")
+
+  return (
+    <div className="flex flex-col md:flex-row md:items-start md:justify-between mt-4 space-y-2 md:space-y-0">
+      <label className="block text-[16px] md:text-[18px] font-poppinsSemiBold md:translate-y-3">
+        {t("product.variation")}
+      </label>
+
+      <div className="flex flex-row flex-wrap gap-2 md:-translate-x-[165px] md:translate-y-2 font-poppinsRegular">
+        {variations.map((variation) => {
+          let displayText = variation
+          if (variation === "Frame Kaca") displayText = t("product.frameGlass")
+          if (variation === "Frame Acrylic") displayText = t("product.frameAcrylic")
+
+          return (
+            <button
+              key={variation}
+              onClick={() => {
+                setSelectedVariation(variation)
+
+                setSelectedOptions(prev => ({
+                  ...prev,
+                  frame: variation === "Frame Kaca" ? "glass" : "acrylic"
+                }))
+              }}
+              className={`px-4 md:px-6 py-2 border rounded-md text-[13px] md:text-sm transition-colors ${
+                selectedVariation === variation
+                  ? "bg-[#dcbec1] border-[#bfa4a6]"
+                  : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
+              }`}
+            >
+              {displayText}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 
   const renderBestSellingLabel = () => {
     if (!product) return null;
@@ -667,6 +745,8 @@ useEffect(() => {
             
             {/* SATU-SATUNYA RENDERER OPTIONS */}
             {renderOptionGroups()}
+            {renderFrameOptions()}
+            
             
             {/* Quantity */}
             <div className="mt-6 md:mt-10">

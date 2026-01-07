@@ -15,38 +15,41 @@ export const productMapper = {
     const currentUIText = resolveUIText();
 
     return {
-      id: data.id,
+  id: data.id,
 
-      title:
-        (currentUIText?.details?.title || data.name) ??
-        data.name,
+  title:
+    (currentUIText?.details?.title || data.name) ??
+    data.name,
 
-      category: data.category,
+  category: data.category,
 
-      images: data.images,
+  images: data.images,
 
-      // 🔥 INI KUNCI UTAMA
-      // FE UTAMA HANYA BACA INI
-      optionsResolved: data.optionsResolved ?? null,
+  frames: data.frames ?? {
+    glass: false,
+    acrylic: false
+  },
 
-      uiText: currentUIText
-        ? {
-            ...currentUIText,
-            details: (() => {
-              if (!currentUIText.details) return null;
-              const { title, ...rest } = currentUIText.details;
-              return rest;
-            })()
-          }
-        : null,
+  optionsResolved: data.optionsResolved ?? null,
 
-      price: data.price,
+  uiText: currentUIText
+    ? {
+        ...currentUIText,
+        details: (() => {
+          if (!currentUIText.details) return null;
+          const { title, ...rest } = currentUIText.details;
+          return rest;
+        })()
+      }
+    : null,
 
-      isBestSelling: data.isBestSelling ?? false,
+  price: data.price,
 
-      bestSellingLabel: data.bestSellingLabel ?? "",
+  isBestSelling: data.isBestSelling ?? false,
 
-      language
-    };
+  bestSellingLabel: data.bestSellingLabel ?? "",
+
+  language
+};
   }
 };

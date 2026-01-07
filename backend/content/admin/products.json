@@ -13,7 +13,7 @@
     "showInGallery": true,
     "frames": {
       "glass": true,
-      "acrylic": false
+      "acrylic": true
     },
     "mainImage": "/api/uploads/images/list-products/3D/12R/1.jpg",
     "mainImageIndex": 39,
@@ -30,7 +30,10 @@
     "shippedTo": [
       "Worldwide"
     ],
-    "displayNameOverride": "3D Frame 12R"
+    "displayNameOverride": "3D Frame 12R",
+    "options": {
+      "groups": []
+    }
   },
   "prod-3d-10r": {
     "showInGallery": true,
@@ -268,7 +271,8 @@
     "frames": {
       "glass": false,
       "acrylic": false
-    }
+    },
+    "displayNameOverride": "Acrylic Stand 2CM"
   },
   "prod-acrylic stand-3mm": {
     "displayName": "3MM",

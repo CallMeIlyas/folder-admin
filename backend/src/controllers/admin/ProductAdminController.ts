@@ -132,7 +132,11 @@ config[id] = {
 
   mainImageIndex:
     payload.mainImageIndex ??
-    config[id]?.mainImageIndex
+    config[id]?.mainImageIndex,
+
+  options:
+    payload.options ??
+    config[id]?.options
 }
   saveConfig(config)
   res.json({ success: true })

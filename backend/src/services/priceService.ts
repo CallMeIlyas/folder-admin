@@ -1,10 +1,39 @@
 import { getAllProducts } from "../../data/productDataLoader"
+import { loadProductAdminConfig } from "../config/productConfig"
 import { getPrice } from "../../utils/getPrice"
 
 export const priceService = {
   calculate(productId: string, options: Record<string, string>) {
     const product = getAllProducts().find(p => p.id === productId)
     if (!product) return 0
+
+    const adminConfig = loadProductAdminConfig()
+    const admin = adminConfig[productId]
+
+    // ============================================
+    // ADMIN OPTION OVERRIDE (SOURCE OF TRUTH)
+    // ============================================
+    if (admin?.options?.groups?.length && Object.keys(options).length > 0) {
+      let total =
+        typeof admin.price === "number"
+          ? admin.price
+          : product.price
+
+      admin.options.groups.forEach(group => {
+        const selected = options[group.id]
+        if (!selected) return
+
+        const item = group.items.find(
+          i => i.value === selected && i.active !== false
+        )
+
+        if (typeof item?.price === "number") {
+          total += item.price
+        }
+      })
+
+      return total
+    }
 
     const category = product.category
     const name = product.name
@@ -23,27 +52,18 @@ export const priceService = {
 
     // ================= 3D FRAME =================
     if (category === "3D Frame") {
-      if (options.packaging === "Dus Kraft + Paperbag") {
-        return getPrice(category, "8R duskraft")
-      }
+      const opt = options.packaging
+      if (!opt) return getPrice(category, name)
 
-      if (options.packaging === "Black Hardbox + Paperbag") {
-        return getPrice(category, "8R hardbox")
-      }
-
-      return getPrice(category, name)
+      return getPrice(category, opt)
     }
 
     // ================= ACRYLIC STAND =================
     if (category === "Acrylic Stand") {
-      if (name.toLowerCase().includes("3mm") && options.stand_type) {
-        return getPrice(
-          category,
-          `Acrylic Stand 3mm size ${options.stand_type}`
-        )
-      }
+      const opt = options.stand_type
+      if (!opt) return getPrice(category, name)
 
-      return getPrice(category, name)
+      return getPrice(category, opt)
     }
 
     // ================= ADDITIONAL =================
@@ -51,28 +71,7 @@ export const priceService = {
       const opt = Object.values(options)[0]
       if (!opt) return getPrice(category, name)
 
-      // EXPRESS GENERAL
-      if (name.toLowerCase().includes("ekspress general")) {
-        if (opt === "opt1") return getPrice(category, "Biaya Ekspress General")
-        if (opt === "opt2") return getPrice(category, "Biaya Ekspress General 2")
-        if (opt === "opt3") return getPrice(category, "Biaya Ekspress General 3")
-      }
-
-      // GANTI FRAME ACRYLIC
-      if (name.toLowerCase().includes("ganti frame kaca")) {
-        return getPrice(
-          category,
-          `Biaya Tambahan Ganti Frame Kaca ke Acrylic ${opt}`
-        )
-      }
-
-      // WAJAH KARIKATUR / WAJAH BANYAK
-      if (name.toLowerCase().includes("wajah")) {
-        return getPrice(category, `${name} ${opt}`)
-      }
-
-      // DEFAULT ADDITIONAL
-      return getPrice(category, name)
+      return getPrice(category, opt)
     }
 
     // ================= SOFTCOPY =================

@@ -88,38 +88,35 @@ export const getProductDetail = (req: Request, res: Response) => {
   // RESPONSE FINAL
   // =====================
   const response = productMapper.toProductDetail(
-    {
-      id: product.id,
+  {
+    id: product.id,
+    category: product.category,
+    name: product.displayName || product.name,
 
-      category: product.category,
-
-      name: product.displayName || product.name,
-
-      images: {
-        main: product.imageUrl,
-        gallery: product.allImages || []
-      },
-
-      optionsResolved,
-
-      uiText: {
-        ...uiText,
-        details
-      },
-
-      price:
-        admin?.price ??
-        product.price ??
-        productService.getBasePrice(product.id, language),
-
-      isBestSelling:
-        productService.isBestSelling(product.id, language).isBestSelling,
-
-      bestSellingLabel:
-        productService.isBestSelling(product.id, language).label || ""
+    frames: admin?.frames ?? {
+      glass: false,
+      acrylic: false
     },
-    language
-  )
+
+    images: {
+      main: product.imageUrl,
+      gallery: product.allImages || []
+    },
+
+    optionsResolved,
+
+    uiText: {
+      ...uiText,
+      details
+    },
+
+    price:
+      admin?.price ??
+      product.price ??
+      productService.getBasePrice(product.id, language)
+  },
+  language
+)
 
   res.json(response)
 }
