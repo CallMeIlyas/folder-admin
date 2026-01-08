@@ -105,7 +105,14 @@ const [formData, setFormData] = useState({
     acrylic: false  
   }  
 });  
-  
+
+  const [bestSelling, setBestSelling] = useState({
+  enabled: false,
+  label: {
+    en: "",
+    id: ""
+  }
+})
   
 // useEffect  
 useEffect(() => {
@@ -231,8 +238,18 @@ displayName:
     glass: data.admin.frames.glass,  
     acrylic: data.admin.frames.acrylic  
   }  
-});  
-      setLoading(false);  
+})  
+
+setBestSelling({
+  enabled: data.admin?.bestSelling?.enabled ?? false,
+  label: {
+    en: data.admin?.bestSelling?.label?.en || "",
+    id: data.admin?.bestSelling?.label?.id || ""
+  }
+})
+setLoading(false);  
+      
+      
     } catch (error) {  
       console.error("Gagal mengambil data produk:", error);  
       setLoading(false);  
@@ -277,6 +294,7 @@ body: JSON.stringify({
   active: formData.active,  
   showInGallery: formData.showInGallery,  
   frames: formData.frames,  
+  bestSelling,
   options: {  
   groups: adminOptions.filter(g => g.items.length > 0)  
   }  
@@ -463,6 +481,70 @@ body: JSON.stringify({
   className="w-full px-4 py-2 border rounded-lg"  
 />  
               </div>  
+              
+{/* Best Selling */}
+<div className="border-t pt-4">
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Best Selling Label
+  </label>
+  
+  <label className="flex items-center gap-2 mb-3 text-sm">
+    <input
+      type="checkbox"
+      checked={bestSelling.enabled}
+      onChange={(e) => 
+        setBestSelling({
+          ...bestSelling,
+          enabled: e.target.checked
+        })
+      }
+      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+    />
+    Aktifkan Best Selling
+  </label>
+  
+  {bestSelling.enabled && (
+    <>
+      <input
+        type="text"
+        placeholder="Best Selling text (EN)"
+        value={bestSelling.label.en}
+        onChange={(e) =>
+          setBestSelling({
+            ...bestSelling,
+            label: {
+              ...bestSelling.label,
+              en: e.target.value
+            }
+          })
+        }
+        className="w-full mb-2 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      
+      <input
+        type="text"
+        placeholder="Best Selling text (ID)"
+        value={bestSelling.label.id}
+        onChange={(e) =>
+          setBestSelling({
+            ...bestSelling,
+            label: {
+              ...bestSelling.label,
+              id: e.target.value
+            }
+          })
+        }
+        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      
+      <div className="mt-2 text-xs text-gray-500">
+        Label ini akan ditampilkan di halaman utama sebagai badge "Best Selling"
+      </div>
+    </>
+  )}
+</div>
+
+
   
 {/* Harga */}  
 <div>  

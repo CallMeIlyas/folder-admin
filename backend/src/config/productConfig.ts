@@ -22,6 +22,14 @@ export type ProductAdminConfig = {
     acrylic?: boolean
   }
   
+  bestSelling?: {
+  enabled?: boolean
+  label?: {
+    id?: string
+    en?: string
+  }
+}
+  
   options?: {
   groups: Array<{
     id: string

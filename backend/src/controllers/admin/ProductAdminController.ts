@@ -129,7 +129,26 @@ config[id] = {
     ...(config[id]?.frames || {}),
     ...(payload.frames || {})
   },
-
+  
+  bestSelling: {
+    enabled:
+      payload.bestSelling?.enabled ??
+      config[id]?.bestSelling?.enabled ??
+      false,
+  
+    label: {
+      en:
+        payload.bestSelling?.label?.en ??
+        config[id]?.bestSelling?.label?.en ??
+        "",
+  
+      id:
+        payload.bestSelling?.label?.id ??
+        config[id]?.bestSelling?.label?.id ??
+        ""
+    }
+  },
+  
   mainImageIndex:
     payload.mainImageIndex ??
     config[id]?.mainImageIndex,
@@ -190,6 +209,7 @@ res.json({
 
   optionsResolved,
 
+
   displayName:
     admin.displayNameOverride?.trim()
       ? admin.displayNameOverride
@@ -198,25 +218,31 @@ res.json({
   description: descriptionText,
 
   admin: {
-    active: admin.active ?? true,
-    showInGallery: admin.showInGallery ?? true,
+  active: admin.active ?? true,
+  showInGallery: admin.showInGallery ?? true,
 
-    hasOptions: !!optionsResolved,
+  hasOptions: !!optionsResolved,
 
-    frames: admin.frames ?? defaultFrameState,
-    mainImageIndex: admin.mainImageIndex ?? 0,
+  frames: admin.frames ?? defaultFrameState,
+  mainImageIndex: admin.mainImageIndex ?? 0,
 
-    shippedFrom:
-      admin.shippedFrom ??
-      product.admin.shippedFrom ??
-      ["Bogor", "Jakarta"],
+  shippedFrom:
+    admin.shippedFrom ??
+    product.admin.shippedFrom ??
+    ["Bogor", "Jakarta"],
 
-    shippedTo:
-      admin.shippedTo ??
-      product.admin.shippedTo ??
-      ["Worldwide"],
+  shippedTo:
+    admin.shippedTo ??
+    product.admin.shippedTo ??
+    ["Worldwide"],
 
-    displayNameOverride: admin.displayNameOverride ?? ""
-  }
+  displayNameOverride: admin.displayNameOverride ?? "",
+
+  bestSelling:
+    admin.bestSelling ?? {
+      enabled: false,
+      label: { en: "", id: "" }
+    }
+}
 })
 }

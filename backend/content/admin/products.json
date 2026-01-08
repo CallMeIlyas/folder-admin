@@ -13,7 +13,7 @@
     "showInGallery": true,
     "frames": {
       "glass": true,
-      "acrylic": true
+      "acrylic": false
     },
     "mainImage": "/api/uploads/images/list-products/3D/12R/1.jpg",
     "mainImageIndex": 39,
@@ -33,6 +33,13 @@
     "displayNameOverride": "3D Frame 12R",
     "options": {
       "groups": []
+    },
+    "bestSelling": {
+      "enabled": true,
+      "label": {
+        "en": "Best Selling for The Most Fitting Size",
+        "id": "Paling populer untuk ukuran"
+      }
     }
   },
   "prod-3d-10r": {
@@ -55,7 +62,17 @@
     ],
     "shippedTo": [
       "Worldwide"
-    ]
+    ],
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "Best for",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": []
+    }
   },
   "prod-2d-12r": {
     "showInGallery": true,
@@ -346,6 +363,126 @@
     "frames": {
       "glass": true,
       "acrylic": false
+    },
+    "bestSelling": {
+      "enabled": true,
+      "label": {
+        "en": "Best Selling for The Most Affordable Gift",
+        "id": "Paling populer untuk ukuran tercocok buat hadiah"
+      }
+    },
+    "options": {
+      "groups": [
+        {
+          "id": "size",
+          "type": "image",
+          "label": {
+            "id": "Ukuran Frame",
+            "en": "Frame Size"
+          },
+          "items": [
+            {
+              "value": "4R",
+              "label": {
+                "id": "4R",
+                "en": "4R"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/frame/4R/4R.jpg",
+              "active": true,
+              "systemPrice": 142800
+            },
+            {
+              "value": "15cm",
+              "label": {
+                "id": "15cm",
+                "en": "15cm"
+              },
+              "active": true,
+              "systemPrice": 142800
+            },
+            {
+              "value": "6R",
+              "label": {
+                "id": "6R",
+                "en": "6R"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/frame/6R/6R.jpg",
+              "active": true,
+              "systemPrice": 142800
+            },
+            {
+              "value": "8R",
+              "label": {
+                "id": "8R",
+                "en": "8R"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/frame/8R/8R.jpg",
+              "active": true,
+              "systemPrice": 142800
+            },
+            {
+              "value": "12R",
+              "label": {
+                "id": "12R",
+                "en": "12R"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/frame/12R/12R.jpg",
+              "active": true,
+              "systemPrice": 142800
+            }
+          ]
+        },
+        {
+          "id": "shading",
+          "type": "image",
+          "label": {
+            "id": "Gaya Shading",
+            "en": "Shading Style"
+          },
+          "items": [
+            {
+              "value": "simple shading",
+              "label": {
+                "id": "Simple Shading",
+                "en": "Simple Shading"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/shading/2D SIMPLE SHADING/2D SIMPLE SHADING.jpg",
+              "active": true,
+              "systemPrice": 123800
+            },
+            {
+              "value": "background catalog",
+              "label": {
+                "id": "Background Catalog",
+                "en": "Background Catalog"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/shading/2D BACKGROUND CATALOG/1.jpg",
+              "active": true,
+              "systemPrice": 140800
+            },
+            {
+              "value": "bold shading",
+              "label": {
+                "id": "Bold Shading",
+                "en": "Bold Shading"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/shading/2D BOLD SHADING/2D BOLD SHADING.jpg",
+              "active": true,
+              "systemPrice": 185800
+            },
+            {
+              "value": "ai",
+              "label": {
+                "id": "AI",
+                "en": "AI"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/shading/2D BY AI/1.jpg",
+              "active": true,
+              "systemPrice": 100800
+            }
+          ]
+        }
+      ]
     }
   },
   "prod-2d-8r": {

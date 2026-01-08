@@ -15,41 +15,39 @@ export const productMapper = {
     const currentUIText = resolveUIText();
 
     return {
-  id: data.id,
+      id: data.id,
 
-  title:
-    (currentUIText?.details?.title || data.name) ??
-    data.name,
+      title:
+        (currentUIText?.details?.title || data.name) ??
+        data.name,
 
-  category: data.category,
+      category: data.category,
 
-  images: data.images,
+      images: data.images,
 
-  frames: data.frames ?? {
-    glass: false,
-    acrylic: false
-  },
+      frames: data.frames ?? {
+        glass: false,
+        acrylic: false
+      },
 
-  optionsResolved: data.optionsResolved ?? null,
+      optionsResolved: data.optionsResolved ?? null,
 
-  uiText: currentUIText
-    ? {
-        ...currentUIText,
-        details: (() => {
-          if (!currentUIText.details) return null;
-          const { title, ...rest } = currentUIText.details;
-          return rest;
-        })()
-      }
-    : null,
+      bestSelling: data.bestSelling ?? null,
 
-  price: data.price,
+      uiText: currentUIText
+        ? {
+            ...currentUIText,
+            details: (() => {
+              if (!currentUIText.details) return null;
+              const { title, ...rest } = currentUIText.details;
+              return rest;
+            })()
+          }
+        : null,
 
-  isBestSelling: data.isBestSelling ?? false,
+      price: data.price,
 
-  bestSellingLabel: data.bestSellingLabel ?? "",
-
-  language
-};
+      language
+    };
   }
 };

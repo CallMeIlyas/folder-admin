@@ -98,6 +98,11 @@ export const getProductDetail = (req: Request, res: Response) => {
       acrylic: false
     },
 
+    bestSelling: admin?.bestSelling ?? {
+      enabled: false,
+      label: { id: "", en: "" }
+    },
+
     images: {
       main: product.imageUrl,
       gallery: product.allImages || []

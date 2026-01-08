@@ -39,47 +39,70 @@ export const resolveProductOptions = (product) => {
   // 2D FRAME
   // ===============================
   if (product.category === "2D Frame") {
-    const sizes = ["4R", "15cm", "6R", "8R", "12R"]
+  const sizeOptions = product.sizeFrameOptions || []
 
-    const shadings = [
-      { key: "simple shading", label: "Simple Shading", image: "/api/uploads/images/list-products/2D/variation/shading/2D SIMPLE SHADING/2D SIMPLE SHADING.jpg" },
-      { key: "background catalog", label: "Background Catalog", image: "/api/uploads/images/list-products/2D/variation/shading/2D BACKGROUND CATALOG/1.jpg" },
-      { key: "bold shading", label: "Bold Shading", image: "/api/uploads/images/list-products/2D/variation/shading/2D BOLD SHADING/2D BOLD SHADING.jpg" },
-      { key: "ai", label: "AI", image: "/api/uploads/images/list-products/2D/variation/shading/2D BY AI/1.jpg" }
-    ]
-
-    return {
-      basePrice: product.price,
-      groups: [
-        {
-          id: "size",
-          type: "image",
-          label: { id: "Ukuran Frame", en: "Frame Size" },
-          defaultValue: sizes[0],
-          options: sizes.map(size => ({
-            value: size,
-            label: { id: size, en: size },
-            image: product.sizeFrameOptions?.find(o => o.label === size)?.image
-          }))
-        },
-        {
-          id: "shading",
-          type: "image",
-          label: { id: "Gaya Shading", en: "Shading Style" },
-          defaultValue: "simple shading",
-          options: shadings.map(s => {
-            const key = `${sizes[0]} ${s.key}`
-            return {
-              value: s.key,
-              label: { id: s.label, en: s.label },
-              image: s.image,
-              price: priceList["2D frame"]?.[key]
-            }
-          })
-        }
-      ]
+  const shadings = [
+    {
+      key: "simple shading",
+      label: "Simple Shading",
+      image: "/api/uploads/images/list-products/2D/variation/shading/2D SIMPLE SHADING/2D SIMPLE SHADING.jpg"
+    },
+    {
+      key: "background catalog",
+      label: "Background Catalog",
+      image: "/api/uploads/images/list-products/2D/variation/shading/2D BACKGROUND CATALOG/1.jpg"
+    },
+    {
+      key: "bold shading",
+      label: "Bold Shading",
+      image: "/api/uploads/images/list-products/2D/variation/shading/2D BOLD SHADING/2D BOLD SHADING.jpg"
+    },
+    {
+      key: "ai",
+      label: "AI",
+      image: "/api/uploads/images/list-products/2D/variation/shading/2D BY AI/1.jpg"
     }
+  ]
+
+  const defaultSize = sizeOptions[0]?.label
+
+  return {
+    basePrice: product.price,
+    groups: [
+      {
+        id: "size",
+        type: "image",
+        label: { id: "Ukuran Frame", en: "Frame Size" },
+        defaultValue: defaultSize,
+        options: sizeOptions.map(o => ({
+          value: o.label,
+          label: { id: o.label, en: o.label },
+          image: o.image
+        }))
+      },
+      {
+        id: "shading",
+        type: "image",
+        label: { id: "Gaya Shading", en: "Shading Style" },
+        defaultValue: "simple shading",
+        options: shadings.map(s => {
+          const priceKey = defaultSize
+            ? `${defaultSize} ${s.key}`
+            : null
+
+          return {
+            value: s.key,
+            label: { id: s.label, en: s.label },
+            image: s.image,
+            price: priceKey
+              ? priceList["2D frame"]?.[priceKey]
+              : undefined
+          }
+        })
+      }
+    ]
   }
+}
 
   // ===============================
   // ADDITIONAL

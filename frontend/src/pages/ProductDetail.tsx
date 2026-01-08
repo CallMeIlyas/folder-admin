@@ -479,32 +479,21 @@ const renderFrameOptions = () => {
 
 
   const renderBestSellingLabel = () => {
-    if (!product) return null;
+  if (!product?.bestSelling?.enabled) return null
 
-    const category = (product.category || "").toLowerCase();
-    const name = (product.name || "").toLowerCase();
-    const title = (product.title || "").toLowerCase();
+  const text =
+    product.bestSelling.label?.[i18n.language] ||
+    product.bestSelling.label?.en
 
-    if (category.includes("3d") && (/\b12r\b/.test(name) || /\b12r\b/.test(title))) {
-      return (
-        <div className="flex items-center space-x-2 text-yellow-600 px-2 md:px-3 py-1 rounded-full text-[12px] md:text-[15px] font-poppinsMediumItalic w-fit mt-2">
-          <FaStar className="w-3 h-3 md:w-4 md:h-4" />
-          <span>{product.uiText?.bestSellingSize || t("product.bestSellingSize")}</span>
-        </div>
-      );
-    }
+  if (!text) return null
 
-    if (category.includes("2d")) {
-      return (
-        <div className="flex items-center space-x-2 text-yellow-600 px-2 md:px-3 py-1 rounded-full text-[12px] md:text-[15px] font-poppinsMediumItalic w-fit mt-2">
-          <FaStar className="w-3 h-3 md:w-4 md:h-4" />
-          <span>{product.uiText?.bestSellingGift || t("product.bestSellingGift")}</span>
-        </div>
-      );
-    }
-
-    return null;
-  };
+  return (
+    <div className="flex items-center space-x-2 text-yellow-600 px-2 md:px-3 py-1 rounded-full text-[12px] md:text-[15px] font-poppinsMediumItalic w-fit mt-2">
+      <FaStar className="w-3 h-3 md:w-4 md:h-4" />
+      <span>{text}</span>
+    </div>
+  )
+}
 
   // ===== HANDLERS =====
   const handleAddToCart = () => {
