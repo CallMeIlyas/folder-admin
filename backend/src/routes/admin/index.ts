@@ -1,25 +1,29 @@
-import { Router } from "express";
-import { adminLogin } from "../../controllers/admin/AuthController";
-import mediaRoutes from "./media";
-import contentRoutes from "../content";
-import productRoutes from "../products";
-import adminProductRoutes from "./products";
+import { Router } from "express"
+import { adminLogin } from "../../controllers/admin/AuthController"
+import mediaRoutes from "./media"
+import contentRoutes from "../content"
+import productRoutes from "../products"
+import adminProductRoutes from "./products"
+import invoiceRoutes from "./invoice"
 
-const router = Router();
+const router = Router()
 
 /* AUTH */
-router.post("/login", adminLogin);
+router.post("/login", adminLogin)
 
 /* MEDIA */
-router.use("/media", mediaRoutes);
+router.use("/media", mediaRoutes)
 
 /* CONTENT */
-router.use("/content", contentRoutes);
+router.use("/content", contentRoutes)
 
 /* PUBLIC PRODUCTS (READ) */
-router.use("/products", productRoutes);
+router.use("/products", productRoutes)
 
 /* ADMIN PRODUCTS (CRUD) */
-router.use("/manage-products", adminProductRoutes);
+router.use("/manage-products", adminProductRoutes)
 
-export default router;
+/* INVOICE */
+router.use("/invoice", invoiceRoutes)
+
+export default router

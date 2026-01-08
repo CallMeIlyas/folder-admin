@@ -1,8 +1,8 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -12,21 +12,27 @@ export default defineConfig({
   base: "/",
   server: {
     host: true,
+    proxy: {
+      "/api": {
+        target: "http://localhost:3001",
+        changeOrigin: true
+      }
+    }
   },
   assetsInclude: [
     "**/*.png",
     "**/*.jpg",
-    "**/*.jpeg", 
+    "**/*.jpeg",
     "**/*.gif",
     "**/*.mp4",
     "**/*.svg",
     "**/*.ttf",
     "**/*.woff",
-    "**/*.woff2",
+    "**/*.woff2"
   ],
   resolve: {
     alias: {
-      "@": resolve(__dirname, "src"),
-    },
-  },
+      "@": resolve(__dirname, "src")
+    }
+  }
 });
