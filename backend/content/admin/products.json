@@ -96,8 +96,126 @@
       "Worldwide"
     ],
     "displayNameOverride": "2D Frame 12R",
-    "optionsOverride": {
-      "items": []
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": [
+        {
+          "id": "size",
+          "type": "image",
+          "label": {
+            "id": "Ukuran Frame",
+            "en": "Frame Size"
+          },
+          "items": [
+            {
+              "value": "4R",
+              "label": {
+                "id": "4R",
+                "en": "4R"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/frame/4R/4R.jpg",
+              "systemPrice": 0,
+              "active": true
+            },
+            {
+              "value": "6R",
+              "label": {
+                "id": "6R",
+                "en": "6R"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/frame/6R/6R.jpg",
+              "systemPrice": 0,
+              "active": true
+            },
+            {
+              "value": "8R",
+              "label": {
+                "id": "8R",
+                "en": "8R"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/frame/8R/8R.jpg",
+              "systemPrice": 0,
+              "active": true
+            },
+            {
+              "value": "12R",
+              "label": {
+                "id": "12R",
+                "en": "12R"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/frame/12R/12R.jpg",
+              "systemPrice": 0,
+              "active": true
+            },
+            {
+              "value": "15CM",
+              "label": {
+                "id": "15CM",
+                "en": "15CM"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/frame/15cm/15cm.jpg",
+              "systemPrice": 0,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "shading",
+          "type": "image",
+          "label": {
+            "id": "Gaya Shading",
+            "en": "Shading Style"
+          },
+          "items": [
+            {
+              "value": "simple shading",
+              "label": {
+                "id": "Simple Shading",
+                "en": "Simple Shading"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/shading/2D SIMPLE SHADING/2D SIMPLE SHADING.jpg",
+              "systemPrice": 348800,
+              "active": true
+            },
+            {
+              "value": "background catalog",
+              "label": {
+                "id": "Background Catalog",
+                "en": "Background Catalog"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/shading/2D BACKGROUND CATALOG/1.jpg",
+              "systemPrice": 398800,
+              "active": true
+            },
+            {
+              "value": "bold shading",
+              "label": {
+                "id": "Bold Shading",
+                "en": "Bold Shading"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/shading/2D BOLD SHADING/2D BOLD SHADING.jpg",
+              "systemPrice": 365800,
+              "active": true
+            },
+            {
+              "value": "ai",
+              "label": {
+                "id": "AI",
+                "en": "AI"
+              },
+              "image": "/api/uploads/images/list-products/2D/variation/shading/2D BY AI/1.jpg",
+              "systemPrice": 296800,
+              "active": true
+            }
+          ]
+        }
+      ]
     }
   },
   "prod-3d-8r": {
@@ -306,7 +424,55 @@
       "glass": false,
       "acrylic": false
     },
-    "displayNameOverride": "Acrylic Stand 3MM"
+    "displayNameOverride": "Acrylic Stand 3MM",
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": [
+        {
+          "id": "stand_type",
+          "type": "text",
+          "label": {
+            "id": "Ukuran & Sisi",
+            "en": "Size & Side"
+          },
+          "items": [
+            {
+              "value": "Acrylic Stand 3mm size 15x15cm 1 sisi",
+              "label": {
+                "id": "15x15cm 1 sisi",
+                "en": "15x15cm 1 side"
+              },
+              "price": 324800,
+              "active": true
+            },
+            {
+              "value": "Acrylic Stand 3mm size A4 2 sisi",
+              "label": {
+                "id": "A4 2 sisi",
+                "en": "A4 2 sides"
+              },
+              "price": 455800,
+              "active": true
+            },
+            {
+              "value": "Acrylic Stand 3mm size A3 2 sisi",
+              "label": {
+                "id": "A3 2 sisi",
+                "en": "A3 2 sides"
+              },
+              "price": 595800,
+              "active": true
+            }
+          ]
+        }
+      ]
+    }
   },
   "prod-2d-15cm": {
     "displayNameOverride": "2D Frame 15cm",
@@ -502,6 +668,418 @@
     "frames": {
       "glass": true,
       "acrylic": false
+    }
+  },
+  "prod-additional-biaya-tambahan-wajah-karikatur": {
+    "active": true,
+    "displayNameOverride": "Additional BIAYA TAMBAHAN WAJAH KARIKATUR",
+    "description": {
+      "en": "Description: Caricature was made by our illustrator, not AI made.\nPhoto Requirements: Please provide clear close up photos with less shadows.\nAngle Note: The caricature is made according to the angle of the facial photo sent by the customer.\nChange Note: Changing angle with different photo = additional charges for 1 face",
+      "id": ""
+    },
+    "price": 52800,
+    "shippedFrom": [
+      "Bogor",
+      "Jakarta"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ],
+    "frames": {
+      "glass": false,
+      "acrylic": false
+    },
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": [
+        {
+          "id": "face_count",
+          "type": "text",
+          "label": {
+            "id": "Jumlah Wajah",
+            "en": "Face Count"
+          },
+          "items": [
+            {
+              "value": "Tambahan Wajah Karikatur 1-9 wajah",
+              "label": {
+                "id": "1–9 Wajah",
+                "en": "1–9 Faces"
+              },
+              "price": 52800,
+              "active": true
+            },
+            {
+              "value": "Tambahan Wajah Karikatur diatas 10 wajah",
+              "label": {
+                "id": "Di atas 10 Wajah",
+                "en": "Above 10 Faces"
+              },
+              "price": 62800,
+              "active": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "prod-additional-biaya-tambahan-ganti-frame-kaca-ke-acrylic": {
+    "active": true,
+    "displayNameOverride": "Additional BIAYA TAMBAHAN GANTI FRAME KACA KE ACRYLIC",
+    "description": {
+      "en": "",
+      "id": ""
+    },
+    "price": 175800,
+    "shippedFrom": [
+      "Bogor",
+      "Jakarta"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ],
+    "frames": {
+      "glass": false,
+      "acrylic": false
+    },
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": [
+        {
+          "id": "acrylic_size",
+          "type": "text",
+          "label": {
+            "id": "Ukuran Acrylic",
+            "en": "Acrylic Size"
+          },
+          "items": [
+            {
+              "value": "Biaya Tambahan Ganti Frame Kaca ke Acrylic A2",
+              "label": {
+                "id": "A2",
+                "en": "A2"
+              },
+              "systemPrice": 175800,
+              "active": true
+            },
+            {
+              "value": "Biaya Tambahan Ganti Frame Kaca ke Acrylic A1",
+              "label": {
+                "id": "A1",
+                "en": "A1"
+              },
+              "systemPrice": 319800,
+              "active": true
+            },
+            {
+              "value": "Biaya Tambahan Ganti Frame Kaca ke Acrylic A0",
+              "label": {
+                "id": "A0",
+                "en": "A0"
+              },
+              "systemPrice": 695000,
+              "active": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "prod-additional-biaya-ekspress-general": {
+    "active": true,
+    "displayNameOverride": "Additional BIAYA EKSPRESS GENERAL",
+    "description": {
+      "en": "",
+      "id": ""
+    },
+    "price": 60000,
+    "shippedFrom": [
+      "Bogor",
+      "Jakarta"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ],
+    "frames": {
+      "glass": false,
+      "acrylic": false
+    },
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": [
+        {
+          "id": "express_level",
+          "type": "text",
+          "label": {
+            "id": "Jenis Express",
+            "en": "Express Type"
+          },
+          "items": [
+            {
+              "value": "Biaya Ekspress General",
+              "label": {
+                "id": "Express 1",
+                "en": "Express 1"
+              },
+              "price": 60000,
+              "active": true
+            },
+            {
+              "value": "Biaya Ekspress General 2",
+              "label": {
+                "id": "Express 2",
+                "en": "Express 2"
+              },
+              "price": 85000,
+              "active": true
+            },
+            {
+              "value": "Biaya Ekspress General 3",
+              "label": {
+                "id": "Express 3",
+                "en": "Express 3"
+              },
+              "price": 100000,
+              "active": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "prod-additional-biaya-tambahan-wajah-banyak--design-dari-customer-": {
+    "active": true,
+    "displayNameOverride": "Additional BIAYA TAMBAHAN WAJAH BANYAK (DESIGN DARI CUSTOMER)",
+    "description": {
+      "en": "Description: Caricature was made by our illustrator, not AI made.\nPhoto Requirements: Please provide clear close up photos with less shadows.\nAngle Note: The caricature is made according to the angle of the facial photo sent by the customer.\nChange Note: Changing angle with different photo = additional charges for 1 face",
+      "id": ""
+    },
+    "price": 150000,
+    "shippedFrom": [
+      "Bogor",
+      "Jakarta"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ],
+    "frames": {
+      "glass": false,
+      "acrylic": false
+    },
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": [
+        {
+          "id": "face_count",
+          "type": "text",
+          "label": {
+            "id": "Jumlah Wajah",
+            "en": "Face Count"
+          },
+          "items": [
+            {
+              "value": "Biaya Tambahan Wajah Banyak 1-9 wajah",
+              "label": {
+                "id": "Wajah Banyak 1–9",
+                "en": "Multiple Faces 1–9"
+              },
+              "price": 150000,
+              "active": true
+            },
+            {
+              "value": "Biaya Tambahan Wajah Banyak diatas 10 wajah",
+              "label": {
+                "id": "Wajah Banyak >10",
+                "en": "Multiple Faces Above 10"
+              },
+              "price": 250000,
+              "active": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "prod-additional-biaya-ekspress-12r": {
+    "active": true,
+    "displayNameOverride": "Additional BIAYA EKSPRESS 12R",
+    "description": {
+      "en": "Description: Express fee for deadline order.\nContact Note: Please contact our admin for deadline date confirmation",
+      "id": ""
+    },
+    "price": 200000,
+    "shippedFrom": [
+      "Bogor",
+      "Jakarta"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ],
+    "frames": {
+      "glass": false,
+      "acrylic": false
+    },
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": [
+        {
+          "id": "express_level",
+          "type": "text",
+          "label": {
+            "id": "Jenis Express",
+            "en": "Express Type"
+          },
+          "items": [
+            {
+              "value": "Biaya Ekspress General",
+              "label": {
+                "id": "Express 1",
+                "en": "Express 1"
+              },
+              "systemPrice": 60000,
+              "active": false
+            },
+            {
+              "value": "Biaya Ekspress General 2",
+              "label": {
+                "id": "Express 2",
+                "en": "Express 2"
+              },
+              "systemPrice": 85000,
+              "active": false
+            },
+            {
+              "value": "Biaya Ekspress General 3",
+              "label": {
+                "id": "Express 3",
+                "en": "Express 3"
+              },
+              "systemPrice": 100000,
+              "active": false
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "prod-additional-biaya-ekspress-a0": {
+    "active": true,
+    "displayNameOverride": "Additional BIAYA EKSPRESS A0",
+    "description": {
+      "en": "",
+      "id": ""
+    },
+    "price": 550000,
+    "shippedFrom": [
+      "Bogor",
+      "Jakarta"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ],
+    "frames": {
+      "glass": false,
+      "acrylic": false
+    },
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": []
+    }
+  },
+  "prod-additional-biaya-ekspress-a1": {
+    "active": true,
+    "displayNameOverride": "Additional BIAYA EKSPRESS A1",
+    "description": {
+      "en": "",
+      "id": ""
+    },
+    "price": 450000,
+    "shippedFrom": [
+      "Bogor",
+      "Jakarta"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ],
+    "frames": {
+      "glass": false,
+      "acrylic": false
+    },
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": []
+    }
+  },
+  "prod-additional-biaya-ekspress-a2": {
+    "active": true,
+    "displayNameOverride": "Additional BIAYA EKSPRESS A2",
+    "description": {
+      "en": "",
+      "id": ""
+    },
+    "price": 250000,
+    "shippedFrom": [
+      "Bogor",
+      "Jakarta"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ],
+    "frames": {
+      "glass": false,
+      "acrylic": false
+    },
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": []
     }
   }
 }

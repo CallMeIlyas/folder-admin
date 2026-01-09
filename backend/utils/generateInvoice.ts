@@ -120,34 +120,29 @@ export const generateInvoice = async (
     }
 
     // IMAGE
-    try {
-      let imagePath = item.imageUrl || ""
-      if (imagePath.startsWith("http")) {
-        imagePath = new URL(imagePath).pathname.substring(1)
-      }
+    const imageFsPath = resolveImagePath(item.imageUrl)
 
-      const imgBytes = fs.readFileSync(
-        path.join(process.cwd(), imagePath)
-      )
+if (imageFsPath && fs.existsSync(imageFsPath)) {
+  const imgBytes = fs.readFileSync(imageFsPath)
 
-      const img = imagePath.endsWith(".png")
-        ? await pdfDoc.embedPng(imgBytes)
-        : await pdfDoc.embedJpg(imgBytes)
+  const img = imageFsPath.endsWith(".png")
+    ? await pdfDoc.embedPng(imgBytes)
+    : await pdfDoc.embedJpg(imgBytes)
 
-      const size = 35
-      const { width, height } = img.scale(1)
-      const aspect = width / height
+  const size = 35
+  const { width, height } = img.scale(1)
+  const aspect = width / height
 
-      const drawW = aspect >= 1 ? size : size * aspect
-      const drawH = aspect >= 1 ? size / aspect : size
+  const drawW = aspect >= 1 ? size : size * aspect
+  const drawH = aspect >= 1 ? size / aspect : size
 
-      page.drawImage(img, {
-        x: box.left + (cols.image - drawW) / 2,
-        y: y - drawH - 53,
-        width: drawW,
-        height: drawH
-      })
-    } catch {}
+  page.drawImage(img, {
+    x: box.left + (cols.image - drawW) / 2,
+    y: y - drawH - 53,
+    width: drawW,
+    height: drawH
+  })
+}
 
     const subtotal = item.price * item.quantity
     const textY = y - 70

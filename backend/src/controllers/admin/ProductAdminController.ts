@@ -95,6 +95,39 @@ export const updateProductMainImage = (req: Request, res: Response) => {
   res.json({ success: true })
 }
 
+const mergeOptionGroups = (prevOptions, nextOptions) => {
+  const prevGroups = prevOptions?.groups || []
+  const nextGroups = nextOptions?.groups || []
+
+  return {
+    groups: nextGroups.map(nextGroup => {
+      const prevGroup = prevGroups.find(g => g.id === nextGroup.id)
+
+      if (!prevGroup) return nextGroup
+
+      const mergedItems = [
+        ...prevGroup.items,
+        ...nextGroup.items
+      ].reduce((acc, item) => {
+        const existing = acc.find(i => i.value === item.value)
+        if (!existing) acc.push(item)
+        return acc
+      }, [])
+
+      return {
+        ...prevGroup,
+        ...nextGroup,
+        items: mergedItems.map(item => {
+          const override = nextGroup.items.find(
+            i => i.value === item.value
+          )
+          return override ? { ...item, ...override } : item
+        })
+      }
+    })
+  }
+}
+
 // ================= UPDATE GENERAL =================
 export const updateProductAdminConfig = (req: Request, res: Response) => {
   const { id } = req.params
@@ -104,10 +137,16 @@ export const updateProductAdminConfig = (req: Request, res: Response) => {
 
 config[id] = {
   ...(config[id] || {}),
+  
+    active:
+  payload.active ??
+  config[id]?.active ??
+  true,
 
   displayNameOverride:
     payload.displayNameOverride ??
     config[id]?.displayNameOverride,
+    
 
   description:
     payload.description ??
@@ -153,9 +192,7 @@ config[id] = {
     payload.mainImageIndex ??
     config[id]?.mainImageIndex,
 
-  options:
-    payload.options ??
-    config[id]?.options
+  options: payload.options ?? config[id]?.options,
 }
   saveConfig(config)
   res.json({ success: true })

@@ -10,76 +10,83 @@ export const priceService = {
     const adminConfig = loadProductAdminConfig()
     const admin = adminConfig[productId]
 
-    // ============================================
-    // ADMIN OPTION OVERRIDE (SOURCE OF TRUTH)
-    // ============================================
-    if (admin?.options?.groups?.length && Object.keys(options).length > 0) {
-      let total =
-        typeof admin.price === "number"
-          ? admin.price
-          : product.price
-
-      admin.options.groups.forEach(group => {
-        const selected = options[group.id]
-        if (!selected) return
-
-        const item = group.items.find(
-          i => i.value === selected && i.active !== false
-        )
-
-        if (typeof item?.price === "number") {
-          total += item.price
-        }
-      })
-
-      return total
-    }
-
     const category = product.category
     const name = product.name
 
-    // ================= 2D FRAME =================
+    // ===============================
+    // 1. 2D FRAME (LOOKUP ONLY)
+    // ===============================
     if (category === "2D Frame") {
-      const size = options.size
-      const shading = options.shading
+      const size = options?.size
+      const shading = options?.shading
 
       if (!size || !shading) {
-        return getPrice(category, name)
+        return typeof admin?.price === "number"
+          ? admin.price
+          : product.price
       }
 
-      return getPrice(category, `${size} ${shading}`)
+      return getPrice("2D Frame", `${size} ${shading}`)
     }
 
-    // ================= 3D FRAME =================
+    // ===============================
+    // 2. 3D FRAME (PACKAGING LOOKUP)
+    // ===============================
     if (category === "3D Frame") {
-      const opt = options.packaging
-      if (!opt) return getPrice(category, name)
+      const packaging = options?.packaging
 
-      return getPrice(category, opt)
+      if (!packaging) {
+        return typeof admin?.price === "number"
+          ? admin.price
+          : getPrice("3D Frame", name)
+      }
+
+      return getPrice("3D Frame", packaging)
     }
 
-    // ================= ACRYLIC STAND =================
+    // ===============================
+    // 3. ACRYLIC STAND (ABSOLUTE OPTION)
+    // ===============================
     if (category === "Acrylic Stand") {
-      const opt = options.stand_type
-      if (!opt) return getPrice(category, name)
+      const group = admin?.options?.groups?.find(g => g.id === "stand_type")
+      const selected = options?.stand_type
+      if (!group || !selected) return 0
 
-      return getPrice(category, opt)
+      const item = group.items.find(
+        i => i.value === selected && i.active !== false
+      )
+
+      return typeof item?.price === "number" ? item.price : 0
     }
 
-    // ================= ADDITIONAL =================
+    // ===============================
+    // 4. ADDITIONAL (ABSOLUTE OPTION)
+    // ===============================
     if (category === "Additional") {
-      const opt = Object.values(options)[0]
-      if (!opt) return getPrice(category, name)
+      const group = admin?.options?.groups?.[0]
+      if (!group) {
+        return typeof admin?.price === "number"
+          ? admin.price
+          : product.price
+      }
 
-      return getPrice(category, opt)
+      const selectedValue = Object.values(options || {})[0]
+      if (!selectedValue) return 0
+
+      const item = group.items.find(
+        i => i.value === selectedValue && i.active !== false
+      )
+
+      return typeof item?.price === "number" ? item.price : 0
     }
 
-    // ================= SOFTCOPY =================
-    if (category === "Softcopy Design") {
-      return getPrice(category, name)
+    // ===============================
+    // 5. FALLBACK (NO OPTIONS)
+    // ===============================
+    if (typeof admin?.price === "number") {
+      return admin.price
     }
 
-    // ================= FALLBACK =================
-    return getPrice(category, name)
+    return product.price
   }
 }

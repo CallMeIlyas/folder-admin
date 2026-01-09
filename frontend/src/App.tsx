@@ -22,7 +22,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard"
 import ImageManagerPage from "./pages/admin/ImageManagerPage"
 import TextEditorPage from "./pages/admin/TextEditorPage"
 import VideoManagerPage from "./pages/admin/VideoManagerPage"
-import InvoiceManagerPage from "./pages/admin/InvoiceManagerPage"
+import InvoiceManagerPage from "./pages/admin/invoice/InvoiceManagerPage"
 import ProductManagerPage from "./pages/admin/ProductManagerPage"
 import PageManagerPage from "./pages/admin/PageManagerPage"
 // Import ProductDetailPage untuk admin (edit produk)

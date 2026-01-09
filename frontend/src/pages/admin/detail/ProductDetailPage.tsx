@@ -7,7 +7,7 @@ type OptionItem = {
     en?: string  
     id?: string  
   }  
-  image?: string  
+  image?: string
 }  
   
 type OptionGroup = {  
@@ -190,25 +190,47 @@ useEffect(() => {
       });  
       const data = await res.json();  
       setProduct(data);  
+      
+      const normalizeAdminOptions = (groups) =>
+  groups.map(g => ({
+    ...g,
+    items: g.items.map(i => ({
+      ...i,
+    }))
+  }))
         
+const syncOptions = (resolvedGroups, adminGroups = []) => {
+  return resolvedGroups.map(rg => {
+    const ag = adminGroups.find(g => g.id === rg.id)
+
+    return {
+      id: rg.id,
+      type: rg.type,
+      label: rg.label,
+      items: rg.options.map(opt => {
+        const saved = ag?.items?.find(i => i.value === opt.value)
+
+        return {
+          value: opt.value,
+          label: opt.label,
+          image: opt.image,
+          systemPrice: opt.price,
+          price: saved?.price,
+          active:
+            saved?.active ??
+            opt.active ??
+            true
+        }
+      })
+    }
+  })
+}
+
 setAdminOptions(
-  data.admin?.options?.groups?.length
-    ? data.admin.options.groups
-    : data.optionsResolved?.groups?.map(g => ({
-        id: g.id,
-        type: g.type,
-        label: g.label,
-        items: g.options.map(o => ({
-          value: o.value,
-          label: o.label,
-          image: o.image,
-          active: true,
-          systemPrice:
-            typeof o.price === "number"
-              ? o.price
-              : data.optionsResolved.basePrice
-        }))
-      })) || []
+  syncOptions(
+    data.optionsResolved?.groups || [],
+    data.admin?.options?.groups || []
+  )
 )
   
   
@@ -296,7 +318,7 @@ body: JSON.stringify({
   frames: formData.frames,  
   bestSelling,
   options: {  
-  groups: adminOptions.filter(g => g.items.length > 0)  
+  groups: adminOptions
   }  
 })  
       });  
@@ -587,55 +609,61 @@ body: JSON.stringify({
 {/* Product Options Preview (CRUD source: adminOptions) */}
 {adminOptions.length > 0 && (
   <div className="border-t pt-6 space-y-6">
-    {adminOptions.map(group => {
-      const activeItems = group.items.filter(i => i.active !== false)
+    {adminOptions.map(group => (
+      <div key={group.id}>
+        <h3 className="text-sm font-medium text-gray-700 mb-3">
+          {group.label[langTab] || group.label.en}
+        </h3>
 
-      if (activeItems.length === 0) return null
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {group.items.map(item => {
+            const isSelected =
+              selectedOptions[group.id] === item.value
 
-      return (
-        <div key={group.id}>
-          <h3 className="text-sm font-medium text-gray-700 mb-3">
-            {group.label[langTab] || group.label.en}
-          </h3>
+            const showImage =
+              group.type === "image" && !!item.image
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {activeItems.map(item => {
-              const isActive = selectedOptions[group.id] === item.value
-              const showImage = group.type === "image" && !!item.image
+            return (
+              <div
+                key={item.value}
+onClick={() => {
+  if (item.active === false) return
 
-              return (
-                <div
-                  key={item.value}
-                  onClick={() =>
-                    setSelectedOptions(prev => ({
-                      ...prev,
-                      [group.id]: item.value
-                    }))
-                  }
-                  className={`border rounded-lg p-2 cursor-pointer transition
-                    ${isActive
-                      ? "border-black ring-2 ring-black"
-                      : "hover:border-black"}
-                  `}
-                >
-                  {showImage && (
-                    <img
-                      src={`${API_BASE}${item.image}`}
-                      alt={item.label[langTab] || item.label.en || item.value}
-                      className="w-full h-24 object-cover rounded mb-2"
-                    />
-                  )}
+  setSelectedOptions(prev => ({
+    ...prev,
+    [group.id]: item.value
+  }))
+}}
+                className={`border rounded-lg p-2 cursor-pointer transition
+                  ${item.active === false && "opacity-50"}
+                  ${isSelected
+                    ? "border-black ring-2 ring-black"
+                    : "hover:border-black"}
+                `}
+              >
+                {showImage && (
+                  <img
+                    src={`${API_BASE}${item.image}`}
+                    alt={item.label[langTab] || item.label.en || item.value}
+                    className="w-full h-24 object-cover rounded mb-2"
+                  />
+                )}
 
-                  <div className="text-xs text-center">
-                    {item.label[langTab] || item.label.en || item.value}
-                  </div>
+                <div className="text-xs text-center">
+                  {item.label[langTab] || item.label.en || item.value}
                 </div>
-              )
-            })}
-          </div>
+
+                {item.active === false && (
+                  <div className="text-[11px] text-red-500 text-center mt-1">
+                    Nonaktif
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
-      )
-    })}
+      </div>
+    ))}
   </div>
 )}
               {/* Frame Options */}  
@@ -794,7 +822,7 @@ body: JSON.stringify({
       <label className="flex items-center gap-2 text-xs">
         <input
           type="checkbox"
-          checked={item.active !== false}
+          checked={item.active === true}
           onChange={(e) => {
             const next = [...adminOptions]
             next[gIndex].items[iIndex].active = e.target.checked

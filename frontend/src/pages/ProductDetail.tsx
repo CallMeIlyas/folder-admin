@@ -376,7 +376,9 @@ useEffect(() => {
           </label>
           
           <div className="flex gap-2 md:gap-4 flex-wrap">
-            {group.options.map(opt => {
+            {group.options
+  .filter(opt => opt.active !== false)
+  .map(opt => {
               const optionLabel = typeof opt.label === 'object'
                 ? opt.label[i18n.language] || opt.label['en'] || opt.value
                 : opt.label || opt.value;
