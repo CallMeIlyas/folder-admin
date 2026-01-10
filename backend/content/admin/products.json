@@ -1242,5 +1242,66 @@
         }
       ]
     }
+  },
+  "prod-softcopy design-with-background-custom": {
+    "active": true,
+    "displayNameOverride": "Softcopy Design WITH BACKGROUND CUSTOM",
+    "description": {
+      "en": "",
+      "id": ""
+    },
+    "price": 225800,
+    "shippedFrom": [
+      "Bogor",
+      "Jakarta"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ],
+    "frames": {
+      "glass": false,
+      "acrylic": false
+    },
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": [
+        {
+          "id": "group_1768051921431",
+          "type": "text",
+          "label": {
+            "en": "asdas",
+            "id": ""
+          },
+          "items": [
+            {
+              "value": "asda",
+              "label": {
+                "en": "sdas",
+                "id": ""
+              },
+              "active": true,
+              "price": 225800,
+              "priceMode": "override"
+            },
+            {
+              "value": "dsas",
+              "label": {
+                "en": "asda",
+                "id": ""
+              },
+              "active": true,
+              "price": 525800,
+              "priceMode": "override"
+            }
+          ]
+        }
+      ]
+    }
   }
 }
