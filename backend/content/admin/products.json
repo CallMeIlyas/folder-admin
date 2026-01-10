@@ -52,7 +52,8 @@
     },
     "price": 495800,
     "frames": {
-      "acrylic": true
+      "acrylic": false,
+      "glass": true
     },
     "mainImageIndex": 0,
     "displayNameOverride": "3D Frame 10R",
@@ -239,7 +240,50 @@
     ],
     "shippedTo": [
       "Worldwide"
-    ]
+    ],
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": [
+        {
+          "id": "packaging",
+          "type": "image",
+          "label": {
+            "id": "Packaging",
+            "en": "Packaging"
+          },
+          "items": [
+            {
+              "value": "8R duskraft",
+              "label": {
+                "id": "Dus Kraft + Paperbag",
+                "en": "Dus Kraft + Paperbag"
+              },
+              "image": "/api/uploads/images/3d-package-photo/8R/PACKING DUS KRAFT.jpg",
+              "systemPrice": 365800,
+              "active": true,
+              "priceMode": "override"
+            },
+            {
+              "value": "8R hardbox",
+              "label": {
+                "id": "Black Hardbox + Paperbag",
+                "en": "Black Hardbox + Paperbag"
+              },
+              "image": "/api/uploads/images/3d-package-photo/8R/PACKING HARDBOX.jpg",
+              "systemPrice": 418800,
+              "active": true,
+              "priceMode": "override"
+            }
+          ]
+        }
+      ]
+    }
   },
   "prod-3d-a2-40x55cm": {
     "mainImageIndex": 6,
@@ -261,7 +305,17 @@
     "shippedTo": [
       "Worldwide"
     ],
-    "displayNameOverride": ""
+    "displayNameOverride": "3D Frame A2",
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": []
+    }
   },
   "prod-3d-15x15cm": {
     "mainImageIndex": 3,
@@ -321,13 +375,34 @@
   "prod-3d-6r": {
     "mainImageIndex": 5,
     "displayName": "3D Frame 6R",
-    "description": "Frame material: Wood, Glass, back side MDF 2-3mm\nOverall frame size: ±20x25x3cm\nDepth: ± 3cm\nFrame Color: White\nPacking: Kraft Box + Paperbag\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 4 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping.\nNote: 6R available for up to 4 people, more than 3 people please choose 20cm, 8R, 10R, 12R, A2, A1, A0",
+    "description": {
+      "en": "Frame material: Wood, Glass, back side MDF 2-3mm\nOverall frame size: ±20x25x3cm\nDepth: ± 3cm\nFrame Color: White\nPacking: Kraft Box + Paperbag\nGreeting card: Artcarton 310gr 1 side 10x15cm\nBlack Envelope: Aster black 150gsm A6 11x16,2cm\nMax People: Up to 4 people\nShipping Note: Packing bubblewrap inside and outside the box, generally it's safe for Instant or Regular Shipping.\nNote: 6R available for up to 4 people, more than 3 people please choose 20cm, 8R, 10R, 12R, A2, A1, A0",
+      "id": ""
+    },
     "price": 245800,
     "active": true,
     "showInGallery": true,
     "frames": {
       "glass": true,
       "acrylic": false
+    },
+    "displayNameOverride": "3D Frame 6R",
+    "shippedFrom": [
+      "Bogor",
+      "Jakarta"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ],
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": []
     }
   },
   "prod-3d-20x20cm": {
@@ -370,6 +445,17 @@
     "frames": {
       "glass": false,
       "acrylic": true
+    },
+    "displayNameOverride": "3D Frame A0",
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": []
     }
   },
   "prod-3d-a1-55x80cm": {
@@ -390,6 +476,17 @@
     "frames": {
       "glass": false,
       "acrylic": true
+    },
+    "displayNameOverride": "3D Frame A1",
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": []
     }
   },
   "prod-acrylic stand-2cm": {
@@ -555,7 +652,8 @@
               },
               "image": "/api/uploads/images/list-products/2D/variation/frame/4R/4R.jpg",
               "active": true,
-              "systemPrice": 142800
+              "systemPrice": 142800,
+              "priceMode": "override"
             },
             {
               "value": "15cm",
@@ -564,7 +662,8 @@
                 "en": "15cm"
               },
               "active": true,
-              "systemPrice": 142800
+              "systemPrice": 142800,
+              "priceMode": "override"
             },
             {
               "value": "6R",
@@ -574,7 +673,8 @@
               },
               "image": "/api/uploads/images/list-products/2D/variation/frame/6R/6R.jpg",
               "active": true,
-              "systemPrice": 142800
+              "systemPrice": 142800,
+              "priceMode": "override"
             },
             {
               "value": "8R",
@@ -584,7 +684,8 @@
               },
               "image": "/api/uploads/images/list-products/2D/variation/frame/8R/8R.jpg",
               "active": true,
-              "systemPrice": 142800
+              "systemPrice": 142800,
+              "priceMode": "override"
             },
             {
               "value": "12R",
@@ -594,7 +695,8 @@
               },
               "image": "/api/uploads/images/list-products/2D/variation/frame/12R/12R.jpg",
               "active": true,
-              "systemPrice": 142800
+              "systemPrice": 142800,
+              "priceMode": "override"
             }
           ]
         },
@@ -614,7 +716,9 @@
               },
               "image": "/api/uploads/images/list-products/2D/variation/shading/2D SIMPLE SHADING/2D SIMPLE SHADING.jpg",
               "active": true,
-              "systemPrice": 123800
+              "systemPrice": 123800,
+              "price": 142800,
+              "priceMode": "override"
             },
             {
               "value": "background catalog",
@@ -624,7 +728,9 @@
               },
               "image": "/api/uploads/images/list-products/2D/variation/shading/2D BACKGROUND CATALOG/1.jpg",
               "active": true,
-              "systemPrice": 140800
+              "systemPrice": 140800,
+              "price": 170800,
+              "priceMode": "override"
             },
             {
               "value": "bold shading",
@@ -634,7 +740,9 @@
               },
               "image": "/api/uploads/images/list-products/2D/variation/shading/2D BOLD SHADING/2D BOLD SHADING.jpg",
               "active": true,
-              "systemPrice": 185800
+              "systemPrice": 185800,
+              "price": 211800,
+              "priceMode": "override"
             },
             {
               "value": "ai",
@@ -644,12 +752,15 @@
               },
               "image": "/api/uploads/images/list-products/2D/variation/shading/2D BY AI/1.jpg",
               "active": true,
-              "systemPrice": 100800
+              "systemPrice": 100800,
+              "price": 110800,
+              "priceMode": "override"
             }
           ]
         }
       ]
-    }
+    },
+    "active": true
   },
   "prod-2d-8r": {
     "displayNameOverride": "2D Frame 8R",
@@ -1080,6 +1191,56 @@
     },
     "options": {
       "groups": []
+    }
+  },
+  "prod-softcopy design-with-background-catalog": {
+    "active": true,
+    "displayNameOverride": "Softcopy Design WITH BACKGROUND CATALOG",
+    "description": {
+      "en": "",
+      "id": ""
+    },
+    "price": 175800,
+    "shippedFrom": [
+      "Bogor",
+      "Jakarta"
+    ],
+    "shippedTo": [
+      "Worldwide"
+    ],
+    "frames": {
+      "glass": false,
+      "acrylic": false
+    },
+    "bestSelling": {
+      "enabled": false,
+      "label": {
+        "en": "",
+        "id": ""
+      }
+    },
+    "options": {
+      "groups": [
+        {
+          "id": "group_1768016145381",
+          "type": "text",
+          "label": {
+            "en": "sdf",
+            "id": ""
+          },
+          "items": [
+            {
+              "value": "sdfs",
+              "label": {
+                "en": "sdfs",
+                "id": ""
+              },
+              "active": true,
+              "price": 545543454
+            }
+          ]
+        }
+      ]
     }
   }
 }

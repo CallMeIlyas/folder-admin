@@ -375,13 +375,13 @@ useEffect(() => {
             {groupLabel}
           </label>
           
-          <div className="flex gap-2 md:gap-4 flex-wrap">
-            {group.options
-  .filter(opt => opt.active !== false)
-  .map(opt => {
-              const optionLabel = typeof opt.label === 'object'
-                ? opt.label[i18n.language] || opt.label['en'] || opt.value
-                : opt.label || opt.value;
+<div className="flex gap-2 md:gap-4 flex-wrap">
+  {group.options
+    .filter(opt => opt.active !== false) // ✅ FILTER DULU
+    .map(opt => {
+      const optionLabel = typeof opt.label === 'object'
+        ? opt.label[i18n.language] || opt.label['en'] || opt.value
+        : opt.label || opt.value;
 
               const isSelected = selectedOptions[group.id] === opt.value;
 
@@ -497,10 +497,14 @@ const renderFrameOptions = () => {
   )
 }
 
-  // ===== HANDLERS =====
+// ===== HANDLERS =====
   const handleAddToCart = () => {
     if (!product) return;
 
+    console.log("➕ Adding to cart with options:", selectedOptions);
+
+    // SIMPLIFIED: Hanya kirim data minimal
+    // CartContext akan fetch optionsResolved sendiri dari backend
     const cartItem = {
       id: product.id,
       name: product.name || product.title,
@@ -508,15 +512,19 @@ const renderFrameOptions = () => {
       price: displayedPrice,
       quantity: quantity,
       imageUrl: apiAsset(product.images?.main || ""),
-      // INI YANG PENTING: Kirim semua options ASLI
-      options: selectedOptions,
-      productType: (product.category || "").toLowerCase().includes("frame") ? "frame" : "other",
-      timestamp: Date.now(),
+      image: apiAsset(product.images?.main || ""),
+      options: selectedOptions, // User selections
+      productType: (product.category || "").toLowerCase().includes("frame") 
+        ? "frame" as const 
+        : "other" as const,
       category: product.category,
     };
 
-    console.log('Adding to cart:', cartItem);
+    console.log("➕ Cart item to add:", cartItem);
     addToCart(cartItem);
+    
+    // Optional: Show success message
+    // toast.success("Product added to cart!");
   };
 
   const handleAdditionalProductClick = (additionalProduct: AdditionalProduct) => {

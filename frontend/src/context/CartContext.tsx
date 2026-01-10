@@ -1,49 +1,42 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { priceList } from "../data/priceList";
+import { apiFetch } from "../utils/api";
 
 export interface CartItem {
   cartId: string;
   id: string;
   name: string;
+  title: string;
   variation?: string;
   variationOptions?: string[];
   price: number;
   quantity: number;
   imageUrl: string;
   image: string;
-  productType: "frame";
+  productType: "frame" | "shipping" | "other";
   parentCartId?: string;
-  attributes?: {
-    is8RProduct?: boolean;
-    packagingPriceMap?: Record<string, number>;
-    packagingType?: string;
-    frameSize?: string;
-    shadingStyle?: string;
-    isAcrylicStand?: boolean;
-    selectedAcrylicOption?: string;
-    isAdditionalProduct?: boolean;
-    additionalType?: string;
+  category?: string;
+  // Store pilihan user dari ProductDetail
+  options?: Record<string, string>;
+  // Store resolved options dari backend untuk re-calculation
+  optionsResolved?: {
+    groups: Array<{
+      id: string;
+      type: string;
+      label?: Record<string, string> | string;
+      options: Array<{
+        value: string;
+        label: Record<string, string> | string;
+        image?: string;
+        preview?: string;
+      }>;
+    }>;
   };
 }
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (
-    item: Omit<CartItem, "cartId"> & {
-      attributes?: {
-        frameSize?: string;
-        shadingStyle?: string;
-        isAcrylicStand?: boolean;
-        selectedAcrylicOption?: string;
-        packagingPriceMap?: Record<string, number>;
-        packagingVariations?: string[];
-        selectedPackagingVariation?: string;
-        isAdditionalProduct?: boolean;
-        additionalType?: string;
-      };
-    }
-  ) => void;
+  addToCart: (item: Omit<CartItem, "cartId">) => void;
   updateQuantity: (cartId: string, delta: number) => void;
   deleteItem: (cartId: string) => void;
   clearCart: () => void;
@@ -72,245 +65,66 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [cart]);
 
-const addToCart = (
-  item: Omit<CartItem, "cartId"> & {
-    attributes?: {
-      frameSize?: string;
-      shadingStyle?: string;
-      isAcrylicStand?: boolean;
-      selectedAcrylicOption?: string;
-      packagingPriceMap?: Record<string, number>;
-      packagingVariations?: string[];
-      selectedPackagingVariation?: string;
-      isAdditionalProduct?: boolean;
-      additionalType?: string;
-      selectedOption?: string;
-    };
-  }
-) => {
-  const { attributes, ...rest } = item;
+  const addToCart = async (item: Omit<CartItem, "cartId">) => {
+    console.log("🛒 Adding to cart:", item);
 
-  const frameSize = attributes?.frameSize?.toLowerCase() || "";
-  const shadingStyle = attributes?.shadingStyle?.toLowerCase() || "";
-  const is2DFrame = rest.name?.toLowerCase().includes("2d");
-  const isAcrylicStand = attributes?.isAcrylicStand || false;
-  const selectedAcrylicOption = attributes?.selectedAcrylicOption || "";
-  
-  const selectedOption = attributes?.selectedOption || "";
-  
-  // Deteksi Jenis Produk
-  const isKarikaturProduct = rest.name?.toLowerCase().includes("wajah karikatur");
-  const isManyFacesProduct = rest.name?.toLowerCase().includes("wajah banyak");
-  const isExpressProduct = rest.name?.toLowerCase().includes("ekspress general");
-  const isAcrylicChangeProduct = rest.name?.toLowerCase().includes("ganti frame kaca ke acrylic");
-  
-  const isAdditionalProduct = isKarikaturProduct || isManyFacesProduct || 
-                             isExpressProduct || isAcrylicChangeProduct ||
-                             attributes?.isAdditionalProduct || false;
-  
-  const is8RProduct = attributes?.is8RProduct || rest.name?.toLowerCase().includes("8r") || false;
-  const packagingPriceMap = attributes?.packagingPriceMap || {};
-  const packagingVariations = attributes?.packagingVariations || [];
-  const selectedPackagingVariation = attributes?.selectedPackagingVariation || "";
-  
-  let finalProductName = rest.name?.trim() || "";
-  let finalPrice = rest.price;
-
-// Logika Harga 2D Frame
-if (is2DFrame) {
-  const twoDPrices = Object.fromEntries(
-    Object.entries(priceList["2D frame"]).map(([k, v]) => [k.toLowerCase(), v])
-  );
-
-  let key = `${frameSize} ${shadingStyle}`.trim();
-  if (!twoDPrices[key] && frameSize) {
-    key = `${frameSize} simple shading`;
-  }
-
-  finalPrice = twoDPrices[key] || rest.price;
-
-  // PERBAIKAN: Format nama tanpa "2d" di shading style
-  let displayShading = shadingStyle
-    .replace(/^2d\s+/i, "")
-    .replace(/\b\w/g, (c) => c.toUpperCase())
-    .replace("Ai", "AI")
-    .trim();
-  
-  // Pastikan tidak ada "2D" di shading style
-  displayShading = displayShading.replace(/2d/gi, "").trim();
-  
-  finalProductName = `2D Frame ${frameSize.toUpperCase()} ${displayShading}`;
-}
-
-  // Logika Harga Acrylic Stand
-  if (isAcrylicStand) {
-    const acrylicPriceMap: Record<string, number> = {
-      "15x15cm 1 sisi": priceList["Acrylic Stand"]?.["Acrylic Stand 3mm size 15x15cm 1 sisi"] || 324800,
-      "A4 2 sisi": priceList["Acrylic Stand"]?.["Acrylic Stand 3mm size A4 2 sisi"] || 455800,
-      "A3 2 sisi": priceList["Acrylic Stand"]?.["Acrylic Stand 3mm size A3 2 sisi"] || 595800,
-    };
-
-    finalPrice = acrylicPriceMap[selectedAcrylicOption] || rest.price;
-    finalProductName = rest.name;
-  }
-
-  // Logika Harga Produk 8R dengan Packaging
-  if (is8RProduct && selectedPackagingVariation && packagingPriceMap[selectedPackagingVariation]) {
-    finalPrice = packagingPriceMap[selectedPackagingVariation] || rest.price;
-  }
-
-  // Logika Harga untuk Produk Additional
-  if (isKarikaturProduct) {
-    if (selectedOption.includes("10") || selectedOption.toLowerCase().includes("above")) {
-      finalPrice = priceList.Additional["Tambahan Wajah Karikatur diatas 10 wajah"] || rest.price;
-    } else {
-      finalPrice = priceList.Additional["Tambahan Wajah Karikatur 1-9 wajah"] || rest.price;
+    // Untuk shipping items, langsung tambahkan tanpa processing
+    if (item.productType === "shipping") {
+      const shippingItem: CartItem = {
+        ...item,
+        cartId: uuidv4(),
+        quantity: item.quantity || 1,
+        image: item.imageUrl,
+        variation: "",
+        variationOptions: [],
+      };
+      setCart((prev) => [...prev, shippingItem]);
+      return;
     }
-  }
-  
-  if (isManyFacesProduct) {
-    if (selectedOption.includes("10") || selectedOption.toLowerCase().includes("above")) {
-      finalPrice = priceList.Additional["Biaya Tambahan Wajah Banyak diatas 10 wajah"] || rest.price;
-    } else {
-      finalPrice = priceList.Additional["Biaya Tambahan Wajah Banyak 1-9 wajah"] || rest.price;
-    }
-  }
-  
-  if (isExpressProduct) {
-    if (selectedOption === "Option 1") {
-      finalPrice = priceList.Additional["Biaya Ekspress General"] || rest.price;
-    } else if (selectedOption === "Option 2") {
-      finalPrice = priceList.Additional["Biaya Ekspress General 2"] || rest.price;
-    } else if (selectedOption === "Option 3") {
-      finalPrice = priceList.Additional["Biaya Ekspress General 3"] || rest.price;
-    }
-  }
-  
-  if (isAcrylicChangeProduct && selectedOption) {
-    const priceKey = `Biaya Tambahan Ganti Frame Kaca ke Acrylic ${selectedOption}`;
-    finalPrice = priceList.Additional[priceKey] || rest.price;
-  }
 
-  // Logika Utama untuk Deteksi Variation
-  let finalVariationOptions: string[] = [];
-  let defaultVariation = "";
-
-  // Kategori 1: Produk yang Pasti Memiliki Variation
-  const hasVariations = () => {
-    const nameLower = rest.name?.toLowerCase() || "";
-    
-    // 1. Produk 2D Frame - selalu punya variant shading
-    if (is2DFrame) return true;
-    
-    // 2. Produk Additional tertentu - punya variant
-    if (isAdditionalProduct && 
-        (isKarikaturProduct || isManyFacesProduct || isExpressProduct || isAcrylicChangeProduct)) {
-      return true;
-    }
-    
-    // 3. Acrylic Stand - punya variant size
-    if (isAcrylicStand) return true;
-    
-    // 4. Produk 8R dengan packaging - punya variant
-    if (is8RProduct && packagingVariations.length > 0) return true;
-    
-    // 5. Produk Frame Kaca/Acrylic reguler (bukan 2D, bukan additional)
-    // Hanya jika nama mengandung "frame" dan bukan produk tanpa variant
-    if (nameLower.includes("frame") && 
-        !nameLower.includes("stand") &&
-        !is2DFrame &&
-        !isAdditionalProduct) {
-      const smallSizes = ["4r", "6r", "8r", "10r", "12r", "15cm", "20cm"];
-      const largeSizes = ["a0", "a1", "a2", "a3", "a4"];
+    try {
+      // Fetch product data untuk mendapatkan optionsResolved terbaru dari backend
+      const productResponse = await apiFetch(`/api/products/${item.id}`);
+      const productData = await productResponse.json();
       
-      const isSmallFrame = smallSizes.some(size => nameLower.includes(size));
-      const isLargeFrame = largeSizes.some(size => nameLower.includes(size));
-      
-      return isSmallFrame || isLargeFrame;
-    }
-    
-    return false;
-  };
+      console.log("🛒 Fetched product data:", productData);
 
-// Tentukan Variation Options Berdasarkan Jenis Produk
-if (hasVariations()) {
-  if (is2DFrame) {
-    // PERBAIKAN: Tambahkan semua variasi shading yang tersedia
-    finalVariationOptions = ["Simple Shading", "Bold Shading", "Background Catalog", "BY AI"];
-    defaultVariation = shadingStyle 
-      ? shadingStyle.charAt(0).toUpperCase() + shadingStyle.slice(1)
-      : "Simple Shading";
-  }
-    else if (isKarikaturProduct || isManyFacesProduct) {
-      finalVariationOptions = ["1–9 Wajah", "Di atas 10 Wajah"];
-      defaultVariation = selectedOption || "1–9 Wajah";
-    }
-    else if (isExpressProduct) {
-      finalVariationOptions = ["Option 1", "Option 2", "Option 3"];
-      defaultVariation = selectedOption || "Option 1";
-    }
-    else if (isAcrylicChangeProduct) {
-      finalVariationOptions = ["A2", "A1", "A0"];
-      defaultVariation = selectedOption || "A2";
-    }
-    else if (isAcrylicStand) {
-      finalVariationOptions = ["15x15cm 1 sisi", "A4 2 sisi", "A3 2 sisi"];
-      defaultVariation = selectedAcrylicOption || "15x15cm 1 sisi";
-    }
-    else if (is8RProduct && packagingVariations.length > 0) {
-      finalVariationOptions = packagingVariations;
-      defaultVariation = selectedPackagingVariation || packagingVariations[0] || "";
-    }
-    else {
-      const nameLower = rest.name?.toLowerCase() || "";
-      const smallSizes = ["4r", "6r", "8r", "10r", "12r", "15cm", "20cm"];
-      const largeSizes = ["a0", "a1", "a2", "a3", "a4"];
-      
-      const isSmallFrame = smallSizes.some(size => nameLower.includes(size));
-      const isLargeFrame = largeSizes.some(size => nameLower.includes(size));
-      
-      if (isSmallFrame) {
-        finalVariationOptions = ["Frame Kaca"];
-        defaultVariation = "Frame Kaca";
-      } 
-      else if (isLargeFrame) {
-        finalVariationOptions = ["Frame Acrylic"];
-        defaultVariation = "Frame Acrylic";
-      }
-    }
-  } else {
-    finalVariationOptions = [];
-    defaultVariation = "";
-  }
+      // Generate variation display dari backend optionsResolved
+      const { variation, variationOptions } = await generateVariationFromOptions(
+        item.id,
+        item.options || {},
+        productData.optionsResolved
+      );
 
-  const mainCartItem: CartItem = {
-    ...rest,
-    cartId: uuidv4(),
-    name: finalProductName,
-    price: finalPrice,
-    quantity: rest.quantity || 1,
-    productType: "frame",
-    variation: defaultVariation,
-    variationOptions: finalVariationOptions,
-    image: rest.imageUrl,
-    attributes: {
-      frameSize: frameSize,
-      shadingStyle: shadingStyle,
-      isAcrylicStand: isAcrylicStand,
-      selectedAcrylicOption: selectedAcrylicOption,
-      is8RProduct: is8RProduct,
-      packagingPriceMap: packagingPriceMap,
-      isAdditionalProduct: isAdditionalProduct,
-      additionalType: isKarikaturProduct ? "wajah_karikatur" :
-                    isManyFacesProduct ? "wajah_banyak" :
-                    isExpressProduct ? "ekspress" :
-                    isAcrylicChangeProduct ? "acrylic_change" :
-                    isAcrylicStand ? "acrylic_stand" : ""
+      const mainCartItem: CartItem = {
+        ...item,
+        cartId: uuidv4(),
+        quantity: item.quantity || 1,
+        image: item.imageUrl,
+        options: item.options || {},
+        optionsResolved: productData.optionsResolved, // Use fresh data dari backend
+        variation,
+        variationOptions,
+      };
+
+      console.log("🛒 Cart item created:", mainCartItem);
+
+      setCart((prev) => [...prev, mainCartItem]);
+    } catch (error) {
+      console.error("❌ Failed to add to cart:", error);
+      
+      // Fallback: tambahkan tanpa variation processing
+      const fallbackItem: CartItem = {
+        ...item,
+        cartId: uuidv4(),
+        quantity: item.quantity || 1,
+        image: item.imageUrl,
+        variation: "",
+        variationOptions: [],
+      };
+      setCart((prev) => [...prev, fallbackItem]);
     }
   };
-
-  setCart((prev) => [...prev, mainCartItem]);
-};
 
   const updateQuantity = (cartId: string, delta: number) => {
     setCart((prev) =>
@@ -341,143 +155,34 @@ if (hasVariations()) {
     );
   };
 
-const updateItemVariant = (cartId: string, newVariation: string) => {
-  setCart((prev) =>
-    prev.map((p) => {
-      if (p.cartId !== cartId) return p;
-      
-      if (!p.variationOptions || p.variationOptions.length === 0) {
-        return p;
-      }
-      
-      const updated = { ...p, variation: newVariation };
+  const updateItemVariant = async (cartId: string, newVariation: string) => {
+    console.log("🔄 Updating variation:", { cartId, newVariation });
 
-      // 1. Produk 8R dengan Packaging - NAMA BERUBAH
-      if (p.attributes?.is8RProduct && p.attributes?.packagingPriceMap) {
-        updated.price = p.attributes.packagingPriceMap[newVariation] || p.price;
-        // Untuk 8R, update nama berdasarkan variasi
-        const baseName = p.name.replace(/\(.*\)/g, "").trim(); // Hapus keterangan sebelumnya
-        updated.name = `${baseName} (${newVariation})`;
-        return updated;
-      }
-      
-      // 2. Additional Wajah Karikatur - NAMA TIDAK BERUBAH
-      if (p.name.toLowerCase().includes("wajah karikatur")) {
-        const key = newVariation.includes("10") || newVariation.toLowerCase().includes("atas")
-          ? "Tambahan Wajah Karikatur diatas 10 wajah"
-          : "Tambahan Wajah Karikatur 1-9 wajah";
-        updated.price = priceList.Additional[key] || p.price;
-        return updated;
-      }
-      
-      // 3. Additional Ganti Frame Kaca ke Acrylic - NAMA TIDAK BERUBAH
-      if (p.name.toLowerCase().includes("ganti frame kaca ke acrylic")) {
-        const key = `Biaya Tambahan Ganti Frame Kaca ke Acrylic ${newVariation}`;
-        updated.price = priceList.Additional[key] || p.price;
-        return updated;
-      }
-      
-      // 4. Additional Ekspress General - NAMA TIDAK BERUBAH
-      if (p.name.toLowerCase().includes("ekspress general")) {
-        let key = "Biaya Ekspress General";
-        if (newVariation === "Option 2") key = "Biaya Ekspress General 2";
-        if (newVariation === "Option 3") key = "Biaya Ekspress General 3";
-        
-        updated.price = priceList.Additional[key] || p.price;
-        return updated;
-      }
-      
-      // 5. Additional Wajah Banyak - NAMA TIDAK BERUBAH
-      if (p.name.toLowerCase().includes("wajah banyak")) {
-        const key = newVariation.includes("10") || newVariation.toLowerCase().includes("atas")
-          ? "Biaya Tambahan Wajah Banyak diatas 10 wajah"
-          : "Biaya Tambahan Wajah Banyak 1-9 wajah";
-        updated.price = priceList.Additional[key] || p.price;
-        return updated;
-      }
-      
-      // 6. Acrylic Stand - NAMA TIDAK BERUBAH
-      if (p.attributes?.isAcrylicStand) {
-        const acrylicPriceMap: Record<string, number> = {
-          "15x15cm 1 sisi": priceList["Acrylic Stand"]?.["Acrylic Stand 3mm size 15x15cm 1 sisi"] || 324800,
-          "A4 2 sisi": priceList["Acrylic Stand"]?.["Acrylic Stand 3mm size A4 2 sisi"] || 455800,
-          "A3 2 sisi": priceList["Acrylic Stand"]?.["Acrylic Stand 3mm size A3 2 sisi"] || 595800,
-        };
-        
-        updated.price = acrylicPriceMap[newVariation] || p.price;
-        return updated;
-      }
-      
-// 7. 2D Frame - NAMA BERUBAH (sesuai kebutuhan shading)
-if (p.attributes?.frameSize && p.name.toLowerCase().includes("2d")) {
-  const twoDPrices = Object.fromEntries(
-    Object.entries(priceList["2D frame"]).map(([k, v]) => [k.toLowerCase(), v])
-  );
-  
-  const frameSize = p.attributes.frameSize.toLowerCase();
-  
-  // PERBAIKAN: Handle semua jenis shading style
-  let shadingStyle = newVariation.toLowerCase();
-  if (shadingStyle.includes("simple")) {
-    shadingStyle = "simple shading";
-  } else if (shadingStyle.includes("bold")) {
-    shadingStyle = "bold shading";
-  } else if (shadingStyle.includes("background")) {
-    shadingStyle = "background catalog";
-  } else if (shadingStyle.includes("ai") || shadingStyle.includes("by ai")) {
-    shadingStyle = "by ai";
-  } else {
-    shadingStyle = "simple shading";
-  }
-  
-  let key = `${frameSize} ${shadingStyle}`.trim();
-  if (!twoDPrices[key] && frameSize) {
-    key = `${frameSize} simple shading`;
-  }
-  
-  updated.price = twoDPrices[key] || p.price;
-  
-  // PERBAIKAN: Format nama tanpa "2d" di shading style
-  let displayShading = newVariation
-    .replace(/^2d\s+/i, "")
-    .replace(/2d/gi, "")
-    .trim();
-  
-  updated.name = `2D Frame ${frameSize.toUpperCase()} ${displayShading}`;
-  
-  return updated;
-}
-      
-      // 8. Frame Kaca/Acrylic Reguler - NAMA TIDAK BERUBAH
-      if (p.name.toLowerCase().includes("frame") && !p.attributes?.isAcrylicStand) {
-        const productKey = p.name.toLowerCase();
-        const priceKeys = Object.keys(priceList).filter(key => 
-          productKey.includes(key.toLowerCase())
-        );
-        
-        if (priceKeys.length > 0) {
-          const mainKey = priceKeys[0];
-          const variantKey = newVariation.includes("Acrylic") ? "Acrylic" : "Kaca";
-          
-          const priceEntries = Object.entries(priceList[mainKey] || {});
-          
-          const matchingPrice = priceEntries.find(([key]) => 
-            key.toLowerCase().includes(variantKey.toLowerCase())
-          );
-          
-          if (matchingPrice) {
-            updated.price = matchingPrice[1];
-          }
+    setCart((prev) =>
+      prev.map((item) => {
+        if (item.cartId !== cartId) return item;
+        if (item.productType === "shipping") {
+          return { ...item, variation: newVariation };
         }
-        
-        // NAMA TIDAK DIRUBAH! Hanya update variasi dan harga
-        return updated;
-      }
 
-      return updated;
-    })
-  );
-};
+        console.log("🔄 Current item:", item);
+
+        // Update variation display
+        const updated = { ...item, variation: newVariation };
+
+        // Calculate new price via backend
+        calculateNewPrice(item, newVariation).then(newPrice => {
+          setCart((prev) =>
+            prev.map((p) =>
+              p.cartId === cartId ? { ...p, price: newPrice } : p
+            )
+          );
+        });
+
+        return updated;
+      })
+    );
+  };
 
   return (
     <CartContext.Provider
@@ -502,3 +207,269 @@ export const useCart = () => {
   if (!context) throw new Error("useCart must be used inside CartProvider");
   return context;
 };
+
+// ===== HELPER FUNCTIONS - BACKEND SYNC =====
+
+/**
+ * Generate variation display dan list dari options yang dipilih user
+ * Menggunakan optionsResolved dari backend (sudah merge dengan admin config)
+ */
+async function generateVariationFromOptions(
+  productId: string,
+  options: Record<string, string>,
+  optionsResolved?: CartItem["optionsResolved"]
+): Promise<{ variation: string; variationOptions: string[] }> {
+  
+  if (!optionsResolved?.groups || optionsResolved.groups.length === 0) {
+    console.log("⚠️ No optionsResolved groups, returning empty variations");
+    return { variation: "", variationOptions: [] };
+  }
+
+  console.log("📋 Generating variations from options:", { 
+    productId, 
+    options, 
+    groups: optionsResolved.groups.map(g => g.id)
+  });
+
+  // Cari group yang paling relevan untuk dijadikan variation display
+  // Priority: shading > frame > packaging > size > stand_type > face_count > acrylic_size > express_level > option
+  const priorityOrder = [
+    "shading",      // 2D Frame
+    "frame",        // Frame Kaca/Acrylic
+    "packaging",    // 3D Frame 8R
+    "size",         // Generic size
+    "stand_type",   // Acrylic Stand
+    "face_count",   // Additional Wajah
+    "acrylic_size", // Additional Acrylic
+    "express_level" // Additional Express
+  ];
+  
+  let mainGroup = null;
+  
+  // Cari berdasarkan priority
+  for (const priority of priorityOrder) {
+    mainGroup = optionsResolved.groups.find(g => g.id === priority);
+    if (mainGroup) {
+      console.log(`✅ Found priority group: ${priority}`);
+      break;
+    }
+  }
+
+  // Fallback: ambil group pertama yang ada options
+  if (!mainGroup) {
+    mainGroup = optionsResolved.groups.find(g => g.options && g.options.length > 0);
+    console.log(`⚠️ Using fallback group: ${mainGroup?.id}`);
+  }
+
+  if (!mainGroup) {
+    console.log("❌ No valid group found");
+    return { variation: "", variationOptions: [] };
+  }
+
+  // Filter hanya options yang active
+  const activeOptions = mainGroup.options.filter(opt => opt.active !== false);
+
+  if (activeOptions.length === 0) {
+    console.log("❌ No active options in main group");
+    return { variation: "", variationOptions: [] };
+  }
+
+  const selectedValue = options[mainGroup.id];
+  console.log(`🔍 Looking for selected value: ${selectedValue} in group: ${mainGroup.id}`);
+
+  // Cari option yang dipilih
+  const selectedOption = activeOptions.find(opt => opt.value === selectedValue);
+
+  // Get variation display (label dari option yang dipilih)
+  let variation = "";
+  if (selectedOption) {
+    if (typeof selectedOption.label === 'object') {
+      variation = selectedOption.label['id'] || selectedOption.label['en'] || selectedOption.value;
+    } else {
+      variation = selectedOption.label || selectedOption.value;
+    }
+  } else {
+    // Fallback ke option pertama
+    const firstOption = activeOptions[0];
+    if (typeof firstOption.label === 'object') {
+      variation = firstOption.label['id'] || firstOption.label['en'] || firstOption.value;
+    } else {
+      variation = firstOption.label || firstOption.value;
+    }
+  }
+
+  // Get all variation options (semua label dari group ini, hanya yang active)
+  const variationOptions = activeOptions.map(opt => {
+    if (typeof opt.label === 'object') {
+      return opt.label['id'] || opt.label['en'] || opt.value;
+    }
+    return opt.label || opt.value;
+  });
+
+  console.log("✅ Generated variations:", { variation, variationOptions });
+
+  return { variation, variationOptions };
+}
+
+/**
+ * Calculate price ketika variation berubah
+ * Menggunakan backend API untuk consistency
+ */
+async function calculateNewPrice(
+  item: CartItem,
+  newVariation: string
+): Promise<number> {
+  console.log("💰 Calculating new price:", { item, newVariation });
+
+  // Untuk shipping, tidak ada price change
+  if (item.productType === "shipping") {
+    return item.price;
+  }
+
+  // Jika tidak ada optionsResolved, kembalikan harga saat ini
+  if (!item.optionsResolved?.groups) {
+    console.log("⚠️ No optionsResolved, keeping current price");
+    return item.price;
+  }
+
+  try {
+    // Map variation display kembali ke option value
+    const newOptions = mapVariationToOptions(item, newVariation);
+
+    if (!newOptions) {
+      console.log("⚠️ Could not map variation to options, keeping current price");
+      return item.price;
+    }
+
+    console.log("💰 New options for price calculation:", newOptions);
+
+    // Call backend API untuk calculate price
+    const response = await apiFetch("/api/products/calculate-price", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productId: item.id,
+        options: newOptions
+      })
+    });
+
+    if (!response.ok) {
+      console.error(`❌ Price calculation API failed: ${response.status}`);
+      return item.price;
+    }
+
+    const data = await response.json();
+    console.log("💰 Price calculation result:", data);
+
+    return typeof data.price === 'number' ? data.price : item.price;
+
+  } catch (error) {
+    console.error("❌ Price calculation error:", error);
+    return item.price; // Fallback ke harga sekarang
+  }
+}
+
+/**
+ * Map variation display (yang ditampilkan di dropdown) kembali ke option value
+ * untuk dikirim ke backend
+ */
+function mapVariationToOptions(
+  item: CartItem,
+  newVariation: string
+): Record<string, string> | null {
+  
+  if (!item.optionsResolved?.groups || !item.options) {
+    return null;
+  }
+
+  const updatedOptions = { ...item.options };
+  let found = false;
+
+  console.log("🔄 Mapping variation to options:", { newVariation, currentOptions: item.options });
+
+  // Cari group mana yang variation-nya berubah
+  for (const group of item.optionsResolved.groups) {
+    // Filter hanya active options
+    const activeOptions = group.options.filter(opt => opt.active !== false);
+
+    const matchingOption = activeOptions.find(opt => {
+      const label = typeof opt.label === 'object'
+        ? opt.label['id'] || opt.label['en']
+        : opt.label;
+      
+      // Match by label atau value
+      return label === newVariation || opt.value === newVariation;
+    });
+
+    if (matchingOption) {
+      // Update option value untuk group ini
+      updatedOptions[group.id] = matchingOption.value;
+      found = true;
+      
+      console.log(`✅ Mapped variation "${newVariation}" to option:`, {
+        groupId: group.id,
+        value: matchingOption.value
+      });
+      break;
+    }
+  }
+
+  if (!found) {
+    console.log(`⚠️ Could not find matching option for variation: ${newVariation}`);
+    return item.options; // Return original options
+  }
+
+  return updatedOptions;
+}
+
+/**
+ * Get user-friendly label untuk variation
+ */
+export function getVariationLabel(
+  item: CartItem,
+  lang: string = 'id'
+): string {
+  if (!item.variation) return "";
+  
+  if (!item.optionsResolved?.groups) return item.variation;
+
+  // Cari option yang match dengan variation saat ini
+  for (const group of item.optionsResolved.groups) {
+    const option = group.options.find(opt => {
+      const label = typeof opt.label === 'object'
+        ? opt.label[lang] || opt.label['en']
+        : opt.label;
+      return label === item.variation || opt.value === item.variation;
+    });
+
+    if (option) {
+      return typeof option.label === 'object'
+        ? option.label[lang] || option.label['en'] || option.value
+        : option.label || option.value;
+    }
+  }
+
+  return item.variation;
+}
+
+/**
+ * Debug helper: Print cart item structure
+ */
+export function debugCartItem(item: CartItem): void {
+  console.group(`🛒 Cart Item: ${item.name}`);
+  console.log("ID:", item.id);
+  console.log("Variation:", item.variation);
+  console.log("Variation Options:", item.variationOptions);
+  console.log("Selected Options:", item.options);
+  console.log("Price:", item.price);
+  console.log("Has optionsResolved:", !!item.optionsResolved);
+  if (item.optionsResolved) {
+    console.log("Groups:", item.optionsResolved.groups.map(g => ({
+      id: g.id,
+      type: g.type,
+      activeOptions: g.options.filter(o => o.active !== false).length,
+      totalOptions: g.options.length
+    })));
+  }
+  console.groupEnd();
+}

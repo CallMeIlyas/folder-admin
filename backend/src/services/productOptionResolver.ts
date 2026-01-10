@@ -34,7 +34,8 @@ const mergeGroupsWithAdmin = (defaultGroups, adminGroups, priceMap = {}) => {
         ...defaultGroup,
         options: defaultGroup.options.map(opt => ({
           ...opt,
-          price: getPriceWithFallback(opt.value, priceMap, opt.price)
+          price: getPriceWithFallback(opt.value, priceMap, opt.price),
+          priceMode: opt.priceMode || "override"
         }))
       };
     }
@@ -59,10 +60,15 @@ const mergeGroupsWithAdmin = (defaultGroups, adminGroups, priceMap = {}) => {
         // Merge preview
         const preview = adminItem.preview || defaultOption?.preview;
 
-        // Tentukan price: admin price -> priceMap lookup -> default price
-        const price = adminItem.price !== undefined 
-          ? adminItem.price 
-          : getPriceWithFallback(adminItem.value, priceMap, defaultOption?.price);
+        // Tentukan price: admin price -> admin systemPrice -> priceMap lookup -> default price
+        let price;
+        if (adminItem.price !== undefined) {
+          price = adminItem.price;
+        } else if (adminItem.systemPrice !== undefined) {
+          price = adminItem.systemPrice; // TAMBAHKAN INI
+        } else {
+          price = getPriceWithFallback(adminItem.value, priceMap, defaultOption?.price || 0);
+        }
 
         // Merge priceMode
         const priceMode = adminItem.priceMode || defaultOption?.priceMode || "override";
@@ -74,7 +80,7 @@ const mergeGroupsWithAdmin = (defaultGroups, adminGroups, priceMap = {}) => {
           preview,
           price,
           priceMode,
-          active: adminItem.active
+          active: adminItem.active !== false
         };
       });
 
@@ -91,90 +97,87 @@ const mergeGroupsWithAdmin = (defaultGroups, adminGroups, priceMap = {}) => {
       defaultValue: getDefaultValueWithFallback(adminGroup, defaultGroup),
       options: defaultGroup.options.map(opt => ({
         ...opt,
-        price: getPriceWithFallback(opt.value, priceMap, opt.price)
+        price: getPriceWithFallback(opt.value, priceMap, opt.price || 0),
+        priceMode: opt.priceMode || "override"
       }))
     };
   });
 };
 
+// Modifikasi resolveProductOptions untuk 2D Frame
 export const resolveProductOptions = (product) => {
   const adminConfig = loadProductAdminConfig();
   const admin = adminConfig[product.id];
   const adminGroups = admin?.options?.groups || [];
 
-// ===============================
-// CATEGORY: 2D FRAME
-// ===============================
-if (product.category === "2D Frame") {
-  const sizeOptions = product.sizeFrameOptions || [];
-  const prices = priceList["2D frame"] || {}; // Tambahkan priceList untuk 2D
-  
-  const defaultGroups = [
-    {
-      id: "size",
-      type: "image",
-      label: { id: "Ukuran Frame", en: "Frame Size" },
-      defaultValue: sizeOptions[0]?.label,
-      options: sizeOptions.map(o => ({
-        value: o.label,
-        label: { id: o.label, en: o.label },
-        image: o.image,
-        // Tambahkan price dari priceList jika ada
-        price: prices[o.label] || 0,
-        priceMode: "override"
-      }))
-    },
-    {
-      id: "shading",
-      type: "image",
-      label: { id: "Gaya Shading", en: "Shading Style" },
-      defaultValue: "simple shading",
-      options: [
-        {
-          value: "simple shading",
-          label: { id: "Simple Shading", en: "Simple Shading" },
-          image: "/api/uploads/images/list-products/2D/variation/shading/2D SIMPLE SHADING/2D SIMPLE SHADING.jpg",
-          price: 0, // Shading tidak ada biaya tambahan
+  // ===============================
+  // CATEGORY: 2D FRAME
+  // ===============================
+  if (product.category === "2D Frame") {
+    const sizeOptions = product.sizeFrameOptions || [];
+    const prices = priceList["2D frame"] || {};
+    
+    const defaultGroups = [
+      {
+        id: "size",
+        type: "image",
+        label: { id: "Ukuran Frame", en: "Frame Size" },
+        defaultValue: product.name,  // ← GUNAKAN product.name SEBAGAI DEFAULT (misal "6R")
+        options: sizeOptions.map(o => ({
+          value: o.label,
+          label: { id: o.label, en: o.label },
+          image: o.image,
+          price: 0, // SELALU 0 untuk 2D Frame size options
           priceMode: "override"
-        },
-        {
-          value: "background catalog",
-          label: { id: "Background Catalog", en: "Background Catalog" },
-          image: "/api/uploads/images/list-products/2D/variation/shading/2D BACKGROUND CATALOG/1.jpg",
-          price: 0,
-          priceMode: "override"
-        },
-        {
-          value: "bold shading",
-          label: { id: "Bold Shading", en: "Bold Shading" },
-          image: "/api/uploads/images/list-products/2D/variation/shading/2D BOLD SHADING/2D BOLD SHADING.jpg",
-          price: 0,
-          priceMode: "override"
-        },
-        {
-          value: "ai",
-          label: { id: "AI", en: "AI" },
-          image: "/api/uploads/images/list-products/2D/variation/shading/2D BY AI/1.jpg",
-          price: 0,
-          priceMode: "override"
-        }
-      ]
-    }
-  ];
+        }))
+      },
+      {
+        id: "shading",
+        type: "image",
+        label: { id: "Gaya Shading", en: "Shading Style" },
+        defaultValue: "simple shading",
+        options: [
+          {
+            value: "simple shading",
+            label: { id: "Simple Shading", en: "Simple Shading" },
+            image: "/api/uploads/images/list-products/2D/variation/shading/2D SIMPLE SHADING/2D SIMPLE SHADING.jpg",
+            price: product.price,
+            priceMode: "override"
+          },
+          {
+            value: "background catalog",
+            label: { id: "Background Catalog", en: "Background Catalog" },
+            image: "/api/uploads/images/list-products/2D/variation/shading/2D BACKGROUND CATALOG/1.jpg",
+            price: product.price + 50000,
+            priceMode: "override"
+          },
+          {
+            value: "bold shading",
+            label: { id: "Bold Shading", en: "Bold Shading" },
+            image: "/api/uploads/images/list-products/2D/variation/shading/2D BOLD SHADING/2D BOLD SHADING.jpg",
+            price: product.price + 20000,
+            priceMode: "override"
+          },
+          {
+            value: "ai",
+            label: { id: "AI", en: "AI" },
+            image: "/api/uploads/images/list-products/2D/variation/shading/2D BY AI/1.jpg",
+            price: product.price - 20000,
+            priceMode: "override"
+          }
+        ]
+      }
+    ];
 
-  const mergedGroups = mergeGroupsWithAdmin(defaultGroups, adminGroups, prices);
+    const mergedGroups = mergeGroupsWithAdmin(defaultGroups, adminGroups, prices);
 
-  // Hitung basePrice: product.price + harga size pertama yang aktif
-  const sizeGroup = mergedGroups.find(g => g.id === "size");
-  const activeSizePrice = sizeGroup?.options?.find(opt => 
-    opt.value === sizeGroup.defaultValue
-  )?.price || 0;
-
-  return {
-    basePrice: product.price + activeSizePrice,
-    groups: mergedGroups
-  };
-}
+    // Untuk 2D Frame, basePrice SELALU product.price
+    // Size options tidak mempengaruhi basePrice
+    return {
+      basePrice: product.price,  // ← FIX: HANYA product.price
+      groups: mergedGroups
+    };
+  }
 
   // ===============================
   // CATEGORY: ADDITIONAL
@@ -183,7 +186,6 @@ if (product.category === "2D Frame") {
     const prices = priceList["Additional"] || {};
     const name = product.name.toLowerCase();
 
-    // 1. WAJAH KARIKATUR
     if (name.includes("wajah")) {
       const defaultGroups = [
         {
@@ -214,7 +216,6 @@ if (product.category === "2D Frame") {
       };
     }
 
-    // 2. GANTI FRAME KACA KE ACRYLIC
     if (name.includes("ganti frame") || name.includes("acrylic")) {
       const defaultGroups = [
         {
@@ -250,7 +251,6 @@ if (product.category === "2D Frame") {
       };
     }
 
-    // 3. EKSPRESS GENERAL
     if (name.includes("biaya ekspress general") || name.includes("biaya express general")) {
       const defaultGroups = [
         {
@@ -283,6 +283,28 @@ if (product.category === "2D Frame") {
       return {
         basePrice: 0,
         groups: mergedGroups
+      };
+    }
+
+    // Fallback untuk Additional lainnya
+    if (adminGroups.length > 0) {
+      return {
+        basePrice: admin?.price ?? product.price ?? 0,
+        groups: adminGroups.map(g => ({
+          id: g.id,
+          type: g.type || "text",
+          label: g.label || { en: g.id, id: g.id },
+          defaultValue: g.defaultValue || g.items?.[0]?.value,
+          options: (g.items || []).map(item => ({
+            value: item.value,
+            label: item.label || { en: item.value, id: item.value },
+            image: item.image,
+            preview: item.preview,
+            price: item.price ?? 0,
+            priceMode: item.priceMode || "override",
+            active: item.active !== false
+          }))
+        }))
       };
     }
 
@@ -320,13 +342,33 @@ if (product.category === "2D Frame") {
 
       const mergedGroups = mergeGroupsWithAdmin(defaultGroups, adminGroups, prices);
       
-      // Base price diambil dari harga pertama yang aktif
       const basePriceOption = mergedGroups[0]?.options?.[0];
       const basePrice = basePriceOption?.price || prices["8R duskraft"] || 0;
 
       return {
         basePrice,
         groups: mergedGroups
+      };
+    }
+
+    if (adminGroups.length > 0) {
+      return {
+        basePrice: admin?.price ?? product.price ?? 0,
+        groups: adminGroups.map(g => ({
+          id: g.id,
+          type: g.type || "text",
+          label: g.label || { en: g.id, id: g.id },
+          defaultValue: g.defaultValue || g.items?.[0]?.value,
+          options: (g.items || []).map(item => ({
+            value: item.value,
+            label: item.label || { en: item.value, id: item.value },
+            image: item.image,
+            preview: item.preview,
+            price: item.price ?? 0,
+            priceMode: item.priceMode || "override",
+            active: item.active !== false
+          }))
+        }))
       };
     }
 
@@ -375,8 +417,55 @@ if (product.category === "2D Frame") {
       };
     }
 
+    // Fallback untuk Acrylic Stand lainnya
+    if (adminGroups.length > 0) {
+      return {
+        basePrice: admin?.price ?? product.price ?? 0,
+        groups: adminGroups.map(g => ({
+          id: g.id,
+          type: g.type || "text",
+          label: g.label || { en: g.id, id: g.id },
+          defaultValue: g.defaultValue || g.items?.[0]?.value,
+          options: (g.items || []).map(item => ({
+            value: item.value,
+            label: item.label || { en: item.value, id: item.value },
+            image: item.image,
+            preview: item.preview,
+            price: item.price ?? 0,
+            priceMode: item.priceMode || "override",
+            active: item.active !== false
+          }))
+        }))
+      };
+    }
+
     return null;
   }
 
+  // ===============================
+  // FALLBACK GLOBAL: KATEGORI APAPUN YANG PUNYA ADMIN OPTIONS
+  // ===============================
+  if (adminGroups.length > 0) {
+    return {
+      basePrice: admin?.price ?? product.price ?? 0,
+      groups: adminGroups.map(g => ({
+        id: g.id,
+        type: g.type || "text",
+        label: g.label || { en: g.id, id: g.id },
+        defaultValue: g.defaultValue || g.items?.[0]?.value,
+        options: (g.items || []).map(item => ({
+          value: item.value,
+          label: item.label || { en: item.value, id: item.value },
+          image: item.image,
+          preview: item.preview,
+          price: item.price ?? 0,
+          priceMode: item.priceMode || "override",
+          active: item.active !== false
+        }))
+      }))
+    };
+  }
+
+  // Benar-benar tidak ada options
   return null;
 };

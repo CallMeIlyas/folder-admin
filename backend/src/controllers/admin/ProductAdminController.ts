@@ -135,68 +135,81 @@ export const updateProductAdminConfig = (req: Request, res: Response) => {
 
   const config = loadProductAdminConfig()
 
-config[id] = {
-  ...(config[id] || {}),
-  
-    active:
-  payload.active ??
-  config[id]?.active ??
-  true,
+  // ✅ NORMALIZE OPTIONS: ENSURE priceMode EXISTS
+  const normalizedOptions = payload.options ? {
+    groups: payload.options.groups?.map(g => ({
+      ...g,
+      items: g.items?.map(item => ({
+        ...item,
+        priceMode: item.priceMode || "override", // ✅ DEFAULT
+        active: item.active !== false // ✅ DEFAULT TRUE
+      }))
+    }))
+  } : config[id]?.options
 
-  displayNameOverride:
-    payload.displayNameOverride ??
-    config[id]?.displayNameOverride,
+  config[id] = {
+    ...(config[id] || {}),
     
+    active:
+      payload.active ??
+      config[id]?.active ??
+      true,
 
-  description:
-    payload.description ??
-    config[id]?.description,
+    displayNameOverride:
+      payload.displayNameOverride ??
+      config[id]?.displayNameOverride,
+      
+    description:
+      payload.description ??
+      config[id]?.description,
 
-  price:
-    payload.price ??
-    config[id]?.price,
+    price:
+      payload.price ??
+      config[id]?.price,
 
-  shippedFrom:
-    payload.shippedFrom ??
-    config[id]?.shippedFrom,
+    shippedFrom:
+      payload.shippedFrom ??
+      config[id]?.shippedFrom,
 
-  shippedTo:
-    payload.shippedTo ??
-    config[id]?.shippedTo,
+    shippedTo:
+      payload.shippedTo ??
+      config[id]?.shippedTo,
 
-  frames: {
-    ...(config[id]?.frames || {}),
-    ...(payload.frames || {})
-  },
+    frames: {
+      ...(config[id]?.frames || {}),
+      ...(payload.frames || {})
+    },
+    
+    bestSelling: {
+      enabled:
+        payload.bestSelling?.enabled ??
+        config[id]?.bestSelling?.enabled ??
+        false,
+    
+      label: {
+        en:
+          payload.bestSelling?.label?.en ??
+          config[id]?.bestSelling?.label?.en ??
+          "",
+    
+        id:
+          payload.bestSelling?.label?.id ??
+          config[id]?.bestSelling?.label?.id ??
+          ""
+      }
+    },
+    
+    mainImageIndex:
+      payload.mainImageIndex ??
+      config[id]?.mainImageIndex,
+
+    options: normalizedOptions, // ✅ GUNAKAN NORMALIZED
+  }
   
-  bestSelling: {
-    enabled:
-      payload.bestSelling?.enabled ??
-      config[id]?.bestSelling?.enabled ??
-      false,
-  
-    label: {
-      en:
-        payload.bestSelling?.label?.en ??
-        config[id]?.bestSelling?.label?.en ??
-        "",
-  
-      id:
-        payload.bestSelling?.label?.id ??
-        config[id]?.bestSelling?.label?.id ??
-        ""
-    }
-  },
-  
-  mainImageIndex:
-    payload.mainImageIndex ??
-    config[id]?.mainImageIndex,
-
-  options: payload.options ?? config[id]?.options,
-}
   saveConfig(config)
   res.json({ success: true })
 }
+
 
 // ================= DETAIL =================
 export const getProductAdminById = (req: Request, res: Response) => {
@@ -246,7 +259,6 @@ res.json({
 
   optionsResolved,
 
-
   displayName:
     admin.displayNameOverride?.trim()
       ? admin.displayNameOverride
@@ -255,31 +267,20 @@ res.json({
   description: descriptionText,
 
   admin: {
-  active: admin.active ?? true,
-  showInGallery: admin.showInGallery ?? true,
-
-  hasOptions: !!optionsResolved,
-
-  frames: admin.frames ?? defaultFrameState,
-  mainImageIndex: admin.mainImageIndex ?? 0,
-
-  shippedFrom:
-    admin.shippedFrom ??
-    product.admin.shippedFrom ??
-    ["Bogor", "Jakarta"],
-
-  shippedTo:
-    admin.shippedTo ??
-    product.admin.shippedTo ??
-    ["Worldwide"],
-
-  displayNameOverride: admin.displayNameOverride ?? "",
-
-  bestSelling:
-    admin.bestSelling ?? {
+    active: admin.active ?? true,
+    showInGallery: admin.showInGallery ?? true,
+    hasOptions: !!optionsResolved,
+    frames: admin.frames ?? defaultFrameState,
+    mainImageIndex: admin.mainImageIndex ?? 0,
+    shippedFrom: admin.shippedFrom ?? product.admin.shippedFrom ?? ["Bogor", "Jakarta"],
+    shippedTo: admin.shippedTo ?? product.admin.shippedTo ?? ["Worldwide"],
+    displayNameOverride: admin.displayNameOverride ?? "",
+    bestSelling: admin.bestSelling ?? {
       enabled: false,
       label: { en: "", id: "" }
-    }
-}
+    },
+    
+    options: admin.options ?? null
+  }
 })
 }

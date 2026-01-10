@@ -226,12 +226,54 @@ const syncOptions = (resolvedGroups, adminGroups = []) => {
   })
 }
 
-setAdminOptions(
-  syncOptions(
-    data.optionsResolved?.groups || [],
-    data.admin?.options?.groups || []
+const resolveAdminOptions = (
+  resolvedGroups = [],
+  adminGroups = []
+) => {
+  // 1. Kalau admin sudah punya options, PAKAI ADMIN FULL
+  if (adminGroups.length > 0) {
+    return adminGroups.map(g => ({
+      ...g,
+      items: g.items.map(i => ({
+        ...i,
+        active: i.active !== false
+      }))
+    }))
+  }
+
+  // 2. Kalau belum ada admin options, fallback ke resolved
+  return resolvedGroups.map(rg => ({
+    id: rg.id,
+    type: rg.type,
+    label: rg.label,
+    items: rg.options.map(opt => ({
+      value: opt.value,
+      label: opt.label,
+      image: opt.image,
+      systemPrice: opt.price,
+      active: opt.active ?? true
+    }))
+  }))
+}
+
+if (data.admin?.options?.groups?.length) {
+  setAdminOptions(data.admin.options.groups)
+} else if (data.optionsResolved?.groups?.length) {
+  setAdminOptions(
+    data.optionsResolved.groups.map(g => ({
+      id: g.id,
+      type: g.type,
+      label: g.label,
+      items: g.options.map(opt => ({
+        value: opt.value,
+        label: opt.label,
+        image: opt.image,
+        systemPrice: opt.price,
+        active: true
+      }))
+    }))
   )
-)
+}
   
   
 setFormData({  
@@ -318,9 +360,16 @@ body: JSON.stringify({
   frames: formData.frames,  
   bestSelling,
   options: {  
-  groups: adminOptions
+    groups: adminOptions.map(g => ({
+      ...g,
+      items: g.items.map(item => ({
+        ...item,
+        priceMode: item.priceMode || "override", // ✅ WAJIB ADA
+        active: item.active !== false // ✅ NORMALIZE
+      }))
+    }))
   }  
-})  
+})
       });  
         
       // Refresh data setelah simpan  
