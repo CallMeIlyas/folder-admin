@@ -7,9 +7,10 @@ export const mergeFooterPdf = async (
   currentPage: any,
   lastProductY: number,
   footerPdfPath: string,
-  total: number,
+  grandTotal: number,
   fonts: any,
-  productCount: number = 0
+  productCount: number = 0,
+  breakdown?: { productTotal: number; shippingTotal: number }
 ) => {
   const footerBytes = fs.readFileSync(
     path.isAbsolute(footerPdfPath)
@@ -24,6 +25,7 @@ export const mergeFooterPdf = async (
   let targetPage = currentPage
   let footerY
 
+  // If 4 or more products, footer goes to new page
   if (productCount >= 4) {
     targetPage = pdfDoc.addPage([595.28, 841.89])
     footerY = 841.89
@@ -33,6 +35,7 @@ export const mergeFooterPdf = async (
 
   const footerX = (595.28 - width) / 2
 
+  // Draw footer page
   targetPage.drawPage(footerPage, {
     x: footerX,
     y: footerY - height,
@@ -40,12 +43,19 @@ export const mergeFooterPdf = async (
     height
   })
 
-  targetPage.drawText(`Rp${total.toLocaleString("id-ID")}`, {
+  console.log('=== FOOTER BREAKDOWN ===')
+  console.log('Product Total:', breakdown?.productTotal)
+  console.log('Shipping Total:', breakdown?.shippingTotal)
+  console.log('Grand Total:', grandTotal)
+
+  // HANYA TAMPILKAN GRAND TOTAL (MERAH)
+  // Subtotal produk dan ongkos kirim dihapus
+  targetPage.drawText(`Rp${grandTotal.toLocaleString("id-ID")}`, {
     x: 405,
-    y: footerY - 68,
+    y: footerY - 74, // Posisi Y tetap sama
     size: 14,
     font: fonts.poppinsBold,
-    color: rgb(0.862, 0.149, 0.149)
+    color: rgb(0.862, 0.149, 0.149) // Warna merah
   })
 
   return {
